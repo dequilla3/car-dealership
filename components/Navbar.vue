@@ -1,6 +1,6 @@
 <template>
-  <b-navbar toggleable type="dark" variant="dark">
-    <b-navbar-brand href="#">DMS</b-navbar-brand>
+  <b-navbar toggleable type="dark" variant="dark" id="navbar-main">
+    <b-navbar-brand href="/dashboard">DMS</b-navbar-brand>
   </b-navbar>
 </template>
 
@@ -10,6 +10,6 @@
     }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 
 </style>

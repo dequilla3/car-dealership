@@ -1,15 +1,15 @@
 <template>
     <div>
-        <label>Home</label>
+        <Navbar/>
+        <SideBar/>
     </div>
 </template>
 
 <script>
     export default {
-        name: "HomePage"
+        name: "Dashboard"
     }
 </script>
 
-<style lang="scss" scoped>
-
+<style scoped>
 </style>
