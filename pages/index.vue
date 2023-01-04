@@ -1,7 +1,7 @@
 <template>
     <div class="container-custom">
         <div id="loginHeader">
-         <h3>Log In</h3>
+         <h3><img class="h-icon" src="../assets/key.png" /> Log In</h3>
         </div>
 
         <b-form @submit.prevent="userLogin">
@@ -71,6 +71,7 @@ export default {
         let localStorageUser = JSON.parse(window.localStorage.getItem("user"));
         console.log(localStorageUser.username);
         console.log(localStorageUser.pw)
+        
         this.$router.push({ path: "../dashboard" });
       }else{
         this.showAlert("Failed to Log In!","danger");
@@ -116,6 +117,7 @@ height: 30px;
 font-size: 13px;
 padding: 0;
 margin-bottom: 20px;;
+background: gray;
 }
 
 #input-group-1{
@@ -136,6 +138,11 @@ font-size: 13px;
 
 #alert-login-div{
  text-align: center;
+}
+
+.h-icon {
+    height: 100%;
+    width: 16%;
 }
 
 </style>

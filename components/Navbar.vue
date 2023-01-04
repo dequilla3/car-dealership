@@ -1,5 +1,5 @@
 <template>
-  <b-navbar toggleable type="dark" variant="dark" id="navbar-main">
+  <b-navbar fixed="top" toggleable type="dark" variant="dark" id="navbar-main">
     <b-navbar-brand href="/dashboard">DMS</b-navbar-brand>
   </b-navbar>
 </template>
@@ -11,5 +11,4 @@
 </script>
 
 <style scoped>
-
 </style>
