@@ -1,5 +1,5 @@
 <template>
-  <div class="container-custom">
+  <div class="container-custom" v-if="!isLoggedIn">
     <div id="loginHeader">
       <h3><img class="h-icon" src="../assets/key.png" /> Log In</h3>
     </div>
@@ -46,6 +46,7 @@
 export default {
   data() {
     return {
+      isLoggedIn: false,
       user: {
         username: "",
         pw: "",
@@ -62,6 +63,16 @@ export default {
       },
     };
   },
+  mounted() {
+    this.isLoggedIn = localStorage.isLoggedIn;
+    if (this.isLoggedIn) {
+      this.$router.push({ path: "/dashboard" });
+    } else {
+      this.$router.push({ path: "./" });
+    }
+  },
+
+  created() {},
 
   methods: {
     userLogin() {
@@ -69,7 +80,8 @@ export default {
         this.user.username == this.userMockdata.username &&
         this.user.pw == this.userMockdata.pw
       ) {
-        localStorage.setItem("token", this.userMockdata.id);
+        localStorage.isLoggedIn = true;
+        localStorage.userName = this.userMockdata.username;
         this.$router.push({ path: "../dashboard" });
       } else {
         this.showAlert("Failed to Log In!", "danger");

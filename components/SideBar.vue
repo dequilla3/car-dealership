@@ -1,6 +1,6 @@
 <template>
   <div class="sidenav">
-    <div class="sidebar-menus-parent" id="dashboard">
+    <div class="sidebar-menus-parent" id="dashboard" @click="setMenuActive(dashboardKey)">
       <a href="/dashboard">
         <img class="btn-icon" src="@/assets/dashboard.png" /> Dashboard</a
       >
@@ -11,14 +11,21 @@
       <button @click="dropDownTriggerAdmin()" class="dropdown-btn">
         <img class="btn-icon" src="@/assets/user.png" />
         Admin
-        <i :class="dropDownAdminIcon()" />
+        <i :class="dropDownAdminArrowIcon()" />
       </button>
+
       <!-- Admin dropdown menus -->
       <div class="sidebar-menus">
         <div :class="dropDownAdmin()">
-          <a v-for="adminMenu in adminMenus" :key="adminMenu.id" :href="adminMenu.href">
-            {{ adminMenu.title }}</a
+          <div
+            v-for="adminMenu in adminMenus"
+            :key="adminMenu.key"
+            class="sidebar-menus-list"
+            :class="{ active: adminMenu.active }"
+            @click="setMenuActive(adminMenu.key)"
           >
+            {{ adminMenu.title }}
+          </div>
         </div>
       </div>
     </div>
@@ -28,17 +35,20 @@
       <button @click="dropDownTriggerTransaction()" class="dropdown-btn">
         <img class="btn-icon" src="@/assets/transaction.png" />
         Transaction
-        <i :class="dropDownTransactionIcon()" />
+        <i :class="dropDownTransactionArrowIcon()" />
       </button>
       <!-- Transaction dropdown menus -->
       <div class="sidebar-menus">
         <div :class="dropDownTransaction()">
-          <a
+          <div
             v-for="transactionMenu in transactionMenus"
             :key="transactionMenu.id"
-            :href="transactionMenu.href"
-            >{{ transactionMenu.title }}</a
+            class="sidebar-menus-list"
+            :class="{ active: transactionMenu.active }"
+            @click="setMenuActive(transactionMenu.key)"
           >
+            {{ transactionMenu.title }}
+          </div>
         </div>
       </div>
     </div>
@@ -56,21 +66,30 @@ export default {
     return {
       isActiveTransaction: true,
       isActiveAdmin: true,
+      isDashboardActive: false,
+      dashboardKey: "dashboard",
+
       transactionMenus: [
         {
           id: 1,
           title: "Quotation",
           href: "#quotation",
+          active: false,
+          key: "t1",
         },
         {
           id: 2,
           title: "Service",
           href: "#service",
+          active: false,
+          key: "t2",
         },
         {
           id: 3,
           title: "Cashier",
           href: "#cashier",
+          active: false,
+          key: "t3",
         },
       ],
 
@@ -78,32 +97,44 @@ export default {
         {
           id: 1,
           title: "Manage User",
-          href: "#manageUser",
+          href: "/admin/manageUser",
+          active: false,
+          key: "admin1",
         },
         {
           id: 2,
           title: "Manage Sales Person",
-          href: "#manageSalesPerson",
+          href: "/admin/manageSalesPerson",
+          active: false,
+          key: "admin2",
         },
         {
           id: 3,
           title: "Manage Mechanic",
           href: "#manageMechanic",
+          active: false,
+          key: "admin3",
         },
         {
           id: 4,
           title: "Manage Customer",
           href: "#manageCustomer",
+          active: false,
+          key: "admin4",
         },
         {
           id: 5,
           title: "Manage Goods",
           href: "#manageGoods",
+          active: false,
+          key: "admin5",
         },
         {
           id: 6,
           title: "Manage Services",
           href: "#manageServices",
+          active: false,
+          key: "admin6",
         },
       ],
     };
@@ -126,16 +157,59 @@ export default {
         : "dropdown-container-none";
     },
 
-    dropDownTransactionIcon() {
+    dropDownTransactionArrowIcon() {
       return this.isActiveTransaction ? "arrow down" : "arrow right";
     },
 
     dropDownAdmin() {
       return this.isActiveAdmin ? "dropdown-container-block" : "dropdown-container-none";
     },
-    dropDownAdminIcon() {
+    dropDownAdminArrowIcon() {
       return this.isActiveAdmin ? "arrow down" : "arrow right";
     },
+
+    setActiveMenus() {},
+
+    setMenuActive(menuKey) {
+      localStorage.activeMenuId = menuKey;
+      var path = "";
+
+      //update selected menu status to true
+      this.adminMenus.forEach(function (menu) {
+        if (menu.key == menuKey) {
+          menu.active = true;
+          path = menu.href;
+        } else {
+          menu.active = false;
+        }
+      });
+
+      this.transactionMenus.forEach(function (menu) {
+        if (menu.key == menuKey) {
+          menu.active = true;
+          path = menu.href;
+        } else {
+          menu.active = false;
+        }
+      });
+
+      this.$router.push({ path: path });
+    },
+
+    onClickMenu() {},
+  },
+
+  mounted() {
+    var menuKey = localStorage.activeMenuId;
+    //for admin menus
+    this.adminMenus.forEach(function (menu) {
+      menu.active = menu.key == menuKey;
+    });
+
+    //for transaction menus
+    this.transactionMenus.forEach(function (menu) {
+      menu.active = menu.key == menuKey;
+    });
   },
 
   created() {},
@@ -200,10 +274,24 @@ export default {
   font-size: 12.5px;
   padding-left: 30px;
 }
+.sidebar-menus-list {
+  padding: 6px 8px 6px 16px;
+  color: black;
+  display: block;
+  background: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  outline: none;
+}
+
+.sidebar-menus-list:hover {
+  background: gray;
+  color: white;
+}
 
 /* On mouse-over */
-.sidenav a:hover,
-.dropdown-btn:hover {
+.sidenav a:hover {
   background: gray;
   color: white;
 }
@@ -217,7 +305,7 @@ export default {
 
 /* Add an active class to the active dropdown button */
 .active {
-  background-color: green;
+  background: gray;
   color: white;
 }
 

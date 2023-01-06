@@ -1,11 +1,11 @@
 <template>
-  <div>
+  <div v-if="this.isLoggedIn">
     <Navbar />
     <SideBar />
     <div class="dashboard">
       <div><h6>Analytical view</h6></div>
       <hr />
-      <div class="dashboard-content">
+      <div class="dashboard-content-container">
         <div class="db-content" v-for="dbContent in dbContents" :key="dbContent.id">
           <p>{{ dbContent.title }}</p>
           <h1>
@@ -23,6 +23,7 @@ export default {
   name: "Dashboard",
   data() {
     return {
+      isLoggedIn: false,
       dbContents: [
         {
           id: 1,
@@ -43,7 +44,9 @@ export default {
     };
   },
   mounted() {
-    if (localStorage.token == undefined) {
+    this.isLoggedIn = localStorage.isLoggedIn;
+
+    if (!this.isLoggedIn) {
       this.$router.push({ path: "./" }); // LOG OUT IF NOT
     }
   },
@@ -58,7 +61,7 @@ export default {
 .dashboard {
   margin: 70px 10px 0 230px;
 }
-.dashboard-content {
+.dashboard-content-container {
   position: absolute;
   display: grid;
   grid-template-columns: repeat(6, 1fr);
@@ -84,19 +87,19 @@ p {
 }
 
 @media (max-width: 1800px) {
-  .dashboard-content {
+  .dashboard-content-container {
     grid-template-columns: repeat(3, 1fr);
   }
 }
 
 @media (max-width: 1500px) {
-  .dashboard-content {
+  .dashboard-content-container {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 780px) {
-  .dashboard-content {
+  .dashboard-content-container {
     grid-template-columns: repeat(1, 1fr);
   }
 }

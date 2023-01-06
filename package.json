@@ -1,6 +1,7 @@
 {
   "name": "car-dealership",
   "version": "1.0.0",
+  "author": "Kim Ariel Dequilla",
   "private": true,
   "scripts": {
     "dev": "nuxt",
