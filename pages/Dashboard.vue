@@ -47,7 +47,7 @@ export default {
     this.isLoggedIn = localStorage.isLoggedIn;
 
     if (!this.isLoggedIn) {
-      this.$router.push({ path: "./" }); // LOG OUT IF NOT
+      this.$router.push({ path: "/" }); // LOG OUT
     }
   },
 };
@@ -59,7 +59,7 @@ export default {
   font-family: "Poppins";
 }
 .dashboard {
-  margin: 70px 10px 0 230px;
+  margin: 80px 10px 0 280px;
 }
 .dashboard-content-container {
   position: absolute;

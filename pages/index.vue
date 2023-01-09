@@ -56,11 +56,18 @@ export default {
         variant: "success",
         message: "The username and / or password is Incorrect",
       },
-      userMockdata: {
-        id: 1,
-        username: "admin",
-        pw: "admin",
-      },
+      userMockdatas: [
+        {
+          id: 1,
+          username: "admin",
+          pw: "admin",
+        },
+        {
+          id: 2,
+          username: "useradmin",
+          pw: "12345",
+        },
+      ],
     };
   },
   mounted() {
@@ -76,18 +83,28 @@ export default {
 
   methods: {
     userLogin() {
-      if (
-        this.user.username == this.userMockdata.username &&
-        this.user.pw == this.userMockdata.pw
-      ) {
+      var userName = this.user.username;
+      var passWord = this.user.pw;
+      var isUserFound = false;
+
+      //iterate user list
+      this.userMockdatas.forEach(function (el) {
+        if (userName === el.username && passWord === el.pw) {
+          //user found
+          isUserFound = true;
+        }
+      });
+
+      //proceed to dashboard if true
+      if (isUserFound) {
         localStorage.isLoggedIn = true;
-        localStorage.userName = this.userMockdata.username;
-        this.$router.push({ path: "../dashboard" });
+        localStorage.userName = userName;
+        this.$router.push({ path: "/dashboard" });
       } else {
         this.showAlert("Failed to Log In!", "danger");
-        console.log("Failed!");
       }
     },
+
     showAlert(message, variant) {
       this.alert = {
         showAlert: 2,

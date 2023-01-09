@@ -1,18 +1,18 @@
 <template>
-  <div class="manage_salesperson-container">
+  <div class="manage_customer-container">
     <Navbar />
     <SideBar />
-    <div><h6>Manage Sales Person</h6></div>
+    <div><h6>Manage Customer</h6></div>
     <hr />
     <div>
-      <b-form @submit="onSubmit" v-if="show" class="form-manage_salesperson">
+      <b-form @submit="onSubmit" v-if="show" class="form-manage_customer">
         <b-form-group id="name" label="Name:" label-for="input-name">
           <b-form-input
             id="input-name"
             v-model="form.name"
             placeholder="Enter name"
             required
-            class="form-manage_salesperson-input"
+            class="form-manage_customer-input"
           ></b-form-input>
         </b-form-group>
 
@@ -22,7 +22,7 @@
             v-model="form.contact"
             placeholder="Enter contact number"
             required
-            class="form-manage_salesperson-input"
+            class="form-manage_customer-input"
           ></b-form-input>
         </b-form-group>
 
@@ -32,18 +32,18 @@
             v-model="form.address"
             placeholder="Enter address"
             required
-            class="form-manage_salesperson-input"
+            class="form-manage_customer-input"
           ></b-form-input>
         </b-form-group>
 
-        <b-button type="submit" variant="primary" class="form-manage_salesperson-btn">
+        <b-button type="submit" variant="primary" class="form-manage_customer-btn">
           {{ btnSubmitLabel }}
         </b-button>
 
         <b-button
           type="reset"
           variant="danger"
-          class="form-manage_salesperson-btn"
+          class="form-manage_customer-btn"
           @click="onReset"
         >
           Reset
@@ -58,15 +58,17 @@
           id="input-search"
           v-model="inputSearch"
           placeholder="Enter text . . ."
-          class="form-manage_salesperson-input"
+          class="form-manage_customer-input"
         ></b-form-input>
       </b-form-group>
 
       <b-table
-        class="sales_person_list-table"
+        class="customer_list-table"
         hover
-        :items="salesPersonList"
-        :fields="salesPersonListFields"
+        :items="customerTblList"
+        :fields="customerTblFields"
+        :per-page="perPage"
+        :current-page="currentPage"
         select-mode="single"
         ref="selectableTable"
         selectable
@@ -74,6 +76,13 @@
         @row-selected="onRowSelected"
       >
       </b-table>
+
+      <b-pagination
+        v-model="currentPage"
+        :total-rows="rows"
+        :per-page="perPage"
+        aria-controls="my-table"
+      ></b-pagination>
     </div>
   </div>
 </template>
@@ -83,23 +92,26 @@ let currentDate = new Date().toJSON().slice(0, 10);
 export default {
   data() {
     return {
+      inputSearch: "",
+      perPage: 3,
+      currentPage: 1,
       selected: [],
-      salesPersonListFields: ["name", "contactNumber", "address", "dateCreated"],
-      btnSubmitLabel: "Add new Sales Person",
-      salesPersonList: [
+      customerTblFields: ["name", "contactNumber", "address", "dateCreated"],
+      btnSubmitLabel: "Add new Customer",
+      customerTblList: [
         {
           id: 1,
-          name: "Kim Ariel Dequilla",
+          name: "Test Data Customer",
           contactNumber: "09123456789",
-          address: "Surallah",
+          address: "Surallah 3232323",
           dateCreated: currentDate,
           // _rowVariant: "info",
         },
         {
           id: 2,
-          name: "Mitchell",
+          name: "Test Customer Data II",
           contactNumber: "09123456789",
-          address: "Surallah2",
+          address: "Koronadal",
           dateCreated: currentDate,
         },
       ],
@@ -120,12 +132,12 @@ export default {
         this.form.name = this.selected[0].name;
         this.form.contact = this.selected[0].contactNumber;
         this.form.address = this.selected[0].address;
-        this.btnSubmitLabel = "Update Sales Person";
+        this.btnSubmitLabel = "Update Customer";
       } else {
         this.form.name = "";
         this.form.contact = "";
         this.form.address = "";
-        this.btnSubmitLabel = "Add new Sales Person";
+        this.btnSubmitLabel = "Add new Customer";
       }
     },
     onReset() {
@@ -133,11 +145,16 @@ export default {
       this.form.name = "";
       this.form.contact = "";
       this.form.address = "";
-      this.btnSubmitLabel = "Add new Sales Person";
+      this.btnSubmitLabel = "Add new Customer";
     },
     onSubmit(event) {
       event.preventDefault();
       console.log(JSON.stringify(this.form));
+    },
+  },
+  computed: {
+    rows() {
+      return this.customerTblList.length;
     },
   },
 };
@@ -148,38 +165,38 @@ export default {
 * {
   font-family: "Poppins";
 }
-.manage_salesperson-container {
+.manage_customer-container {
   margin: 80px 10px 0 280px;
 }
-.form-manage_salesperson {
+.form-manage_customer {
   width: 75%;
   font-size: 14px;
 }
 
-.form-manage_salesperson-input {
+.form-manage_customer-input {
   height: 35px;
   font-size: 13px;
 }
 
-.form-manage_salesperson-btn {
+.form-manage_customer-btn {
   font-size: 13px;
   width: 180px;
   margin-bottom: 10px;
 }
 
 @media (max-width: 800px) {
-  .form-manage_salesperson-btn {
+  .form-manage_customer-btn {
     width: 100%;
   }
 }
 
 @media (max-width: 800px) {
-  .form-manage_salesperson {
+  .form-manage_customer {
     width: 100%;
   }
 }
 
-.sales_person_list-table {
+.customer_list-table {
   width: 100%;
   font-size: 13px;
 }

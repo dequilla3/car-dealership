@@ -111,28 +111,28 @@ export default {
         {
           id: 3,
           title: "Manage Mechanic",
-          href: "#manageMechanic",
+          href: "/admin/manageMechanic",
           active: false,
           key: "admin3",
         },
         {
           id: 4,
           title: "Manage Customer",
-          href: "#manageCustomer",
+          href: "/admin/manageCustomer",
           active: false,
           key: "admin4",
         },
         {
           id: 5,
           title: "Manage Goods",
-          href: "#manageGoods",
+          href: "/admin/manageGoods",
           active: false,
           key: "admin5",
         },
         {
           id: 6,
-          title: "Manage Services",
-          href: "#manageServices",
+          title: "Manage Service Item",
+          href: "/admin/manageServiceItem",
           active: false,
           key: "admin6",
         },
@@ -195,8 +195,6 @@ export default {
 
       this.$router.push({ path: path });
     },
-
-    onClickMenu() {},
   },
 
   mounted() {
@@ -224,12 +222,12 @@ export default {
 /* Fixed sidenav, full height */
 .sidenav {
   height: 100%;
-  width: 220px;
+  width: 260px;
   position: fixed;
   z-index: 1;
   top: 0;
   left: 0;
-  background-color: lightgray;
+  background-color: rgb(246, 246, 246);
   overflow-x: hidden;
   padding-top: 60px;
 }

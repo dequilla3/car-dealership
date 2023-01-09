@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-navbar fixed="top" toggleable="lg" type="dark" variant="dark">
+    <b-navbar class="navbar" fixed="top" toggleable="lg" type="dark" variant="dark">
       <b-navbar-brand href="#">DMS</b-navbar-brand>
 
       <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
@@ -13,6 +13,7 @@
             <template #button-content>
               {{ userName }}
             </template>
+            <!-- Logout -->
             <b-dropdown-item href="#">Profile</b-dropdown-item>
             <b-dropdown-item @click="onLogout()">Log Out</b-dropdown-item>
           </b-nav-item-dropdown>
@@ -34,7 +35,7 @@ export default {
   methods: {
     onLogout() {
       localStorage.clear();
-      this.$router.push({ path: "./" });
+      this.$router.push({ path: "/" });
     },
   },
   mounted() {
@@ -43,4 +44,8 @@ export default {
 };
 </script>
 
-<style></style>
+<style scoped>
+.navbar.navbar-dark.bg-dark {
+  background-color: rgb(88, 88, 88) !important;
+}
+</style>

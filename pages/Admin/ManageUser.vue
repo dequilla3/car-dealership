@@ -60,6 +60,10 @@ export default {
   font-family: "Poppins";
 }
 
+.manage_user-container {
+  margin: 80px 10px 0 280px;
+}
+
 .form-manage_user {
   width: 50%;
   font-size: 14px;
@@ -85,9 +89,5 @@ export default {
   .form-manage_user {
     width: 100%;
   }
-}
-
-.manage_user-container {
-  margin: 70px 10px 0 230px;
 }
 </style>
