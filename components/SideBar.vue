@@ -2,15 +2,15 @@
   <div class="sidenav">
     <div class="sidebar-menus-parent" id="dashboard" @click="setMenuActive(dashboardKey)">
       <a href="/dashboard">
-        <img class="btn-icon" src="@/assets/dashboard.png" /> Dashboard</a
+        <font-awesome-icon icon="fa-solid fa-bars" />
+        Dashboard</a
       >
     </div>
 
     <!-- Admin menu parent-->
     <div class="sidebar-menus-parent">
       <button @click="dropDownTriggerAdmin()" class="dropdown-btn">
-        <img class="btn-icon" src="@/assets/user.png" />
-        Admin
+        <font-awesome-icon icon="fa-solid fa-users" /> Admin
         <i :class="dropDownAdminArrowIcon()" />
       </button>
 
@@ -24,6 +24,7 @@
             :class="{ active: adminMenu.active }"
             @click="setMenuActive(adminMenu.key)"
           >
+            <font-awesome-icon :icon="['fa-solid', adminMenu.icon]" />
             {{ adminMenu.title }}
           </div>
         </div>
@@ -33,8 +34,7 @@
     <!-- Transaction menu parent-->
     <div class="sidebar-menus-parent">
       <button @click="dropDownTriggerTransaction()" class="dropdown-btn">
-        <img class="btn-icon" src="@/assets/transaction.png" />
-        Transaction
+        <font-awesome-icon icon="fa-solid fa-exchange" /> Transaction
         <i :class="dropDownTransactionArrowIcon()" />
       </button>
       <!-- Transaction dropdown menus -->
@@ -47,6 +47,7 @@
             :class="{ active: transactionMenu.active }"
             @click="setMenuActive(transactionMenu.key)"
           >
+            <font-awesome-icon :icon="['fa-solid', transactionMenu.icon]" />
             {{ transactionMenu.title }}
           </div>
         </div>
@@ -55,7 +56,7 @@
 
     <!-- Report menu -->
     <div class="sidebar-menus-parent">
-      <a href="#reports"> <img class="btn-icon" src="@/assets/file.png" /> Reports</a>
+      <a href="#reports"> <font-awesome-icon icon="fa-solid fa-file" /> Reports</a>
     </div>
   </div>
 </template>
@@ -68,14 +69,15 @@ export default {
       isActiveAdmin: true,
       isDashboardActive: false,
       dashboardKey: "dashboard",
-
+      tMenuIcons: [],
       transactionMenus: [
         {
           id: 1,
           title: "Quotation",
-          href: "#quotation",
+          href: "/transaction/quotation",
           active: false,
           key: "t1",
+          icon: "fa-quote-right",
         },
         {
           id: 2,
@@ -83,6 +85,7 @@ export default {
           href: "#service",
           active: false,
           key: "t2",
+          icon: "fa-cog",
         },
         {
           id: 3,
@@ -90,6 +93,7 @@ export default {
           href: "#cashier",
           active: false,
           key: "t3",
+          icon: "fa-usd",
         },
       ],
 
@@ -100,6 +104,7 @@ export default {
           href: "/admin/manageUser",
           active: false,
           key: "admin1",
+          icon: "fa-user",
         },
         {
           id: 2,
@@ -107,6 +112,7 @@ export default {
           href: "/admin/manageSalesPerson",
           active: false,
           key: "admin2",
+          icon: "fa-money-bill",
         },
         {
           id: 3,
@@ -114,6 +120,7 @@ export default {
           href: "/admin/manageMechanic",
           active: false,
           key: "admin3",
+          icon: "fa-wrench",
         },
         {
           id: 4,
@@ -121,6 +128,7 @@ export default {
           href: "/admin/manageCustomer",
           active: false,
           key: "admin4",
+          icon: "fa-people-arrows",
         },
         {
           id: 5,
@@ -128,6 +136,7 @@ export default {
           href: "/admin/manageGoods",
           active: false,
           key: "admin5",
+          icon: "fa-parachute-box",
         },
         {
           id: 6,
@@ -135,6 +144,7 @@ export default {
           href: "/admin/manageServiceItem",
           active: false,
           key: "admin6",
+          icon: "fa-gears",
         },
       ],
     };
@@ -230,6 +240,7 @@ export default {
   background-color: rgb(246, 246, 246);
   overflow-x: hidden;
   padding-top: 60px;
+  padding: 60px 10px 0 10px;
 }
 
 @media (max-width: 780px) {
@@ -273,7 +284,7 @@ export default {
   padding-left: 30px;
 }
 .sidebar-menus-list {
-  padding: 6px 8px 6px 16px;
+  padding: 6px 8px 6px 40px;
   color: black;
   display: block;
   background: none;
@@ -319,7 +330,8 @@ export default {
 
 .btn-icon {
   height: 100%;
-  width: 20px;
+  width: 18px;
+  margin-right: 10px;
 }
 
 .menus-icon {

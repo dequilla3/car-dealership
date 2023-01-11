@@ -78,6 +78,7 @@ export default {
 .db-content,
 p {
   font-size: 13px;
+  cursor: pointer;
 }
 
 .db-content:hover {

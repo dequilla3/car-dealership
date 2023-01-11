@@ -1,7 +1,7 @@
 <template>
   <div class="container-custom" v-if="!isLoggedIn">
     <div id="loginHeader">
-      <h3><img class="h-icon" src="../assets/key.png" /> Log In</h3>
+      <h3><font-awesome-icon icon="fa-solid fa-lock" /> Log In</h3>
     </div>
 
     <b-form @submit.prevent="userLogin">
@@ -24,10 +24,11 @@
           type="password"
           placeholder="Enter your password"
           required
+          autocomplete="off"
         />
       </b-form-group>
 
-      <b-button id="loginButton" type="submit" pill variant="primary">Login</b-button>
+      <b-button id="loginButton" type="submit" variant="primary">Login</b-button>
 
       <div id="alert-login-div">
         <b-alert
@@ -140,11 +141,8 @@ export default {
 }
 #loginButton {
   width: 100%;
-  height: 30px;
   font-size: 13px;
-  padding: 0;
   margin-bottom: 20px;
-  background: gray;
 }
 
 #input-group-1 {

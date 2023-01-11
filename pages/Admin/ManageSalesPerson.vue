@@ -37,7 +37,7 @@
         </b-form-group>
 
         <b-button type="submit" variant="primary" class="form-manage_salesperson-btn">
-          {{ btnSubmitLabel }}
+          <font-awesome-icon icon="fa-solid fa-check" /> {{ btnSubmitLabel }}
         </b-button>
 
         <b-button
@@ -46,7 +46,7 @@
           class="form-manage_salesperson-btn"
           @click="onReset"
         >
-          Reset
+          <font-awesome-icon icon="fa-solid fa-redo" /> Reset
         </b-button>
       </b-form>
 
@@ -163,7 +163,7 @@ export default {
 
 .form-manage_salesperson-btn {
   font-size: 13px;
-  width: 180px;
+  width: 185px;
   margin-bottom: 10px;
 }
 

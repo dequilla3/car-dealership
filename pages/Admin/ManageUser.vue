@@ -27,7 +27,7 @@
         </b-form-group>
 
         <b-button type="submit" variant="primary" class="form-manage_user-btn"
-          >Submit</b-button
+          ><font-awesome-icon icon="fa-solid fa-check" /> Submit</b-button
         >
       </b-form>
     </div>

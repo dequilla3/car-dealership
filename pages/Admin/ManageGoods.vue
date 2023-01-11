@@ -44,4 +44,7 @@ export default {};
 .manage_goods-card-tabs {
   font-size: 13px;
 }
+.pagination {
+  font-size: 12px;
+}
 </style>

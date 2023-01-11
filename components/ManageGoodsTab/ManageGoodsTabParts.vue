@@ -74,7 +74,7 @@
           <div class="grid-item">
             <div class="form-manag_parts-after-grid"></div>
             <b-button type="submit" variant="primary" class="form-manag_parts-btn">
-              {{ btnSubmitLabel }}
+              <font-awesome-icon icon="fa-solid fa-check" /> {{ btnSubmitLabel }}
             </b-button>
 
             <b-button
@@ -83,7 +83,7 @@
               class="form-manag_parts-btn"
               @click="onReset"
             >
-              Reset
+              <font-awesome-icon icon="fa-solid fa-redo" /> Reset
             </b-button>
           </div>
         </div>
@@ -124,6 +124,7 @@
         :total-rows="rows"
         :per-page="perPage"
         aria-controls="my-table"
+        class="pagination"
       ></b-pagination>
     </div>
   </div>
@@ -265,6 +266,9 @@ export default {
 }
 
 .customer_list-table {
+  font-size: 12px;
+}
+.pagination {
   font-size: 12px;
 }
 </style>
