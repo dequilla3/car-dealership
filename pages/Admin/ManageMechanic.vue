@@ -83,6 +83,7 @@ let currentDate = new Date().toJSON().slice(0, 10);
 export default {
   data() {
     return {
+      inputSearch: "",
       selected: [],
       mechanicTblFields: ["name", "contactNumber", "address", "dateCreated"],
       btnSubmitLabel: "Add new Mechanic",

@@ -82,7 +82,7 @@ export default {
         {
           id: 2,
           title: "Service",
-          href: "#service",
+          href: "/transaction/service",
           active: false,
           key: "t2",
           icon: "fa-cog",

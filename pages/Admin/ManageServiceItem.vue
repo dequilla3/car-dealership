@@ -87,6 +87,7 @@
         :total-rows="rows"
         :per-page="perPage"
         aria-controls="my-table"
+        class="pagination"
       ></b-pagination>
     </div>
   </div>
@@ -211,5 +212,8 @@ export default {
 .customer_list-table {
   width: 100%;
   font-size: 13px;
+}
+.pagination {
+  font-size: 12px;
 }
 </style>

@@ -99,23 +99,7 @@ export default {
       selected: [],
       customerTblFields: ["name", "contactNumber", "address", "dateCreated"],
       btnSubmitLabel: "Add new Customer",
-      customerTblList: [
-        {
-          id: 1,
-          name: "Test Data Customer",
-          contactNumber: "09123456789",
-          address: "Surallah 3232323",
-          dateCreated: currentDate,
-          // _rowVariant: "info",
-        },
-        {
-          id: 2,
-          name: "Test Customer Data II",
-          contactNumber: "09123456789",
-          address: "Koronadal",
-          dateCreated: currentDate,
-        },
-      ],
+      customerTblList: [],
 
       form: {
         name: "",
@@ -154,9 +138,18 @@ export default {
       console.log(JSON.stringify(this.form));
     },
   },
+
+  created() {
+    this.customerTblList = this.getCustomerList;
+  },
+
   computed: {
     rows() {
       return this.customerTblList.length;
+    },
+
+    getCustomerList() {
+      return this.$store.state.customer.customerList;
     },
   },
 };
