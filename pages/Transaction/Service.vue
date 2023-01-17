@@ -27,7 +27,7 @@
         label="Select Customer:"
         label-for="input-customerName"
       >
-        <b-input-group id="b-input-group-customerName" class="mt-3">
+        <b-input-group id="b-input-group-customerName">
           <b-form-input
             id="input-customerName"
             v-model="form.customer.customerName"

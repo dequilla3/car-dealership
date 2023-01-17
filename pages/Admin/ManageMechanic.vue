@@ -156,16 +156,16 @@ export default {
 
 .form-manage_mechanic {
   width: 75%;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .form-manage_mechanic-input {
   height: 35px;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .form-manage_mechanic-btn {
-  font-size: 13px;
+  font-size: 12px;
   width: 180px;
   margin-bottom: 10px;
 }
@@ -184,6 +184,6 @@ export default {
 
 .mechanic_list-table {
   width: 100%;
-  font-size: 13px;
+  font-size: 12px;
 }
 </style>

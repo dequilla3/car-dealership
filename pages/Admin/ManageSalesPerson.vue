@@ -154,16 +154,16 @@ export default {
 }
 .form-manage_salesperson {
   width: 75%;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .form-manage_salesperson-input {
   height: 35px;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .form-manage_salesperson-btn {
-  font-size: 13px;
+  font-size: 12px;
   width: 185px;
   margin-bottom: 10px;
 }
@@ -182,6 +182,6 @@ export default {
 
 .sales_person_list-table {
   width: 100%;
-  font-size: 13px;
+  font-size: 12px;
 }
 </style>

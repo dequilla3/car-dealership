@@ -42,13 +42,14 @@
           label-for="input-customerName"
           class="b-form-group-t_quotation"
         >
-          <b-input-group id="b-input-group-customerName" class="mt-3">
+          <b-input-group id="b-input-group-customerName">
             <b-form-input
               id="input-customerName"
               v-model="form.customer.customerName"
               required
               class="form-t_quotation-input"
               placeholder="None"
+              disabled
             ></b-form-input>
             <b-input-group-append>
               <b-button
@@ -71,13 +72,14 @@
           class="b-form-group-t_quotation"
           v-if="isService"
         >
-          <b-input-group id="b-input-group-service" class="mt-3">
+          <b-input-group id="b-input-group-service">
             <b-form-input
               id="input-service"
               v-model="form.service.serviceNumber"
               required
               class="form-t_quotation-input"
               placeholder="None"
+              disabled
             ></b-form-input>
             <b-input-group-append>
               <b-button

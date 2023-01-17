@@ -128,7 +128,7 @@
       <b-table
         class="customer_list-table"
         hover
-        :items="partsTblList"
+        :items="tblItems"
         :fields="partsTblFields"
         :per-page="perPage"
         :current-page="currentPage"
@@ -171,38 +171,7 @@ export default {
         "qty",
       ],
       btnSubmitLabel: "Add New Car Details",
-      partsTblList: [
-        {
-          serial_number: "21456789JKL",
-          id: 1,
-          color: "RED",
-          model: "v2",
-          brandname: "BMW",
-          unit: "PC",
-          cost: "12000000",
-          qty: "1",
-        },
-        {
-          serial_number: "789456789EDE",
-          id: 2,
-          color: "BLUE",
-          model: "v3.3",
-          brandname: "MAZDA",
-          unit: "PC",
-          cost: "13500000",
-          qty: "1",
-        },
-        {
-          serial_number: "89897564231KLL",
-          id: 3,
-          color: "YELLOW",
-          model: "v10",
-          brandname: "Mercedes-Benz",
-          unit: "PC",
-          cost: "20500000",
-          qty: "1",
-        },
-      ],
+      tblItems: [],
 
       form: {
         serial_number: "",
@@ -256,9 +225,18 @@ export default {
       console.log(JSON.stringify(this.form));
     },
   },
+
+  created() {
+    this.tblItems = this.getCarList;
+  },
+
   computed: {
     rows() {
-      return this.partsTblList.length;
+      return this.tblItems === undefined ? 0 : this.tblItems.length;
+    },
+
+    getCarList() {
+      return this.$store.state.goods.goodsCarList;
     },
   },
 };

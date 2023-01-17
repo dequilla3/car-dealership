@@ -100,6 +100,7 @@ export default {
       if (isUserFound) {
         localStorage.isLoggedIn = true;
         localStorage.userName = userName;
+        localStorage.activeMenuId = "dashboard";
         this.$router.push({ path: "/dashboard" });
       } else {
         this.showAlert("Failed to Log In!", "danger");

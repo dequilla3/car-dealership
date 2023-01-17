@@ -69,84 +69,8 @@ export default {
       isActiveAdmin: true,
       isDashboardActive: false,
       dashboardKey: "dashboard",
-      tMenuIcons: [],
-      transactionMenus: [
-        {
-          id: 1,
-          title: "Quotation",
-          href: "/transaction/quotation",
-          active: false,
-          key: "t1",
-          icon: "fa-quote-right",
-        },
-        {
-          id: 2,
-          title: "Service",
-          href: "/transaction/service",
-          active: false,
-          key: "t2",
-          icon: "fa-cog",
-        },
-        {
-          id: 3,
-          title: "Cashier",
-          href: "#cashier",
-          active: false,
-          key: "t3",
-          icon: "fa-usd",
-        },
-      ],
-
-      adminMenus: [
-        {
-          id: 1,
-          title: "Manage User",
-          href: "/admin/manageUser",
-          active: false,
-          key: "admin1",
-          icon: "fa-user",
-        },
-        {
-          id: 2,
-          title: "Manage Sales Person",
-          href: "/admin/manageSalesPerson",
-          active: false,
-          key: "admin2",
-          icon: "fa-money-bill",
-        },
-        {
-          id: 3,
-          title: "Manage Mechanic",
-          href: "/admin/manageMechanic",
-          active: false,
-          key: "admin3",
-          icon: "fa-wrench",
-        },
-        {
-          id: 4,
-          title: "Manage Customer",
-          href: "/admin/manageCustomer",
-          active: false,
-          key: "admin4",
-          icon: "fa-people-arrows",
-        },
-        {
-          id: 5,
-          title: "Manage Goods",
-          href: "/admin/manageGoods",
-          active: false,
-          key: "admin5",
-          icon: "fa-parachute-box",
-        },
-        {
-          id: 6,
-          title: "Manage Service Item",
-          href: "/admin/manageServiceItem",
-          active: false,
-          key: "admin6",
-          icon: "fa-gears",
-        },
-      ],
+      transactionMenus: [],
+      adminMenus: [],
     };
   },
 
@@ -209,6 +133,11 @@ export default {
 
   mounted() {
     var menuKey = localStorage.activeMenuId;
+
+    //load menus
+    this.transactionMenus = this.getTransactionMenus;
+    this.adminMenus = this.getAdminMenus;
+
     //for admin menus
     this.adminMenus.forEach(function (menu) {
       menu.active = menu.key == menuKey;
@@ -221,6 +150,16 @@ export default {
   },
 
   created() {},
+
+  computed: {
+    getTransactionMenus() {
+      return this.$store.state.menus.transactionMenus;
+    },
+
+    getAdminMenus() {
+      return this.$store.state.menus.adminMenus;
+    },
+  },
 };
 </script>
 
