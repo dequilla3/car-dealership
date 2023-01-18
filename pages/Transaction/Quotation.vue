@@ -9,6 +9,8 @@
         <b-button
           variant="primary"
           class="form-t_quotation-btn t-btn-primary-margin-bottom"
+          v-if="isProcessed"
+          @click="onClickedNewTrans"
         >
           <font-awesome-icon icon="fa-solid fa-plus" />
           New Transaction
@@ -103,7 +105,7 @@
           @click="openItemListModalDialog"
         >
           <font-awesome-icon icon="fa-solid fa-arrow-down" />
-          Insert Item
+          Insert Product
         </b-button>
 
         <b-button
@@ -112,7 +114,7 @@
           @click="removeItem"
         >
           <font-awesome-icon icon="fa-solid fa-close" />
-          Remove Item
+          Remove Product
         </b-button>
 
         <!-- table -->
@@ -131,6 +133,7 @@
         >
           <template #cell(qty)="data">
             <b-form-input
+              :disabled="isProcessed"
               class="b-table-input"
               type="number"
               v-model="quotationLineList[data.index].qty"
@@ -152,18 +155,35 @@
         </b-table>
 
         <hr />
+
         <!-- Total amount section -->
-        <div class="div-content-left">
-          <b-input-group class="input--total-size" size="sm" prepend="Total:">
-            <b-form-input disabled v-model="totalAmount" type="text"></b-form-input>
-          </b-input-group>
+        <div class="d-flex flex-row-reverse">
+          <div class="p-2">
+            <b-input-group class="input--total-size" size="sm" prepend="Total:">
+              <b-form-input disabled v-model="totalAmount" type="text"></b-form-input>
+            </b-input-group>
+          </div>
+          <div class="p-2">
+            <b-pagination
+              v-model="currentPage"
+              :total-rows="rows"
+              :per-page="perPage"
+              aria-controls="my-table"
+              v-if="rows > 0"
+              class="pagination"
+            ></b-pagination>
+          </div>
         </div>
 
         <hr />
 
         <!-- Proecss and Print button -->
         <div class="div-content-left">
-          <b-button variant="info" class="form-t_quotation-btn btn-transaction">
+          <b-button
+            variant="info"
+            class="form-t_quotation-btn btn-transaction"
+            @click="onClickProcess"
+          >
             <font-awesome-icon icon="fa-solid fa-cogs" /> Process Transaction
           </b-button>
 
@@ -172,15 +192,6 @@
             Print Receipt
           </b-button>
         </div>
-
-        <b-pagination
-          v-model="currentPage"
-          :total-rows="rows"
-          :per-page="perPage"
-          aria-controls="my-table"
-          v-if="rows > 0"
-          class="pagination"
-        ></b-pagination>
       </div>
 
       <!-- Customer Modals -->
@@ -404,11 +415,6 @@ let currentDate = new Date().toJSON().slice(0, 10);
 export default {
   data() {
     return {
-      alert: {
-        showAlert: 0,
-        variant: "",
-        message: "",
-      },
       isService: false,
       selectedLine: [],
       show: true,
@@ -416,35 +422,23 @@ export default {
       perPage: 4,
       totalAmount: 0,
       currentPage: 1,
-      quotationLineTblFields: [
-        {
-          key: "productCode",
-          label: "Product Code",
-        },
-        {
-          key: "productName",
-          label: "Product Name",
-        },
-        {
-          key: "unit",
-          label: "Unit",
-        },
-        {
-          key: "cost",
-          label: "Cost",
-        },
-        {
-          key: "qty",
-          label: "Quantity",
-          thStyle: { width: "10%" },
-        },
-        {
-          key: "amount",
-          label: "Amount",
-        },
-      ],
+      isProcessed: false,
 
       quotationLineList: [],
+      quotationLineTblFields: [
+        { key: "productCode", label: "Product Code", thStyle: { width: "10%" } },
+        { key: "productName", label: "Product Name", thStyle: { width: "50%" } },
+        { key: "unit", label: "Unit", thStyle: { width: "10%" } },
+        { key: "cost", label: "Cost", thStyle: { width: "10%" } },
+        { key: "qty", label: "Quantity", thStyle: { width: "10%" } },
+        { key: "amount", label: "Amount", thStyle: { width: "10%" } },
+      ],
+
+      alert: {
+        showAlert: 0,
+        variant: "",
+        message: "",
+      },
 
       form: {
         quotationNumber: "",
@@ -539,6 +533,17 @@ export default {
 
     openItemListModalDialog() {
       this.insertItemModal.itemList = this.getItemList;
+    },
+
+    onClickedNewTrans() {
+      this.isProcessed = false;
+      this.quotationLineList = [];
+      this.form.customer = "";
+      this.form.quotationNumber = "";
+    },
+
+    onClickProcess() {
+      this.isProcessed = true;
     },
 
     //select btn on customerModal
@@ -695,7 +700,7 @@ export default {
   margin-bottom: 20px;
 }
 .t-btn-secondary-margin-bottom {
-  width: 120px;
+  width: 140px;
   margin-bottom: 10px;
 }
 .btn-transaction {

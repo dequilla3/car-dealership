@@ -190,10 +190,24 @@
     <hr />
 
     <!-- Total amount section -->
-    <div class="div-content-left">
-      <b-input-group class="input--total-size" size="sm" prepend="Total:">
-        <b-form-input disabled v-model="totalAmount" type="text"></b-form-input>
-      </b-input-group>
+
+    <div class="d-flex flex-row-reverse">
+      <div class="p-2">
+        <b-input-group class="input--total-size" size="sm" prepend="Total:">
+          <b-form-input disabled v-model="totalAmount" type="text"></b-form-input>
+        </b-input-group>
+      </div>
+
+      <div class="p-2">
+        <b-pagination
+          v-model="currentPage"
+          :total-rows="rows"
+          :per-page="perPage"
+          aria-controls="my-table"
+          v-if="rows > 0"
+          class="pagination"
+        ></b-pagination>
+      </div>
     </div>
 
     <hr />
@@ -209,15 +223,6 @@
         Print Receipt
       </b-button>
     </div>
-
-    <b-pagination
-      v-model="currentPage"
-      :total-rows="rows"
-      :per-page="perPage"
-      aria-controls="my-table"
-      v-if="rows > 0"
-      class="pagination"
-    ></b-pagination>
 
     <!-- Insert Item Modal -->
     <b-modal
