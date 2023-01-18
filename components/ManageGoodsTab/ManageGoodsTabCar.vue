@@ -260,7 +260,7 @@ export default {
 
 .form-manage_car-btn {
   font-size: 12px;
-  width: 180px;
+  width: 170px;
   margin-bottom: 10px;
 }
 

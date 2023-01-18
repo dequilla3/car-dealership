@@ -1,10 +1,10 @@
 let currentDate = new Date().toJSON().slice(0, 10);
 
 export const state = () => ({
-  customerList: [
+  userList: [
     {
       id: 1,
-      name: "Test Data Customer",
+      name: "Test Data",
       contactNumber: "09123456789",
       address: "Surallah 3232323",
       dateCreated: currentDate,
@@ -12,7 +12,7 @@ export const state = () => ({
     },
     {
       id: 2,
-      name: "Test Customer Data II",
+      name: "Test Data II",
       contactNumber: "09123456789",
       address: "Koronadal",
       dateCreated: currentDate,

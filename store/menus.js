@@ -30,27 +30,12 @@ export const state = () => ({
     {
       id: 1,
       title: "Manage User",
-      href: "/admin/manageUser",
+      href: "/admin/manageAppUser",
       active: false,
       key: "admin1",
       icon: "fa-user",
     },
-    {
-      id: 2,
-      title: "Manage Sales Person",
-      href: "/admin/manageSalesPerson",
-      active: false,
-      key: "admin2",
-      icon: "fa-money-bill",
-    },
-    {
-      id: 3,
-      title: "Manage Mechanic",
-      href: "/admin/manageMechanic",
-      active: false,
-      key: "admin3",
-      icon: "fa-wrench",
-    },
+
     {
       id: 4,
       title: "Manage Customer",

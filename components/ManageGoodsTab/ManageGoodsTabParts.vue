@@ -223,7 +223,7 @@ export default {
 
 .form-manag_parts-btn {
   font-size: 12px;
-  width: 180px;
+  width: 150px;
   margin-bottom: 10px;
 }
 

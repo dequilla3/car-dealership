@@ -183,16 +183,16 @@ export default {
 }
 .form-manage_customer {
   width: 75%;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .form-manage_customer-input {
   height: 35px;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .form-manage_customer-btn {
-  font-size: 13px;
+  font-size: 12px;
   width: 185px;
   margin-bottom: 10px;
 }
@@ -211,7 +211,7 @@ export default {
 
 .customer_list-table {
   width: 100%;
-  font-size: 13px;
+  font-size: 12px;
 }
 .pagination {
   font-size: 12px;

@@ -134,18 +134,18 @@ export default {
   margin: 80px 10px 0 280px;
 }
 .form-manage_role {
-  width: 75%;
-  font-size: 14px;
+  width: 30%;
+  font-size: 12px;
 }
 
 .form-manage_role-input {
   height: 35px;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .form-manage_role-btn {
-  font-size: 13px;
-  width: 180px;
+  font-size: 12px;
+  width: 130px;
   margin-bottom: 10px;
 }
 
@@ -163,7 +163,7 @@ export default {
 
 .customer_list-table {
   width: 100%;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .pagination {

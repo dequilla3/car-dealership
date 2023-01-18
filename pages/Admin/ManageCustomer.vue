@@ -164,7 +164,7 @@ export default {
   margin: 80px 10px 0 280px;
 }
 .form-manage_customer {
-  width: 75%;
+  width: 30%;
   font-size: 12px;
 }
 
@@ -175,7 +175,7 @@ export default {
 
 .form-manage_customer-btn {
   font-size: 12px;
-  width: 180px;
+  width: 160px;
   margin-bottom: 10px;
 }
 

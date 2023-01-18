@@ -137,12 +137,12 @@ export default {
         currentPage: 1,
         quotationLineList: [],
         quotationLineTblFields: [
-          { key: "productCode", label: "Product Code" },
-          { key: "productName", label: "Product Name" },
-          { key: "unit", label: "Unit" },
-          { key: "cost", label: "Cost" },
+          { key: "productCode", label: "Product Code", thStyle: { width: "30%" } },
+          { key: "productName", label: "Product Name", thStyle: { width: "30%" } },
+          { key: "unit", label: "Unit", thStyle: { width: "10%" } },
+          { key: "cost", label: "Cost", thStyle: { width: "10%" } },
           { key: "qty", label: "Quantity", thStyle: { width: "10%" } },
-          { key: "amount", label: "Amount" },
+          { key: "amount", label: "Amount", thStyle: { width: "10%" } },
         ],
       },
     };
