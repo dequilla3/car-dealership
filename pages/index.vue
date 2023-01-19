@@ -1,11 +1,19 @@
 <template>
-  <div class="container-custom" v-if="!isLoggedIn">
+  <div class="container-login" v-if="!isLoggedIn">
     <div id="loginHeader">
-      <h3><font-awesome-icon icon="fa-solid fa-lock" /> Log In</h3>
+      <h3><font-awesome-icon icon="fa-solid fa-lock" /> Lou Geh DMS</h3>
     </div>
 
+    <hr />
+    <br />
+
     <b-form @submit.prevent="userLogin">
-      <b-form-group id="input-group-1" label="Username:" label-for="username-input">
+      <b-form-group
+        id="input-group-1"
+        label="Username:"
+        label-for="username-input"
+        class="standardFontSize"
+      >
         <b-form-input
           id="username-input"
           v-model="user.username"
@@ -13,24 +21,42 @@
           type="text"
           placeholder="Enter your username"
           required
+          class="globalInputSize"
         />
       </b-form-group>
 
-      <b-form-group id="input-group-2" label="Password:" label-for="pw-input">
-        <b-form-input
-          id="pw-input"
-          v-model="user.pw"
-          @keyup.enter="userLogin()"
-          type="password"
-          placeholder="Enter your password"
-          required
-          autocomplete="off"
-        />
+      <b-form-group
+        id="input-group-2"
+        label="Password:"
+        label-for="pw-input"
+        class="standardFontSize"
+      >
+        <b-input-group>
+          <b-form-input
+            id="pw-input"
+            v-model="user.pw"
+            @keyup.enter="userLogin()"
+            placeholder="Enter your password"
+            required
+            autocomplete="none"
+            class="globalInputSize"
+            :type="isPwShow ? 'text' : 'password'"
+          />
+          <b-input-group-append>
+            <b-button @click="onclickShowPw" class="standardFontSize" variant="info">
+              <font-awesome-icon
+                :icon="['fa-solid', isPwShow ? 'fa-eye' : 'fa-eye-slash']"
+            /></b-button>
+          </b-input-group-append>
+        </b-input-group>
       </b-form-group>
 
-      <b-button id="loginButton" type="submit" variant="primary">Login</b-button>
+      <b-button class="standardButton" id="loginButton" type="submit" variant="primary">
+        <font-awesome-icon icon="fa-solid fa-right-to-bracket" /> Login</b-button
+      >
 
       <div id="alert-login-div">
+        <br />
         <b-alert
           :show="alert.showAlert"
           :variant="alert.variant"
@@ -47,6 +73,7 @@
 export default {
   data() {
     return {
+      isPwShow: false,
       isLoggedIn: false,
       user: {
         username: "",
@@ -80,9 +107,17 @@ export default {
     }
   },
 
-  created() {},
+  created() {
+    // setTimeout(function () {
+    //   console.log("Reload");
+    //   window.location.reload(1);
+    // }, 5000);
+  },
 
   methods: {
+    onclickShowPw() {
+      this.isPwShow = !this.isPwShow;
+    },
     userLogin() {
       var userName = this.user.username;
       var passWord = this.user.pw;
@@ -119,55 +154,23 @@ export default {
 </script>
 
 <style scoped>
-@import url("https://fonts.googleapis.com/css?family=Poppins");
+/* @import url("@fontsource/poppins");
 * {
   font-family: "Poppins";
-}
-.container-custom {
-  border-radius: 5px;
-  width: 400px;
-  height: 400px;
-  background-color: lightgray;
+} */
+.container-login {
+  width: 500px;
+  height: 500px;
+  /* background-color: rgb(255, 255, 255); */
   position: absolute;
   top: 0;
   bottom: 0;
   left: 0;
   right: 0;
   margin: auto;
-  padding: 25px;
-}
-
-#loginHeader {
-  padding-bottom: 20px;
-}
-#loginButton {
-  width: 100%;
-  font-size: 13px;
-  margin-bottom: 20px;
-}
-
-#input-group-1 {
-  font-size: 14px;
-}
-
-#input-group-2 {
-  font-size: 14px;
-}
-
-#username-input {
-  font-size: 13px;
-}
-
-#pw-input {
-  font-size: 13px;
-}
-
-#alert-login-div {
-  text-align: center;
-}
-
-.h-icon {
-  height: 100%;
-  width: 16%;
+  padding: 30px;
+  border-style: solid;
+  border-width: 0.5px;
+  border-color: lightgray;
 }
 </style>

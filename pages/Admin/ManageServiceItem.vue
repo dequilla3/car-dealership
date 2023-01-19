@@ -1,5 +1,5 @@
 <template>
-  <div class="manage_customer-container">
+  <div class="mainContainer">
     <Navbar />
     <SideBar />
     <div><h6>Manage Service Items</h6></div>
@@ -16,7 +16,7 @@
             v-model="form.service_name"
             placeholder="Enter service item name"
             required
-            class="form-manage_customer-input"
+            class="globalInputSize"
           ></b-form-input>
         </b-form-group>
 
@@ -26,7 +26,7 @@
             v-model="form.unit"
             placeholder="Enter unit"
             required
-            class="form-manage_customer-input"
+            class="globalInputSize"
           ></b-form-input>
         </b-form-group>
 
@@ -37,12 +37,15 @@
             v-model="form.cost"
             placeholder="Enter cost"
             required
-            class="form-manage_customer-input"
+            class="globalInputSize"
           ></b-form-input>
         </b-form-group>
 
         <b-button type="submit" variant="primary" class="form-manage_customer-btn">
-          <font-awesome-icon icon="fa-solid fa-check" /> {{ btnSubmitLabel }}
+          <font-awesome-icon
+            :icon="['fa-solid', isUpdate ? 'fa-user-pen' : 'fa-user-plus']"
+          />
+          {{ btnSubmitLabel }}
         </b-button>
 
         <b-button
@@ -63,7 +66,7 @@
           id="input-search"
           v-model="inputSearch"
           placeholder="Enter text . . ."
-          class="form-manage_customer-input"
+          class="globalInputSize"
         ></b-form-input>
       </b-form-group>
 
@@ -98,6 +101,7 @@ let currentDate = new Date().toJSON().slice(0, 10);
 export default {
   data() {
     return {
+      isUpdate: false,
       inputSearch: "",
       perPage: 3,
       currentPage: 1,
@@ -146,11 +150,13 @@ export default {
         this.form.unit = this.selected[0].unit;
         this.form.cost = this.selected[0].cost;
         this.btnSubmitLabel = "Update Service Item";
+        this.isUpdate = true;
       } else {
         this.form.service_name = "";
         this.form.unit = "";
         this.form.cost = "";
         this.btnSubmitLabel = "Add New Service Item";
+        this.isUpdate = false;
       }
     },
     onReset() {
@@ -174,20 +180,8 @@ export default {
 </script>
 
 <style scoped>
-@import url("https://fonts.googleapis.com/css?family=Poppins");
-* {
-  font-family: "Poppins";
-}
-.manage_customer-container {
-  margin: 80px 10px 0 280px;
-}
 .form-manage_customer {
   width: 75%;
-  font-size: 12px;
-}
-
-.form-manage_customer-input {
-  height: 35px;
   font-size: 12px;
 }
 

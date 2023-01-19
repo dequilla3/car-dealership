@@ -164,19 +164,15 @@ export default {
 </script>
 
 <style scoped>
-@import url("https://fonts.googleapis.com/css?family=Poppins");
-* {
-  font-family: "Poppins";
-}
 /* Fixed sidenav, full height */
 .sidenav {
   height: 100%;
-  width: 260px;
+  width: 280px;
   position: fixed;
-  z-index: 1;
+  z-index: 2;
   top: 0;
   left: 0;
-  background-color: rgb(246, 246, 246);
+  background-color: rgb(231, 231, 231);
   overflow-x: hidden;
   padding-top: 60px;
   padding: 60px 10px 0 10px;

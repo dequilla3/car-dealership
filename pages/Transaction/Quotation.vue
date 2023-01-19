@@ -1,5 +1,5 @@
 <template>
-  <div class="t_quotation-container">
+  <div class="mainContainer">
     <Navbar />
     <SideBar />
     <div><h6>Quotation</h6></div>
@@ -32,7 +32,7 @@
             v-model="form.quotationNumber"
             placeholder="None"
             required
-            class="form-t_quotation-input"
+            class="globalInputSize"
             disabled
           ></b-form-input>
         </b-form-group>
@@ -49,7 +49,7 @@
               id="input-customerName"
               v-model="form.customer.customerName"
               required
-              class="form-t_quotation-input"
+              class="globalInputSize"
               placeholder="None"
               disabled
             ></b-form-input>
@@ -79,7 +79,7 @@
               id="input-service"
               v-model="form.service.serviceNumber"
               required
-              class="form-t_quotation-input"
+              class="globalInputSize"
               placeholder="None"
               disabled
             ></b-form-input>
@@ -669,15 +669,6 @@ export default {
 </script>
 
 <style scoped>
-@import url("https://fonts.googleapis.com/css?family=Poppins");
-* {
-  font-family: "Poppins";
-}
-.t_quotation-container {
-  margin: 65px 10px 0 270px;
-  padding: 20px;
-  /* background: rgb(239, 239, 239); */
-}
 .t_quotation-btn {
   width: 150px;
   font-size: 12px;
@@ -687,10 +678,7 @@ export default {
   width: 25%;
   font-size: 12px;
 }
-.form-t_quotation-input {
-  height: 35px;
-  font-size: 12px;
-}
+
 .form-t_quotation-btn {
   height: 35px;
   font-size: 12px;

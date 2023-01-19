@@ -1,5 +1,5 @@
 <template>
-  <div class="app_user-container">
+  <div class="mainContainer">
     <Navbar />
     <SideBar />
     <div><h6>Manage User</h6></div>
@@ -14,7 +14,7 @@
                 v-model="form.name"
                 placeholder="Enter name"
                 required
-                class="form-app_user-input"
+                class="globalInputSize"
               ></b-form-input>
             </b-form-group>
 
@@ -24,7 +24,7 @@
                 v-model="form.contact"
                 placeholder="Enter contact number"
                 required
-                class="form-app_user-input"
+                class="globalInputSize"
               ></b-form-input>
             </b-form-group>
 
@@ -34,7 +34,7 @@
                 v-model="form.address"
                 placeholder="Enter address"
                 required
-                class="form-app_user-input"
+                class="globalInputSize"
               ></b-form-input>
             </b-form-group>
           </div>
@@ -46,7 +46,6 @@
                 :text="dropDownText"
                 class="dropdown--dropdown_custom-size"
                 size="sm"
-                @click="setRoleList"
               >
                 <b-dropdown-item
                   class="dropdown--dropdown-menu-size"
@@ -64,26 +63,36 @@
                 v-model="form.username"
                 placeholder="Enter username"
                 required
-                class="form-custom-input"
+                class="globalInputSize"
                 :disabled="isDisabled"
               ></b-form-input>
             </b-form-group>
 
             <b-form-group id="pw" label="Password:" label-for="input-pw">
-              <b-form-input
-                id="input-pw"
-                v-model="form.pw"
-                placeholder="Enter password"
-                required
-                class="form-custom-input"
-                :disabled="isDisabled"
-              ></b-form-input>
+              <b-input-group>
+                <b-form-input
+                  id="input-pw"
+                  v-model="form.pw"
+                  placeholder="Enter password"
+                  required
+                  class="globalInputSize"
+                  :disabled="isDisabled"
+                  :type="isPwShow ? 'text' : 'password'"
+                ></b-form-input>
+                <b-input-group-append>
+                  <b-button variant="info" class="globalInputSize" @click="onlickShowPw">
+                    <font-awesome-icon
+                      :icon="['fa-solid', isPwShow ? 'fa-eye' : 'fa-eye-slash']"
+                    />
+                  </b-button>
+                </b-input-group-append>
+              </b-input-group>
             </b-form-group>
           </div>
         </div>
 
         <b-button type="submit" variant="primary" class="form-app_user-btn">
-          <font-awesome-icon icon="fa-solid fa-check" /> {{ btnSubmitLabel }}
+          <font-awesome-icon :icon="['fa-solid', icn]" /> {{ btnSubmitLabel }}
         </b-button>
 
         <b-button
@@ -104,7 +113,7 @@
           id="input-search"
           v-model="inputSearch"
           placeholder="Enter text . . ."
-          class="form-app_user-input"
+          class="globalInputSize"
         ></b-form-input>
       </b-form-group>
 
@@ -135,10 +144,12 @@
 </template>
 
 <script>
-let currentDate = new Date().toJSON().slice(0, 10);
+const currentDate = new Date().toJSON().slice(0, 10);
 export default {
   data() {
     return {
+      isPwShow: false,
+      icn: "fa-user-plus",
       dropDownText: "-- Select Role -- ",
       inputSearch: "",
       perPage: 3,
@@ -147,6 +158,7 @@ export default {
       customerTblFields: ["name", "contactNumber", "address", "dateCreated"],
       btnSubmitLabel: "Add new User",
       customerTblList: [],
+      roleList: [],
 
       form: {
         name: "",
@@ -173,14 +185,24 @@ export default {
         this.form.name = this.selected[0].name;
         this.form.contact = this.selected[0].contactNumber;
         this.form.address = this.selected[0].address;
+        this.form.username = "N/A";
+        this.form.pw = "N/A";
         this.btnSubmitLabel = "Update User";
+        this.icn = "fa-user-pen";
+
         this.isDisabled = true;
+        this.isPwShow = true;
       } else {
         this.form.name = "";
         this.form.contact = "";
         this.form.address = "";
+        this.form.username = "";
+        this.form.pw = "";
         this.btnSubmitLabel = "Add new User";
+        this.icn = "fa-user-plus";
+
         this.isDisabled = false;
+        this.isPwShow = false;
       }
     },
     onReset() {
@@ -192,11 +214,25 @@ export default {
     },
     onSubmit(event) {
       event.preventDefault();
-      console.log(JSON.stringify(this.form));
+      this.$store.dispatch("user/addUser", {
+        id: this.rows + 1,
+        name: this.form.name,
+        contactNumber: this.form.contact,
+        address: this.form.address,
+        dateCreated: currentDate,
+      });
+
+      // this.$store.commit("user/ADD_USER", {
+      //   id: this.rows + 1,
+      //   name: this.form.name,
+      //   contactNumber: this.form.contact,
+      //   address: this.form.address,
+      //   dateCreated: currentDate,
+      // });
     },
 
-    setRoleList() {
-      this.roleList = this.getRoles;
+    onlickShowPw() {
+      this.isPwShow = !this.isPwShow;
     },
 
     onClickRoleDropdownMenu(role) {
@@ -207,8 +243,15 @@ export default {
   },
 
   created() {
-    this.customerTblList = this.getCustomerList;
-    this.setRoleList();
+    setTimeout(() => {
+      this.customerTblList = this.getCustomerList;
+      this.roleList = this.getRoles;
+
+      setInterval(() => {
+        this.customerTblList = this.getCustomerList;
+        this.roleList = this.getRoles;
+      }, 5000);
+    }, 5000);
   },
 
   computed: {
@@ -228,20 +271,8 @@ export default {
 </script>
 
 <style scoped>
-@import url("https://fonts.googleapis.com/css?family=Poppins");
-* {
-  font-family: "Poppins";
-}
-.app_user-container {
-  margin: 80px 10px 0 280px;
-}
 .form-app_user {
   width: 75%;
-  font-size: 12px;
-}
-
-.form-app_user-input {
-  height: 35px;
   font-size: 12px;
 }
 
@@ -268,10 +299,6 @@ export default {
   font-size: 12px;
 }
 
-.pagination {
-  font-size: 12px;
-}
-
 .dropdown--dropdown_custom-size {
   width: 100%;
   font-size: 12px !important;
@@ -279,9 +306,5 @@ export default {
 .dropdown--dropdown-menu-size {
   font-size: 12px !important;
   width: 300px !important;
-}
-.form-custom-input {
-  height: 35px;
-  font-size: 12px;
 }
 </style>

@@ -1,24 +1,22 @@
 <template>
   <div>
     <b-navbar class="navbar" fixed="top" toggleable="lg" type="dark" variant="dark">
-      <b-navbar-brand href="#"> DMS</b-navbar-brand>
+      <b-navbar-brand href="/dashboard"
+        ><font-awesome-icon icon="fa-solid fa-car" /> DMS</b-navbar-brand
+      >
 
-      <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
-
-      <b-collapse id="nav-collapse" is-nav>
-        <!-- Right aligned nav items -->
-        <b-navbar-nav class="ml-auto">
-          <b-nav-item-dropdown right>
-            <!-- Using 'button-content' slot -->
-            <template #button-content>
-              {{ userName }}
-            </template>
-            <!-- Logout -->
-            <b-dropdown-item href="#">Profile</b-dropdown-item>
-            <b-dropdown-item @click="onLogout()">Log Out</b-dropdown-item>
-          </b-nav-item-dropdown>
-        </b-navbar-nav>
-      </b-collapse>
+      <div class="d-flex flex-row-reverse w-100">
+        <b-dropdown id="dropdown-right" right variant="info" class="w-150-px" size="sm">
+          <template #button-content
+            ><font-awesome-icon icon="fa-solid fa-user" /> {{ userName }}
+          </template>
+          <hr />
+          <b-dropdown-item class="f-s-13" @click="onLogout"
+            ><font-awesome-icon icon="fa-solid fa-arrow-right-from-bracket" />
+            Logout</b-dropdown-item
+          >
+        </b-dropdown>
+      </div>
     </b-navbar>
   </div>
 </template>
@@ -47,5 +45,17 @@ export default {
 <style scoped>
 .navbar.navbar-dark.bg-dark {
   background-color: rgb(88, 88, 88) !important;
+}
+
+.w-150-px {
+  width: 150px;
+}
+
+.w-125-px {
+  width: 150px;
+}
+
+.f-s-13 {
+  font-size: 13px !important;
 }
 </style>

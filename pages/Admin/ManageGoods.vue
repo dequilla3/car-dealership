@@ -1,5 +1,5 @@
 <template>
-  <div class="manage_goods-container">
+  <div class="mainContainer">
     <Navbar />
     <SideBar />
     <div><h6>Manage Goods</h6></div>
@@ -29,14 +29,6 @@ export default {};
 </script>
 
 <style scoped>
-@import url("https://fonts.googleapis.com/css?family=Poppins");
-* {
-  font-family: "Poppins";
-}
-.manage_goods-container {
-  margin: 80px 10px 0 280px;
-}
-
 .manage_goods-card {
   padding-bottom: 100px;
 }

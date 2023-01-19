@@ -1,4 +1,4 @@
-export const state = () => ({
+export default () => ({
   goodsCarList: [
     {
       serial_number: "21456789JKL",

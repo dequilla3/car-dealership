@@ -1,5 +1,5 @@
 <template>
-  <div class="t_cashier-container">
+  <div class="mainContainer">
     <Navbar />
     <SideBar />
     <div><h6>Cashier</h6></div>
@@ -17,7 +17,7 @@
           v-model="form.salesInvoiceNumber"
           placeholder="None"
           required
-          class="form-t_cashier-input"
+          class="globalInputSize"
           disabled
         ></b-form-input>
       </b-form-group>
@@ -29,7 +29,7 @@
             id="input-quote"
             v-model="form.quote.quoteId"
             required
-            class="form-t_cashier-input"
+            class="globalInputSize"
             placeholder="None"
             disabled
           ></b-form-input>
@@ -48,7 +48,7 @@
             id="input-service"
             v-model="form.service.serviceId"
             required
-            class="form-t_cashier-input"
+            class="globalInputSize"
             placeholder="None"
             disabled
           ></b-form-input>
@@ -160,21 +160,6 @@ export default {
 </script>
 
 <style scoped>
-@import url("https://fonts.googleapis.com/css?family=Poppins");
-* {
-  font-family: "Poppins";
-}
-
-.form-t_cashier-input {
-  height: 35px;
-  font-size: 12px;
-}
-
-.t_cashier-container {
-  margin: 65px 10px 0 270px;
-  padding: 20px;
-}
-
 .form-t_cashier {
   width: 25%;
   font-size: 12px;

@@ -1,4 +1,4 @@
-export const state = () => ({
+export default () => ({
   itemList: [
     {
       id: 1,
@@ -50,9 +50,3 @@ export const state = () => ({
     },
   ],
 });
-
-export const getters = () => ({});
-
-export const mutations = () => ({});
-
-export const actions = () => ({});

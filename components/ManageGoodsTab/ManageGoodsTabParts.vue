@@ -1,5 +1,5 @@
 <template>
-  <div class="manag_parts-container">
+  <div>
     <Navbar />
     <SideBar />
     <div>
@@ -15,7 +15,7 @@
                 v-model="form.barcode"
                 placeholder="Enter barcode"
                 required
-                class="form-manag_parts-input"
+                class="globalInputSize"
               ></b-form-input>
             </b-form-group>
 
@@ -26,7 +26,7 @@
                 v-model="form.printname"
                 placeholder="Enter printname"
                 required
-                class="form-manag_parts-input"
+                class="globalInputSize"
               ></b-form-input>
             </b-form-group>
           </div>
@@ -40,7 +40,7 @@
                 v-model="form.unit"
                 placeholder="Enter unit"
                 required
-                class="form-manag_parts-input"
+                class="globalInputSize"
               ></b-form-input>
             </b-form-group>
 
@@ -51,7 +51,7 @@
                 v-model="form.cost"
                 placeholder="Enter cost"
                 required
-                class="form-manag_parts-input"
+                class="globalInputSize"
               ></b-form-input>
             </b-form-group>
           </div>
@@ -64,7 +64,7 @@
                 v-model="form.qty"
                 placeholder="Enter beginning balance"
                 :disabled="isUpdate"
-                class="form-manag_parts-input"
+                class="globalInputSize"
               ></b-form-input>
             </b-form-group>
           </div>
@@ -74,7 +74,10 @@
           <div class="grid-item">
             <div class="form-manag_parts-after-grid"></div>
             <b-button type="submit" variant="primary" class="form-manag_parts-btn">
-              <font-awesome-icon icon="fa-solid fa-check" /> {{ btnSubmitLabel }}
+              <font-awesome-icon
+                :icon="['fa-solid', isUpdate ? 'fa-user-pen' : 'fa-user-plus']"
+              />
+              {{ btnSubmitLabel }}
             </b-button>
 
             <b-button
@@ -99,7 +102,7 @@
           id="input-search"
           v-model="inputSearch"
           placeholder="Enter text . . ."
-          class="form-manag_parts-input"
+          class="globalInputSize"
         ></b-form-input>
       </b-form-group>
 
@@ -206,18 +209,8 @@ export default {
 </script>
 
 <style scoped>
-@import url("https://fonts.googleapis.com/css?family=Poppins");
-* {
-  font-family: "Poppins";
-}
-
 .form-manag_parts {
   width: 75%;
-  font-size: 12px;
-}
-
-.form-manag_parts-input {
-  height: 35px;
   font-size: 12px;
 }
 

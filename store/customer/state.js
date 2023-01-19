@@ -1,6 +1,6 @@
 let currentDate = new Date().toJSON().slice(0, 10);
 
-export const state = () => ({
+export default () => ({
   customerList: [
     {
       id: 1,
@@ -26,9 +26,3 @@ export const state = () => ({
     },
   ],
 });
-
-export const getters = () => ({});
-
-export const mutations = () => ({});
-
-export const actions = () => ({});

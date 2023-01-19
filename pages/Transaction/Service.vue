@@ -1,5 +1,5 @@
 <template>
-  <div class="t_service-container">
+  <div class="mainContainer">
     <Navbar />
     <SideBar />
     <div><h6>Service</h6></div>
@@ -16,7 +16,7 @@
           v-model="form.serviceNumber"
           placeholder="None"
           required
-          class="form-t_service-input"
+          class="globalInputSize"
           disabled
         ></b-form-input>
       </b-form-group>
@@ -32,7 +32,7 @@
             id="input-customerName"
             v-model="form.customer.customerName"
             required
-            class="form-t_service-input"
+            class="globalInputSize"
             placeholder="None"
             disabled
           ></b-form-input>
@@ -56,7 +56,7 @@
           v-model="form.serialNum"
           placeholder="Enter serial number"
           required
-          class="form-t_service-input"
+          class="globalInputSize"
         ></b-form-input>
       </b-form-group>
 
@@ -481,22 +481,11 @@ export default {
 </script>
 
 <style scoped>
-@import url("https://fonts.googleapis.com/css?family=Poppins");
-* {
-  font-family: "Poppins";
-}
-.t_service-container {
-  margin: 65px 10px 0 270px;
-  padding: 20px;
-}
 .form-t_service {
   width: 25%;
   font-size: 12px;
 }
-.form-t_service-input {
-  height: 35px;
-  font-size: 12px;
-}
+
 .form-t_service-btn {
   height: 35px;
   font-size: 12px;

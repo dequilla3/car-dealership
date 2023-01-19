@@ -1,5 +1,5 @@
 <template>
-  <div class="manage_role-container">
+  <div class="mainContainer">
     <Navbar />
     <SideBar />
     <div><h6>Manage Role</h6></div>
@@ -12,12 +12,15 @@
             v-model="form.role"
             placeholder="Enter role"
             required
-            class="form-manage_role-input"
+            class="globalInputSize"
           ></b-form-input>
         </b-form-group>
 
         <b-button type="submit" variant="primary" class="form-manage_role-btn">
-          <font-awesome-icon icon="fa-solid fa-check" /> {{ btnSubmitLabel }}
+          <font-awesome-icon
+            :icon="['fa-solid', isUpdate ? 'fa-user-pen' : 'fa-user-plus']"
+          />
+          {{ btnSubmitLabel }}
         </b-button>
 
         <b-button
@@ -38,7 +41,7 @@
           id="input-search"
           v-model="inputSearch"
           placeholder="Enter text . . ."
-          class="form-manage_role-input"
+          class="globalInputSize"
         ></b-form-input>
       </b-form-group>
 
@@ -73,6 +76,7 @@ let currentDate = new Date().toJSON().slice(0, 10);
 export default {
   data() {
     return {
+      isUpdate: false,
       inputSearch: "",
       perPage: 3,
       currentPage: 1,
@@ -95,8 +99,11 @@ export default {
       if (this.selected.length > 0) {
         this.form.role = this.selected[0].role;
         this.btnSubmitLabel = "Update Role";
+        this.isUpdate = true;
       } else {
+        this.btnSubmitLabel = "Add New Role";
         this.form.role = "";
+        this.isUpdate = false;
       }
     },
     onReset() {
@@ -126,20 +133,8 @@ export default {
 </script>
 
 <style scoped>
-@import url("https://fonts.googleapis.com/css?family=Poppins");
-* {
-  font-family: "Poppins";
-}
-.manage_role-container {
-  margin: 80px 10px 0 280px;
-}
 .form-manage_role {
   width: 30%;
-  font-size: 12px;
-}
-
-.form-manage_role-input {
-  height: 35px;
   font-size: 12px;
 }
 

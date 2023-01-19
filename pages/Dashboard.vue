@@ -2,7 +2,7 @@
   <div v-if="this.isLoggedIn">
     <Navbar />
     <SideBar />
-    <div class="dashboard">
+    <div class="mainContainer">
       <div><h6>Analytical view</h6></div>
       <hr />
       <div class="dashboard-content-container">
@@ -25,21 +25,9 @@ export default {
     return {
       isLoggedIn: false,
       dbContents: [
-        {
-          id: 1,
-          title: "Daily Sales",
-          value: 999.99,
-        },
-        {
-          id: 2,
-          title: "Weekly Sales",
-          value: 10000.99,
-        },
-        {
-          id: 3,
-          title: "Monthly Sales",
-          value: 13032.99,
-        },
+        { id: 1, title: "Daily Sales", value: 999.99 },
+        { id: 2, title: "Weekly Sales", value: 10000.99 },
+        { id: 3, title: "Monthly Sales", value: 13032.99 },
       ],
     };
   },
@@ -54,13 +42,6 @@ export default {
 </script>
 
 <style scoped>
-@import url("https://fonts.googleapis.com/css?family=Poppins");
-* {
-  font-family: "Poppins";
-}
-.dashboard {
-  margin: 80px 10px 0 280px;
-}
 .dashboard-content-container {
   position: absolute;
   display: grid;

@@ -1,0 +1,30 @@
+@import url("@fontsource/poppins");
+* {
+  font-family: "Poppins";
+}
+
+$lgFSize: 13px;
+$smFSize: 12px;
+$mainContainerSize: 80px 10px 0 300px;
+
+.mainContainer {
+  margin: $mainContainerSize;
+}
+
+.globalInputSize {
+  height: 35px;
+  font-size: $smFSize;
+}
+
+.pagination {
+  font-size: $smFSize;
+}
+
+.standardFontSize {
+  font-size: $lgFSize;
+}
+
+.standardButton {
+  width: 100%;
+  font-size: $lgFSize;
+}

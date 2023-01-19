@@ -1,5 +1,5 @@
 <template>
-  <div class="manage_customer-container">
+  <div class="mainContainer">
     <Navbar />
     <SideBar />
     <div><h6>Manage Customer</h6></div>
@@ -12,7 +12,7 @@
             v-model="form.name"
             placeholder="Enter name"
             required
-            class="form-manage_customer-input"
+            class="globalInputSize"
           ></b-form-input>
         </b-form-group>
 
@@ -22,7 +22,7 @@
             v-model="form.contact"
             placeholder="Enter contact number"
             required
-            class="form-manage_customer-input"
+            class="globalInputSize"
           ></b-form-input>
         </b-form-group>
 
@@ -32,12 +32,12 @@
             v-model="form.address"
             placeholder="Enter address"
             required
-            class="form-manage_customer-input"
+            class="globalInputSize"
           ></b-form-input>
         </b-form-group>
 
         <b-button type="submit" variant="primary" class="form-manage_customer-btn">
-          <font-awesome-icon icon="fa-solid fa-check" /> {{ btnSubmitLabel }}
+          <font-awesome-icon :icon="['fa-solid', icn]" /> {{ btnSubmitLabel }}
         </b-button>
 
         <b-button
@@ -58,7 +58,7 @@
           id="input-search"
           v-model="inputSearch"
           placeholder="Enter text . . ."
-          class="form-manage_customer-input"
+          class="globalInputSize"
         ></b-form-input>
       </b-form-group>
 
@@ -93,6 +93,7 @@ let currentDate = new Date().toJSON().slice(0, 10);
 export default {
   data() {
     return {
+      icn: "fa-user-plus",
       inputSearch: "",
       perPage: 3,
       currentPage: 1,
@@ -119,11 +120,13 @@ export default {
         this.form.contact = this.selected[0].contactNumber;
         this.form.address = this.selected[0].address;
         this.btnSubmitLabel = "Update Customer";
+        this.icn = "fa-user-pen";
       } else {
         this.form.name = "";
         this.form.contact = "";
         this.form.address = "";
         this.btnSubmitLabel = "Add new Customer";
+        this.icn = "fa-user-plus";
       }
     },
     onReset() {
@@ -156,20 +159,8 @@ export default {
 </script>
 
 <style scoped>
-@import url("https://fonts.googleapis.com/css?family=Poppins");
-* {
-  font-family: "Poppins";
-}
-.manage_customer-container {
-  margin: 80px 10px 0 280px;
-}
 .form-manage_customer {
   width: 30%;
-  font-size: 12px;
-}
-
-.form-manage_customer-input {
-  height: 35px;
   font-size: 12px;
 }
 

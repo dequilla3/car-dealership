@@ -1,5 +1,5 @@
 <template>
-  <div class="manage_car-container">
+  <div>
     <Navbar />
     <SideBar />
     <div>
@@ -19,7 +19,7 @@
                 v-model="form.serial_number"
                 placeholder="Enter serial #"
                 required
-                class="form-manage_car-input"
+                class="globalInputSize"
               ></b-form-input>
             </b-form-group>
 
@@ -30,7 +30,7 @@
                 v-model="form.color"
                 placeholder="Enter color"
                 required
-                class="form-manage_car-input"
+                class="globalInputSize"
               ></b-form-input>
             </b-form-group>
 
@@ -41,7 +41,7 @@
                 v-model="form.model"
                 placeholder="Enter model"
                 required
-                class="form-manage_car-input"
+                class="globalInputSize"
               ></b-form-input>
             </b-form-group>
 
@@ -52,7 +52,7 @@
                 v-model="form.brandname"
                 placeholder="Enter brandname"
                 required
-                class="form-manage_car-input"
+                class="globalInputSize"
               ></b-form-input>
             </b-form-group>
           </div>
@@ -66,7 +66,7 @@
                 v-model="form.unit"
                 placeholder="Enter unit"
                 required
-                class="form-manage_car-input"
+                class="globalInputSize"
               ></b-form-input>
             </b-form-group>
 
@@ -77,7 +77,7 @@
                 v-model="form.cost"
                 placeholder="Enter cost"
                 required
-                class="form-manage_car-input"
+                class="globalInputSize"
               ></b-form-input>
             </b-form-group>
 
@@ -87,7 +87,7 @@
                 id="input-qty"
                 placeholder="Enter beginning balance"
                 :disabled="isUpdate"
-                class="form-manage_car-input"
+                class="globalInputSize"
               ></b-form-input>
             </b-form-group>
           </div>
@@ -95,7 +95,10 @@
           <div class="grid-item">
             <div class="form-manage_car-after-grid"></div>
             <b-button type="submit" variant="primary" class="form-manage_car-btn">
-              <font-awesome-icon icon="fa-solid fa-check" /> {{ btnSubmitLabel }}
+              <font-awesome-icon
+                :icon="['fa-solid', isUpdate ? 'fa-user-pen' : 'fa-user-plus']"
+              />
+              {{ btnSubmitLabel }}
             </b-button>
 
             <b-button
@@ -108,19 +111,16 @@
             </b-button>
           </div>
         </div>
-
         <!-- END OF GRID -->
       </b-form>
-
       <br />
-
       <!-- search input -->
       <b-form-group id="inputSearch" label="Search:" label-for="input-search">
         <b-form-input
           id="input-search"
           v-model="inputSearch"
           placeholder="Enter text . . ."
-          class="form-manage_car-input"
+          class="globalInputSize"
         ></b-form-input>
       </b-form-group>
 
@@ -138,6 +138,13 @@
         selected-variant="info"
         @row-selected="onRowSelected"
       >
+        <template #cell(cost)="data">
+          <b-form-input
+            disabled
+            class="globalInputSize"
+            :value="Number(data.value).toLocaleString('en-US')"
+          ></b-form-input>
+        </template>
       </b-table>
 
       <b-pagination
@@ -162,13 +169,13 @@ export default {
       currentPage: 1,
       selected: [],
       partsTblFields: [
-        "serial_number",
-        "color",
-        "model",
-        "brandname",
-        "unit",
-        "cost",
-        "qty",
+        { key: "serial_number", label: "Serial Number", thStyle: { width: "10%" } },
+        { key: "color", label: "Color", thStyle: { width: "10%" } },
+        { key: "model", label: "Model", thStyle: { width: "25%" } },
+        { key: "brandname", label: "Brand", thStyle: { width: "25%" } },
+        { key: "unit", label: "Unit", thStyle: { width: "10%" } },
+        { key: "cost", label: "Cost", thStyle: { width: "10%" } },
+        { key: "qty", label: "Qty", thStyle: { width: "10%" } },
       ],
       btnSubmitLabel: "Add New Car Details",
       tblItems: [],
@@ -243,18 +250,8 @@ export default {
 </script>
 
 <style scoped>
-@import url("https://fonts.googleapis.com/css?family=Poppins");
-* {
-  font-family: "Poppins";
-}
-
 .form-manage_car {
   width: 75%;
-  font-size: 12px;
-}
-
-.form-manage_car-input {
-  height: 35px;
   font-size: 12px;
 }
 
