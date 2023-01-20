@@ -11,6 +11,10 @@ $mainContainerSize: 80px 10px 0 300px;
   margin: $mainContainerSize;
 }
 
+.docnoInput {
+  font-weight: bold;
+}
+
 .globalInputSize {
   height: 35px;
   font-size: $smFSize;
@@ -27,4 +31,31 @@ $mainContainerSize: 80px 10px 0 300px;
 .standardButton {
   width: 100%;
   font-size: $lgFSize;
+}
+
+.print {
+  display: none;
+}
+
+.print-body {
+  padding: 50px 20px 20px 20px;
+}
+
+@media print {
+  .dontPrint {
+    display: none;
+  }
+  .print {
+    display: block;
+    margin: 0;
+    padding: 0;
+  }
+  .mainContainer {
+    margin: 0;
+    padding: 0;
+  }
+  @page {
+    size: auto;
+    margin: 0mm;
+  }
 }

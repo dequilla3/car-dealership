@@ -4,7 +4,6 @@
       <b-navbar-brand href="/dashboard"
         ><font-awesome-icon icon="fa-solid fa-car" /> DMS</b-navbar-brand
       >
-
       <div class="d-flex flex-row-reverse w-100">
         <b-dropdown id="dropdown-right" right variant="info" class="w-150-px" size="sm">
           <template #button-content

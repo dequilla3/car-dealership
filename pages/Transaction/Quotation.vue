@@ -1,11 +1,19 @@
 <template>
   <div class="mainContainer">
+    <b-overlay no-wrap :show="isBusy" opacity="0.40" />
     <Navbar />
     <SideBar />
     <div><h6>Quotation</h6></div>
     <hr />
     <div>
       <b-form @submit="onSubmit" class="form-t_quotation">
+        <b-alert
+          :show="alert.showAlert"
+          :variant="alert.variant"
+          @dismissed="alert.showAlert = null"
+        >
+          {{ alert.message }}
+        </b-alert>
         <b-button
           variant="primary"
           class="form-t_quotation-btn t-btn-primary-margin-bottom"
@@ -16,7 +24,13 @@
           New Transaction
         </b-button>
 
-        <b-form-checkbox id="checkbox-1" v-model="isService" name="checkbox-1" size="sm">
+        <b-form-checkbox
+          id="checkbox-1"
+          v-model="isService"
+          name="checkbox-1"
+          size="sm"
+          :disabled="isProcessed"
+        >
           Leave check if transaction is for service
         </b-form-checkbox>
         <br />
@@ -32,7 +46,7 @@
             v-model="form.quotationNumber"
             placeholder="None"
             required
-            class="globalInputSize"
+            class="globalInputSize docnoInput"
             disabled
           ></b-form-input>
         </b-form-group>
@@ -60,6 +74,7 @@
                 variant="secondary"
                 class="form-t_quotation-btn"
                 @click="openCustomerModal"
+                :disabled="isProcessed"
                 >Select</b-button
               >
             </b-input-group-append>
@@ -90,6 +105,7 @@
                 variant="secondary"
                 class="form-t_quotation-btn"
                 @click="onClickServiceBtnModal"
+                :disabled="isProcessed"
                 >Select</b-button
               >
             </b-input-group-append>
@@ -103,6 +119,7 @@
           variant="info"
           class="form-t_quotation-btn t-btn-secondary-margin-bottom"
           @click="openItemListModalDialog"
+          :disabled="isProcessed"
         >
           <font-awesome-icon icon="fa-solid fa-arrow-down" />
           Insert Product
@@ -112,6 +129,7 @@
           variant="danger"
           class="form-t_quotation-btn t-btn-secondary-margin-bottom"
           @click="removeItem"
+          :disabled="isProcessed"
         >
           <font-awesome-icon icon="fa-solid fa-close" />
           Remove Product
@@ -187,7 +205,11 @@
             <font-awesome-icon icon="fa-solid fa-cogs" /> Process Transaction
           </b-button>
 
-          <b-button variant="info" class="form-t_quotation-btn btn-transaction">
+          <b-button
+            variant="info"
+            class="form-t_quotation-btn btn-transaction"
+            :disabled="!isProcessed"
+          >
             <font-awesome-icon icon="fa-solid fa-file" />
             Print Receipt
           </b-button>
@@ -338,13 +360,7 @@
         <div class="modal-container">
           <h6>Insert Item</h6>
           <hr />
-          <b-alert
-            :show="alert.showAlert"
-            :variant="alert.variant"
-            @dismissed="alert.showAlert = null"
-          >
-            {{ alert.message }}
-          </b-alert>
+
           <!-- search input -->
           <b-form-group
             id="inputSearchInsertItemModal"
@@ -415,6 +431,7 @@ let currentDate = new Date().toJSON().slice(0, 10);
 export default {
   data() {
     return {
+      isBusy: false,
       isService: false,
       selectedLine: [],
       show: true,
@@ -458,8 +475,8 @@ export default {
         perPage: 5,
         currentPage: 1,
         selected: [],
-        customerTblFields: ["name", "contactNumber", "address", "dateCreated"],
         customerTblList: [],
+        customerTblFields: ["name", "contactNumber", "address", "dateCreated"],
       },
 
       serviceModal: {
@@ -479,25 +496,13 @@ export default {
         perPage: 5,
         currentPage: 1,
         selected: [],
-        itemTblFields: [
-          {
-            key: "productCode",
-            label: "Product Code",
-          },
-          {
-            key: "productName",
-            label: "Product Name",
-          },
-          {
-            key: "unit",
-            label: "Unit",
-          },
-          {
-            key: "cost",
-            label: "Cost",
-          },
-        ],
         itemList: [],
+        itemTblFields: [
+          { key: "productCode", label: "Product Code" },
+          { key: "productName", label: "Product Name" },
+          { key: "unit", label: "Unit" },
+          { key: "cost", label: "Cost" },
+        ],
       },
     };
   },
@@ -532,18 +537,38 @@ export default {
     },
 
     openItemListModalDialog() {
+      this.insertItemModal.selected = [];
       this.insertItemModal.itemList = this.getItemList;
     },
 
     onClickedNewTrans() {
+      this.totalAmount = "";
+
       this.isProcessed = false;
       this.quotationLineList = [];
-      this.form.customer = "";
+
+      this.form.customer.customerId = "";
+      this.form.customer.customerName = "";
+
+      this.form.service.serviceId = "";
+      this.form.service.serviceNumber = "";
+
       this.form.quotationNumber = "";
     },
 
     onClickProcess() {
-      this.isProcessed = true;
+      this.isBusy = true;
+
+      setTimeout(() => {
+        this.form.quotationNumber = "TEST123";
+        this.isProcessed = true;
+        this.isBusy = false;
+        this.alert = {
+          showAlert: 3,
+          variant: "success",
+          message: "Successfully processed!",
+        };
+      }, 3000);
     },
 
     //select btn on customerModal
@@ -580,13 +605,8 @@ export default {
       let selectedLine = this.insertItemModal.selected[0];
       let isNotExist = true;
 
-      if (this.customerModal.selected.length < 1) {
-        this.alert = {
-          showAlert: 3,
-          variant: "warning",
-          message: "Please select customer first!",
-        };
-      } else {
+      //IF empty selection
+      if (selectedLine !== undefined) {
         // if exist in list increase qty
         this.quotationLineList.forEach(function (line) {
           if (selectedLine.skuId === line.skuId) {

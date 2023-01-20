@@ -1,240 +1,12 @@
 <template>
   <div class="mainContainer">
-    <Navbar />
-    <SideBar />
-    <div><h6>Service</h6></div>
-    <hr />
-    <b-form @submit="onSubmuit" class="form-t_service">
-      <b-button variant="primary" class="form-t_service-btn t-btn-primary-margin-bottom">
-        <font-awesome-icon icon="fa-solid fa-plus" />
-        New Trasaction
-      </b-button>
-      <!-- transaction number form group-->
-      <b-form-group id="serviceNum" label="Reference Number:" label-for="serviceNum">
-        <b-form-input
-          id="serviceNum"
-          v-model="form.serviceNumber"
-          placeholder="None"
-          required
-          class="globalInputSize"
-          disabled
-        ></b-form-input>
-      </b-form-group>
-
-      <!-- customer form grp-->
-      <b-form-group
-        id="customerName"
-        label="Select Customer:"
-        label-for="input-customerName"
-      >
-        <b-input-group id="b-input-group-customerName">
-          <b-form-input
-            id="input-customerName"
-            v-model="form.customer.customerName"
-            required
-            class="globalInputSize"
-            placeholder="None"
-            disabled
-          ></b-form-input>
-          <b-input-group-append>
-            <b-button
-              id="b-modal-customer"
-              v-b-modal.modal-lg="'customerModal'"
-              variant="secondary"
-              class="form-t_service-btn"
-              @click="openCustomerModal"
-              >Select</b-button
-            >
-          </b-input-group-append>
-        </b-input-group>
-      </b-form-group>
-
-      <!-- car serial number -->
-      <b-form-group id="serialNum" label="Serial Number:" label-for="serialNum">
-        <b-form-input
-          id="serialNum"
-          v-model="form.serialNum"
-          placeholder="Enter serial number"
-          required
-          class="globalInputSize"
-        ></b-form-input>
-      </b-form-group>
-
-      <!-- Customer Modals -->
-      <b-modal
-        id="customerModal"
-        size="lg"
-        hide-footer
-        hide-header
-        title="Select Customer"
-        centered
-      >
-        <div class="modal-container">
-          <h6>Select Customer</h6>
-          <hr />
-          <!-- search input -->
-          <b-form-group id="inputSearch" label="Search:" label-for="input-search">
-            <b-form-input
-              id="input-search"
-              v-model="customerModal.inputSearch"
-              placeholder="Search . . ."
-              class="modal-input"
-            ></b-form-input>
-          </b-form-group>
-
-          <!-- customer modal table -->
-          <b-table
-            class="t_service-table"
-            hover
-            :items="customerModal.customerTblList"
-            :fields="customerModal.customerTblFields"
-            :per-page="customerModal.perPage"
-            :current-page="customerModal.currentPage"
-            select-mode="single"
-            ref="selectableTable"
-            selectable
-            selected-variant="info"
-            @row-selected="setSelectedCustomer"
-          >
-          </b-table>
-
-          <!-- tbl pages -->
-          <b-pagination
-            v-model="customerModal.currentPage"
-            :total-rows="totalRowsCustomerModal"
-            :per-page="customerModal.perPage"
-            aria-controls="my-table"
-            class="pagination"
-          ></b-pagination>
-
-          <hr />
-
-          <!-- customer modal action btn -->
-          <div class="div-content-left">
-            <b-button
-              variant="success"
-              class="form-t_service-btn modal-action-btn"
-              @click="selectCustomer"
-            >
-              <font-awesome-icon icon="fa-solid fa-check" /> Select
-            </b-button>
-
-            <b-button
-              variant="danger"
-              class="form-t_service-btn modal-action-btn"
-              @click="$bvModal.hide('customerModal')"
-            >
-              <font-awesome-icon icon="fa-solid fa-xmark" /> Cancel
-            </b-button>
-          </div>
-        </div>
-      </b-modal>
-    </b-form>
-    <br />
-
-    <!-- Insert item button -->
-    <b-button
-      v-b-modal.modal-lg="'insertItemModal'"
-      variant="info"
-      class="form-t_service-btn t-btn-secondary-margin-bottom"
-      @click="onClickInsertItem"
-    >
-      <font-awesome-icon icon="fa-solid fa-arrow-down" />
-      Insert Item
-    </b-button>
-
-    <!-- Remove item button -->
-    <b-button
-      variant="danger"
-      class="form-t_service-btn t-btn-secondary-margin-bottom"
-      @click="removeItem"
-    >
-      <font-awesome-icon icon="fa-solid fa-close" />
-      Remove Item
-    </b-button>
-
-    <!--transaction table -->
-    <b-table
-      class="t_service-table"
-      hover
-      :items="serviceLineList"
-      :fields="serviceLineTblField"
-      :per-page="perPage"
-      :current-page="currentPage"
-      select-mode="single"
-      ref="selectableTable"
-      selectable
-      selected-variant="info"
-      @row-selected="setSelectedLine"
-    >
-      <template #cell(qty)="data">
-        <b-form-input
-          class="b-table-input"
-          type="number"
-          v-model="serviceLineList[data.index].qty"
-          :value="data.value"
-          @keyup="onKeypressInputQty"
-        ></b-form-input>
-      </template>
-
-      <template #cell(amount)="data">
-        <b-form-input
-          disabled
-          class="b-table-input"
-          type="number"
-          :value="serviceLineList[data.index].qty * serviceLineList[data.index].cost"
-        ></b-form-input>
-      </template>
-    </b-table>
-
-    <hr />
-
-    <!-- Total amount section -->
-
-    <div class="d-flex flex-row-reverse">
-      <div class="p-2">
-        <b-input-group class="input--total-size" size="sm" prepend="Total:">
-          <b-form-input disabled v-model="totalAmount" type="text"></b-form-input>
-        </b-input-group>
-      </div>
-
-      <div class="p-2">
-        <b-pagination
-          v-model="currentPage"
-          :total-rows="rows"
-          :per-page="perPage"
-          aria-controls="my-table"
-          v-if="rows > 0"
-          class="pagination"
-        ></b-pagination>
-      </div>
-    </div>
-
-    <hr />
-
-    <!-- Proecss and Print button -->
-    <div class="div-content-left">
-      <b-button variant="info" class="form-t_service-btn btn-transaction">
-        <font-awesome-icon icon="fa-solid fa-cogs" /> Process Transaction
-      </b-button>
-
-      <b-button variant="info" class="form-t_service-btn btn-transaction">
-        <font-awesome-icon icon="fa-solid fa-file" />
-        Print Receipt
-      </b-button>
-    </div>
-
-    <!-- Insert Item Modal -->
-    <b-modal
-      id="insertItemModal"
-      size="xl"
-      hide-footer
-      hide-header
-      title="Insert Customer"
-    >
-      <div class="modal-container">
-        <h6>Insert Item</h6>
-        <hr />
+    <b-overlay no-wrap :show="isBusy" opacity="0.40" />
+    <div class="dontPrint">
+      <Navbar />
+      <SideBar />
+      <div><h6>Service</h6></div>
+      <hr />
+      <b-form @submit="onSubmuit" class="form-t_service">
         <b-alert
           :show="alert.showAlert"
           :variant="alert.variant"
@@ -242,74 +14,334 @@
         >
           {{ alert.message }}
         </b-alert>
-        <!-- search input -->
-        <b-form-group
-          id="inputSearchInsertItemModal"
-          label="Search:"
-          label-for="input-search"
+        <b-button
+          v-if="isProcessed"
+          variant="primary"
+          class="form-t_service-btn t-btn-primary-margin-bottom"
+          @click="onNewTrans"
         >
+          <font-awesome-icon icon="fa-solid fa-plus" />
+          New Trasaction
+        </b-button>
+        <!-- transaction number form group-->
+        <b-form-group id="serviceNum" label="Reference Number:" label-for="serviceNum">
           <b-form-input
-            id="input-search"
-            v-model="insertItemModal.inputSearch"
-            placeholder="Search . . ."
-            class="modal-input"
+            id="serviceNum"
+            v-model="form.serviceNumber"
+            placeholder="None"
+            required
+            class="globalInputSize docnoInput"
+            disabled
           ></b-form-input>
         </b-form-group>
 
-        <!-- item modal table -->
-        <b-table
-          class="t_service-table"
-          hover
-          :items="insertItemModal.itemList"
-          :fields="insertItemModal.itemTblFields"
-          :per-page="insertItemModal.perPage"
-          :current-page="insertItemModal.currentPage"
-          select-mode="single"
-          ref="selectableTable"
-          selectable
-          selected-variant="info"
-          @row-selected="setSelectedItem"
+        <!-- customer form grp-->
+        <b-form-group
+          id="customerName"
+          label="Select Customer:"
+          label-for="input-customerName"
         >
-        </b-table>
+          <b-input-group id="b-input-group-customerName">
+            <b-form-input
+              id="input-customerName"
+              v-model="form.customer.customerName"
+              required
+              class="globalInputSize"
+              placeholder="None"
+              disabled
+            ></b-form-input>
+            <b-input-group-append>
+              <b-button
+                id="b-modal-customer"
+                v-b-modal.modal-lg="'customerModal'"
+                variant="secondary"
+                class="form-t_service-btn"
+                @click="openCustomerModal"
+                :disabled="isProcessed"
+                >Select</b-button
+              >
+            </b-input-group-append>
+          </b-input-group>
+        </b-form-group>
 
-        <!-- tbl pages -->
-        <b-pagination
-          v-model="insertItemModal.currentPage"
-          :total-rows="totalItemRows"
-          :per-page="insertItemModal.perPage"
-          aria-controls="my-table"
-          class="pagination"
-        ></b-pagination>
+        <!-- car serial number -->
+        <b-form-group id="serialNum" label="Serial Number:" label-for="serialNum">
+          <b-form-input
+            id="serialNum"
+            v-model="form.serialNum"
+            placeholder="Enter serial number"
+            required
+            class="globalInputSize"
+            :disabled="isProcessed"
+          ></b-form-input>
+        </b-form-group>
 
-        <hr />
+        <!-- Customer Modals -->
+        <b-modal
+          id="customerModal"
+          size="lg"
+          hide-footer
+          hide-header
+          title="Select Customer"
+          centered
+        >
+          <div class="modal-container">
+            <h6>Select Customer</h6>
+            <hr />
+            <!-- search input -->
+            <b-form-group id="inputSearch" label="Search:" label-for="input-search">
+              <b-form-input
+                id="input-search"
+                v-model="customerModal.inputSearch"
+                placeholder="Search . . ."
+                class="modal-input"
+              ></b-form-input>
+            </b-form-group>
 
-        <!-- item modal action btn -->
-        <div class="div-content-left">
-          <b-button
-            variant="success"
-            class="form-t_service-btn modal-action-btn"
-            @click="onClickInsertItemModal"
-          >
-            <font-awesome-icon icon="fa-solid fa-check" /> Insert
-          </b-button>
+            <!-- customer modal table -->
+            <b-table
+              class="t_service-table"
+              hover
+              :items="customerModal.customerTblList"
+              :fields="customerModal.customerTblFields"
+              :per-page="customerModal.perPage"
+              :current-page="customerModal.currentPage"
+              select-mode="single"
+              ref="selectableTable"
+              selectable
+              selected-variant="info"
+              @row-selected="setSelectedCustomer"
+            >
+            </b-table>
 
-          <b-button
-            variant="danger"
-            class="form-t_service-btn modal-action-btn"
-            @click="$bvModal.hide('insertItemModal')"
-          >
-            <font-awesome-icon icon="fa-solid fa-xmark" /> Cancel
-          </b-button>
+            <!-- tbl pages -->
+            <b-pagination
+              v-model="customerModal.currentPage"
+              :total-rows="totalRowsCustomerModal"
+              :per-page="customerModal.perPage"
+              aria-controls="my-table"
+              class="pagination"
+            ></b-pagination>
+
+            <hr />
+
+            <!-- customer modal action btn -->
+            <div class="div-content-left">
+              <b-button
+                variant="success"
+                class="form-t_service-btn modal-action-btn"
+                @click="selectCustomer"
+              >
+                <font-awesome-icon icon="fa-solid fa-check" /> Select
+              </b-button>
+
+              <b-button
+                variant="danger"
+                class="form-t_service-btn modal-action-btn"
+                @click="$bvModal.hide('customerModal')"
+              >
+                <font-awesome-icon icon="fa-solid fa-xmark" /> Cancel
+              </b-button>
+            </div>
+          </div>
+        </b-modal>
+      </b-form>
+      <br />
+
+      <!-- Insert item button -->
+      <b-button
+        v-b-modal.modal-lg="'insertItemModal'"
+        variant="info"
+        class="form-t_service-btn t-btn-secondary-margin-bottom"
+        @click="onClickInsertItem"
+        :disabled="isProcessed"
+      >
+        <font-awesome-icon icon="fa-solid fa-arrow-down" />
+        Insert Item
+      </b-button>
+
+      <!-- Remove item button -->
+      <b-button
+        variant="danger"
+        class="form-t_service-btn t-btn-secondary-margin-bottom"
+        @click="removeItem"
+        :disabled="isProcessed"
+      >
+        <font-awesome-icon icon="fa-solid fa-close" />
+        Remove Item
+      </b-button>
+
+      <!--transaction table -->
+      <b-table
+        class="t_service-table"
+        hover
+        :items="serviceLineList"
+        :fields="serviceLineTblField"
+        :per-page="perPage"
+        :current-page="currentPage"
+        select-mode="single"
+        ref="selectableTable"
+        selectable
+        selected-variant="info"
+        @row-selected="setSelectedLine"
+      >
+        <template #cell(qty)="data">
+          <b-form-input
+            class="b-table-input"
+            type="number"
+            v-model="serviceLineList[data.index].qty"
+            :value="data.value"
+            @keyup="onKeypressInputQty"
+            :disabled="isProcessed"
+          ></b-form-input>
+        </template>
+
+        <template #cell(amount)="data">
+          <b-form-input
+            disabled
+            class="b-table-input"
+            type="number"
+            :value="serviceLineList[data.index].qty * serviceLineList[data.index].cost"
+          ></b-form-input>
+        </template>
+      </b-table>
+
+      <hr />
+
+      <!-- Total amount section -->
+
+      <div class="d-flex flex-row-reverse">
+        <div class="p-2">
+          <b-input-group class="input--total-size" size="sm" prepend="Total:">
+            <b-form-input disabled v-model="totalAmount" type="text"></b-form-input>
+          </b-input-group>
+        </div>
+
+        <div class="p-2">
+          <b-pagination
+            v-model="currentPage"
+            :total-rows="rows"
+            :per-page="perPage"
+            aria-controls="my-table"
+            v-if="rows > 0"
+            class="pagination"
+          ></b-pagination>
         </div>
       </div>
-    </b-modal>
+
+      <hr />
+
+      <!-- Proecss and Print button -->
+      <div class="div-content-left">
+        <b-button
+          @click="onProcess"
+          variant="info"
+          class="form-t_service-btn btn-transaction"
+        >
+          <font-awesome-icon icon="fa-solid fa-cogs" /> Process Transaction
+        </b-button>
+
+        <b-button
+          @click="onPrint"
+          variant="info"
+          class="form-t_service-btn btn-transaction"
+        >
+          <font-awesome-icon icon="fa-solid fa-file" />
+          Print Receipt
+        </b-button>
+      </div>
+
+      <!-- Insert Item Modal -->
+      <b-modal
+        id="insertItemModal"
+        size="xl"
+        hide-footer
+        hide-header
+        title="Insert Customer"
+      >
+        <div class="modal-container">
+          <h6>Insert Item</h6>
+          <hr />
+
+          <!-- search input -->
+          <b-form-group
+            id="inputSearchInsertItemModal"
+            label="Search:"
+            label-for="input-search"
+          >
+            <b-form-input
+              id="input-search"
+              v-model="insertItemModal.inputSearch"
+              placeholder="Search . . ."
+              class="modal-input"
+            ></b-form-input>
+          </b-form-group>
+
+          <!-- item modal table -->
+          <b-table
+            class="t_service-table"
+            hover
+            :items="insertItemModal.itemList"
+            :fields="insertItemModal.itemTblFields"
+            :per-page="insertItemModal.perPage"
+            :current-page="insertItemModal.currentPage"
+            select-mode="single"
+            ref="selectableTable"
+            selectable
+            selected-variant="info"
+            @row-selected="setSelectedItem"
+          >
+          </b-table>
+
+          <!-- tbl pages -->
+          <b-pagination
+            v-model="insertItemModal.currentPage"
+            :total-rows="totalItemRows"
+            :per-page="insertItemModal.perPage"
+            aria-controls="my-table"
+            class="pagination"
+          ></b-pagination>
+
+          <hr />
+
+          <!-- item modal action btn -->
+          <div class="div-content-left">
+            <b-button
+              variant="success"
+              class="form-t_service-btn modal-action-btn"
+              @click="onClickInsertItemModal"
+            >
+              <font-awesome-icon icon="fa-solid fa-check" /> Insert
+            </b-button>
+
+            <b-button
+              variant="danger"
+              class="form-t_service-btn modal-action-btn"
+              @click="$bvModal.hide('insertItemModal')"
+            >
+              <font-awesome-icon icon="fa-solid fa-xmark" /> Cancel
+            </b-button>
+          </div>
+        </div>
+      </b-modal>
+    </div>
+
+    <div class="print">
+      <ServiceTicket />
+    </div>
   </div>
 </template>
 
 <script>
+import ServiceTicket from "../../components/Reports/ServiceTicket.vue";
 export default {
+  components: {
+    ServiceTicket,
+  },
   data() {
     return {
+      isBusy: false,
+      isProcessed: false,
       show: true,
       totalAmount: 0,
       perPage: 4,
@@ -383,6 +415,35 @@ export default {
 
     onSubmuit() {},
 
+    onPrint() {
+      window.print();
+    },
+
+    onNewTrans() {
+      this.totalAmount = "";
+      this.form.serviceNumber = "";
+      this.form.serialNum = "";
+      this.form.customer.customerId = "";
+      this.form.customer.customerName = "";
+      this.isProcessed = false;
+      this.serviceLineList = [];
+    },
+
+    onProcess() {
+      this.isBusy = true;
+
+      setTimeout(() => {
+        this.isBusy = false;
+        this.isProcessed = true;
+        this.form.serviceNumber = "TEST123";
+        this.alert = {
+          showAlert: 3,
+          variant: "success",
+          message: "Successfully processed!",
+        };
+      }, 3000);
+    },
+
     openCustomerModal() {
       this.customerModal.customerTblList = this.getCustomerList;
     },
@@ -424,30 +485,22 @@ export default {
       let selectedLine = this.insertItemModal.selected[0];
       let isNotExist = true;
 
-      if (this.customerModal.selected.length < 1) {
-        this.alert = {
-          showAlert: 2,
-          variant: "warning",
-          message: "Please select customer first!",
-        };
-      } else {
-        // if exist in list increase qty
-        this.serviceLineList.forEach(function (line) {
-          if (selectedLine.serviceId === line.serviceId) {
-            line.qty++;
-            isNotExist = false;
-            return;
-          }
-        });
-
-        // if not exist push to list
-        if (isNotExist) {
-          this.serviceLineList.push(this.insertItemModal.selected[0]);
+      // if exist in list increase qty
+      this.serviceLineList.forEach(function (line) {
+        if (selectedLine.serviceId === line.serviceId) {
+          line.qty++;
+          isNotExist = false;
+          return;
         }
+      });
 
-        //set total amount
-        this.totalAmount = this.computeTotalAmount;
+      // if not exist push to list
+      if (isNotExist) {
+        this.serviceLineList.push(this.insertItemModal.selected[0]);
       }
+
+      //set total amount
+      this.totalAmount = this.computeTotalAmount;
     },
   },
 

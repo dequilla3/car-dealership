@@ -246,12 +246,7 @@ export default {
     setTimeout(() => {
       this.customerTblList = this.getCustomerList;
       this.roleList = this.getRoles;
-
-      setInterval(() => {
-        this.customerTblList = this.getCustomerList;
-        this.roleList = this.getRoles;
-      }, 5000);
-    }, 5000);
+    }, 1000);
   },
 
   computed: {

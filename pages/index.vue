@@ -75,6 +75,7 @@ export default {
     return {
       isPwShow: false,
       isLoggedIn: false,
+      userList: [], //For mockdata only
       user: {
         username: "",
         pw: "",
@@ -84,18 +85,6 @@ export default {
         variant: "success",
         message: "The username and / or password is Incorrect",
       },
-      userMockdatas: [
-        {
-          id: 1,
-          username: "admin",
-          pw: "admin",
-        },
-        {
-          id: 2,
-          username: "useradmin",
-          pw: "12345",
-        },
-      ],
     };
   },
   mounted() {
@@ -105,13 +94,6 @@ export default {
     } else {
       this.$router.push({ path: "./" });
     }
-  },
-
-  created() {
-    // setTimeout(function () {
-    //   console.log("Reload");
-    //   window.location.reload(1);
-    // }, 5000);
   },
 
   methods: {
@@ -124,7 +106,7 @@ export default {
       var isUserFound = false;
 
       //iterate user list
-      this.userMockdatas.forEach(function (el) {
+      this.userList.forEach(function (el) {
         if (userName === el.username && passWord === el.pw) {
           //user found
           isUserFound = true;
@@ -148,6 +130,17 @@ export default {
         variant,
         message,
       };
+    },
+  },
+
+  created() {
+    this.userList = this.getUsers;
+  },
+
+  computed: {
+    //for mocldata implementation only
+    getUsers() {
+      return this.$store.state.login.users;
     },
   },
 };
