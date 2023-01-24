@@ -52,10 +52,12 @@
       </b-form-group>
 
       <b-button class="standardButton" id="loginButton" type="submit" variant="primary">
-        <font-awesome-icon icon="fa-solid fa-right-to-bracket" /> Login</b-button
-      >
+        <b-spinner small v-if="show" />
+        <font-awesome-icon icon="fa-solid fa-right-to-bracket" v-if="!show" />
+        Login
+      </b-button>
 
-      <div id="alert-login-div">
+      <div>
         <br />
         <b-alert
           :show="alert.showAlert"
@@ -75,6 +77,7 @@ export default {
     return {
       isPwShow: false,
       isLoggedIn: false,
+      show: false,
       userList: [], //For mockdata only
       user: {
         username: "",
@@ -87,41 +90,37 @@ export default {
       },
     };
   },
-  mounted() {
-    this.isLoggedIn = localStorage.isLoggedIn;
-    if (this.isLoggedIn) {
-      this.$router.push({ path: "/dashboard" });
-    } else {
-      this.$router.push({ path: "./" });
-    }
-  },
 
   methods: {
     onclickShowPw() {
       this.isPwShow = !this.isPwShow;
     },
-    userLogin() {
-      var userName = this.user.username;
-      var passWord = this.user.pw;
-      var isUserFound = false;
+    async userLogin() {
+      this.show = true;
+      await this.$store
+        .dispatch("login/loginUser", {
+          username: this.user.username,
+          password: this.user.pw,
+        })
+        .then(
+          (res) => {
+            localStorage.isLoggedIn = true;
+            localStorage.userId = res.data.user_id;
+            localStorage.userName = `${res.data.name} (${res.data.username})`;
+            localStorage.token = res.data.token;
 
-      //iterate user list
-      this.userList.forEach(function (el) {
-        if (userName === el.username && passWord === el.pw) {
-          //user found
-          isUserFound = true;
-        }
-      });
-
-      //proceed to dashboard if true
-      if (isUserFound) {
-        localStorage.isLoggedIn = true;
-        localStorage.userName = userName;
-        localStorage.activeMenuId = "dashboard";
-        this.$router.push({ path: "/dashboard" });
-      } else {
-        this.showAlert("Failed to Log In!", "danger");
-      }
+            this.show = false;
+            this.$router.push({ path: "/dashboard" });
+          },
+          (err) => {
+            if (err.response === undefined) {
+              this.showAlert("Not Connected!", "danger");
+              this.show = false;
+            } else {
+              this.showAlert(err.response.data.error, "danger");
+            }
+          }
+        );
     },
 
     showAlert(message, variant) {
@@ -131,14 +130,25 @@ export default {
         message,
       };
     },
+
+    async validateUser() {
+      await this.$store.dispatch("login/getUserById");
+    },
   },
 
-  created() {
-    this.userList = this.getUsers;
+  mounted() {
+    this.isLoggedIn = localStorage.isLoggedIn;
+    if (this.isLoggedIn) {
+      this.show = true;
+      setTimeout(() => {
+        this.$router.push({ path: "/dashboard" });
+      }, 3000);
+    } else {
+      this.$router.push({ path: "./" });
+    }
   },
 
   computed: {
-    //for mocldata implementation only
     getUsers() {
       return this.$store.state.login.users;
     },

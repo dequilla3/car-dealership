@@ -6,7 +6,7 @@
       <SideBar />
       <div><h6>Service</h6></div>
       <hr />
-      <b-form @submit="onSubmuit" class="form-t_service">
+      <b-form @submit="onSubmuit" class="form-60">
         <b-alert
           :show="alert.showAlert"
           :variant="alert.variant"
@@ -23,58 +23,71 @@
           <font-awesome-icon icon="fa-solid fa-plus" />
           New Trasaction
         </b-button>
-        <!-- transaction number form group-->
-        <b-form-group id="serviceNum" label="Reference Number:" label-for="serviceNum">
-          <b-form-input
-            id="serviceNum"
-            v-model="form.serviceNumber"
-            placeholder="None"
-            required
-            class="globalInputSize docnoInput"
-            disabled
-          ></b-form-input>
-        </b-form-group>
 
-        <!-- customer form grp-->
-        <b-form-group
-          id="customerName"
-          label="Select Customer:"
-          label-for="input-customerName"
-        >
-          <b-input-group id="b-input-group-customerName">
-            <b-form-input
-              id="input-customerName"
-              v-model="form.customer.customerName"
-              required
-              class="globalInputSize"
-              placeholder="None"
-              disabled
-            ></b-form-input>
-            <b-input-group-append>
-              <b-button
-                id="b-modal-customer"
-                v-b-modal.modal-lg="'customerModal'"
-                variant="secondary"
-                class="form-t_service-btn"
-                @click="openCustomerModal"
+        <div class="grid-container-3">
+          <div class="grid-item">
+            <!-- transaction number form group-->
+            <b-form-group
+              id="serviceNum"
+              label="Reference Number:"
+              label-for="serviceNum"
+            >
+              <b-form-input
+                id="serviceNum"
+                v-model="form.serviceNumber"
+                placeholder="None"
+                required
+                class="globalInputSize docnoInput"
+                disabled
+              ></b-form-input>
+            </b-form-group>
+          </div>
+
+          <div class="grid-item">
+            <!-- customer form grp-->
+            <b-form-group
+              id="customerName"
+              label="Select Customer:"
+              label-for="input-customerName"
+            >
+              <b-input-group id="b-input-group-customerName">
+                <b-form-input
+                  id="input-customerName"
+                  v-model="form.customer.customerName"
+                  required
+                  class="globalInputSize"
+                  placeholder="None"
+                  disabled
+                ></b-form-input>
+                <b-input-group-append>
+                  <b-button
+                    id="b-modal-customer"
+                    v-b-modal.modal-lg="'customerModal'"
+                    variant="secondary"
+                    class="form-t_service-btn"
+                    @click="openCustomerModal"
+                    :disabled="isProcessed"
+                    >Select</b-button
+                  >
+                </b-input-group-append>
+              </b-input-group>
+            </b-form-group>
+          </div>
+
+          <div class="grid-item">
+            <!-- car serial number -->
+            <b-form-group id="serialNum" label="Serial Number:" label-for="serialNum">
+              <b-form-input
+                id="serialNum"
+                v-model="form.serialNum"
+                placeholder="Enter serial number"
+                required
+                class="globalInputSize"
                 :disabled="isProcessed"
-                >Select</b-button
-              >
-            </b-input-group-append>
-          </b-input-group>
-        </b-form-group>
-
-        <!-- car serial number -->
-        <b-form-group id="serialNum" label="Serial Number:" label-for="serialNum">
-          <b-form-input
-            id="serialNum"
-            v-model="form.serialNum"
-            placeholder="Enter serial number"
-            required
-            class="globalInputSize"
-            :disabled="isProcessed"
-          ></b-form-input>
-        </b-form-group>
+              ></b-form-input>
+            </b-form-group>
+          </div>
+        </div>
 
         <!-- Customer Modals -->
         <b-modal

@@ -5,41 +5,55 @@
     <div><h6>Manage Service Items</h6></div>
     <hr />
     <div>
-      <b-form @submit="onSubmit" v-if="show" class="form-manage_customer">
-        <b-form-group
-          id="service_name"
-          label="Service Item:"
-          label-for="input-service_name"
+      <b-form @submit="onSubmit" v-if="show" class="form-60">
+        <b-alert
+          :show="alert.showAlert"
+          :variant="alert.variant"
+          @dismissed="alert.showAlert = null"
         >
-          <b-form-input
-            id="input-service_name"
-            v-model="form.service_name"
-            placeholder="Enter service item name"
-            required
-            class="globalInputSize"
-          ></b-form-input>
-        </b-form-group>
-
-        <b-form-group id="unit" label="Unit:" label-for="input-unit">
-          <b-form-input
-            id="input-unit"
-            v-model="form.unit"
-            placeholder="Enter unit"
-            required
-            class="globalInputSize"
-          ></b-form-input>
-        </b-form-group>
-
-        <b-form-group id="cost" label="Cost:" label-for="input-cost">
-          <b-form-input
-            id="input-cost"
-            type="number"
-            v-model="form.cost"
-            placeholder="Enter cost"
-            required
-            class="globalInputSize"
-          ></b-form-input>
-        </b-form-group>
+          {{ alert.message }} <br />
+          {{ alert.subMsg }}
+        </b-alert>
+        <div class="grid-container-3">
+          <div class="grid-item">
+            <b-form-group
+              id="service_name"
+              label="Service Item:"
+              label-for="input-service_name"
+            >
+              <b-form-input
+                id="input-service_name"
+                v-model="form.service_name"
+                placeholder="Enter service item name"
+                required
+                class="globalInputSize"
+              ></b-form-input>
+            </b-form-group>
+          </div>
+          <div class="grid-item">
+            <b-form-group id="unit" label="Unit:" label-for="input-unit">
+              <b-form-input
+                id="input-unit"
+                v-model="form.unit"
+                placeholder="Enter unit"
+                required
+                class="globalInputSize"
+              ></b-form-input>
+            </b-form-group>
+          </div>
+          <div class="grid-item">
+            <b-form-group id="cost" label="Cost:" label-for="input-cost">
+              <b-form-input
+                id="input-cost"
+                type="number"
+                v-model="form.cost"
+                placeholder="Enter cost"
+                required
+                class="globalInputSize"
+              ></b-form-input>
+            </b-form-group>
+          </div>
+        </div>
 
         <b-button type="submit" variant="primary" class="form-manage_customer-btn">
           <font-awesome-icon
@@ -73,8 +87,8 @@
       <b-table
         class="customer_list-table"
         hover
-        :items="customerTblList"
-        :fields="customerTblFields"
+        :items="serviceTblList"
+        :fields="serviceTblFields"
         :per-page="perPage"
         :current-page="currentPage"
         select-mode="single"
@@ -83,6 +97,9 @@
         selected-variant="info"
         @row-selected="onRowSelected"
       >
+        <template #cell(date_created)="data">
+          {{ new Date(data.value).toJSON().slice(0, 10) }}
+        </template>
       </b-table>
 
       <b-pagination
@@ -101,36 +118,20 @@ let currentDate = new Date().toJSON().slice(0, 10);
 export default {
   data() {
     return {
+      alert: {
+        showAlert: 0,
+        variant: "",
+        message: "",
+        subMsg: "",
+      },
       isUpdate: false,
       inputSearch: "",
       perPage: 3,
       currentPage: 1,
       selected: [],
-      customerTblFields: ["service_name", "unit", "cost", "dateCreated"],
+      serviceTblFields: ["service_name", "unit", "cost", "date_created"],
       btnSubmitLabel: "Add New Service Item",
-      customerTblList: [
-        {
-          id: 1,
-          service_name: "FI Cleaning",
-          unit: "per car",
-          cost: "500",
-          dateCreated: currentDate,
-        },
-        {
-          id: 2,
-          service_name: "Change Oil",
-          unit: "per car",
-          cost: "100",
-          dateCreated: currentDate,
-        },
-        {
-          id: 2,
-          service_name: "Tune-up",
-          unit: "day",
-          cost: "500",
-          dateCreated: currentDate,
-        },
-      ],
+      serviceTblList: [],
 
       form: {
         service_name: "",
@@ -143,6 +144,11 @@ export default {
     };
   },
   methods: {
+    showAlert(dissmiss, warning, msg) {
+      this.alert.showAlert = dissmiss;
+      this.alert.variant = warning;
+      this.alert.message = msg;
+    },
     onRowSelected(items) {
       this.selected = items;
       if (this.selected.length > 0) {
@@ -168,12 +174,70 @@ export default {
     },
     onSubmit(event) {
       event.preventDefault();
-      console.log(JSON.stringify(this.form));
+      if (this.isUpdate) {
+        this.editServiceItem();
+      } else {
+        this.addServiceItem();
+      }
     },
+
+    async loadServiceItems() {
+      await this.$store
+        .dispatch("service/loadServiceItemList", {
+          token: localStorage.token,
+        })
+        .then((res) => {
+          this.serviceTblList = this.getServiceItems;
+        });
+    },
+
+    async addServiceItem() {
+      await this.$store
+        .dispatch("service/addServiceITem", {
+          token: localStorage.token,
+          service_name: this.form.service_name,
+          unit: this.form.unit,
+          cost: this.form.cost,
+        })
+        .then((res) => {
+          this.showAlert(3, "success", "Successfully added new service item!");
+          this.loadServiceItems();
+          this.onReset();
+        });
+    },
+
+    async editServiceItem() {
+      await this.$store
+        .dispatch("service/editServiceITem", {
+          token: localStorage.token,
+          service_item_id: this.selected[0].service_item_id,
+          service_name: this.form.service_name,
+          unit: this.form.unit,
+          cost: this.form.cost,
+        })
+        .then(
+          (res) => {
+            this.showAlert(3, "success", "Successfully updated selected service item!");
+            this.loadServiceItems();
+            this.onReset();
+          },
+          (err) => {
+            this.onReset();
+            this.showAlert(3, "warning", err.response.data.error);
+          }
+        );
+    },
+  },
+  mounted() {
+    this.loadServiceItems();
   },
   computed: {
     rows() {
-      return this.customerTblList.length;
+      return this.serviceTblList.length;
+    },
+
+    getServiceItems() {
+      return this.$store.state.service.serviceItemsList;
     },
   },
 };

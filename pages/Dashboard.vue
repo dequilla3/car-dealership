@@ -35,7 +35,7 @@ export default {
     this.isLoggedIn = localStorage.isLoggedIn;
 
     if (!this.isLoggedIn) {
-      this.$router.push({ path: "/" }); // LOG OUT
+      // this.$router.push({ path: "/" }); // LOG OUT
     }
   },
 };

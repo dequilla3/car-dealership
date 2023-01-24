@@ -6,7 +6,7 @@
     <div><h6>Quotation</h6></div>
     <hr />
     <div>
-      <b-form @submit="onSubmit" class="form-t_quotation">
+      <b-form @submit="onSubmit" class="form-60">
         <b-alert
           :show="alert.showAlert"
           :variant="alert.variant"
@@ -31,86 +31,95 @@
           size="sm"
           :disabled="isProcessed"
         >
-          Leave check if transaction is for service
+          Leave check if transaction with service
         </b-form-checkbox>
         <br />
-        <!-- transaction number form group-->
-        <b-form-group
-          id="quotationNumber"
-          label="Reference Number:"
-          label-for="input-quotationNumber"
-          class="b-form-group-t_quotation"
-        >
-          <b-form-input
-            id="input-quotationNumber"
-            v-model="form.quotationNumber"
-            placeholder="None"
-            required
-            class="globalInputSize docnoInput"
-            disabled
-          ></b-form-input>
-        </b-form-group>
 
-        <!-- customer form grp-->
-        <b-form-group
-          id="customerName"
-          label="Select Customer:"
-          label-for="input-customerName"
-          class="b-form-group-t_quotation"
-        >
-          <b-input-group id="b-input-group-customerName">
-            <b-form-input
-              id="input-customerName"
-              v-model="form.customer.customerName"
-              required
-              class="globalInputSize"
-              placeholder="None"
-              disabled
-            ></b-form-input>
-            <b-input-group-append>
-              <b-button
-                id="b-modal-customer"
-                v-b-modal.modal-lg="'customerModal'"
-                variant="secondary"
-                class="form-t_quotation-btn"
-                @click="openCustomerModal"
-                :disabled="isProcessed"
-                >Select</b-button
-              >
-            </b-input-group-append>
-          </b-input-group>
-        </b-form-group>
+        <div class="grid-container-3">
+          <div class="grid-item">
+            <!-- transaction number form group-->
+            <b-form-group
+              id="quotationNumber"
+              label="Reference Number:"
+              label-for="input-quotationNumber"
+              class="b-form-group-t_quotation"
+            >
+              <b-form-input
+                id="input-quotationNumber"
+                v-model="form.quotationNumber"
+                placeholder="None"
+                required
+                class="globalInputSize docnoInput"
+                disabled
+              ></b-form-input>
+            </b-form-group>
+          </div>
 
-        <!-- select service form grp-->
-        <b-form-group
-          id="serviceModal"
-          label="Select Service Number:"
-          label-for="input-service"
-          class="b-form-group-t_quotation"
-          v-if="isService"
-        >
-          <b-input-group id="b-input-group-service">
-            <b-form-input
-              id="input-service"
-              v-model="form.service.serviceNumber"
-              required
-              class="globalInputSize"
-              placeholder="None"
-              disabled
-            ></b-form-input>
-            <b-input-group-append>
-              <b-button
-                id="b-modal-service"
-                v-b-modal.modal-lg="'serviceModal'"
-                variant="secondary"
-                class="form-t_quotation-btn"
-                @click="onClickServiceBtnModal"
-                :disabled="isProcessed"
-                >Select</b-button
-              >
-            </b-input-group-append>
-          </b-input-group>
-        </b-form-group>
+          <div class="grid-item">
+            <!-- customer form grp-->
+            <b-form-group
+              id="customerName"
+              label="Select Customer:"
+              label-for="input-customerName"
+              class="b-form-group-t_quotation"
+            >
+              <b-input-group id="b-input-group-customerName">
+                <b-form-input
+                  id="input-customerName"
+                  v-model="form.customer.customerName"
+                  required
+                  class="globalInputSize"
+                  placeholder="None"
+                  disabled
+                ></b-form-input>
+                <b-input-group-append>
+                  <b-button
+                    id="b-modal-customer"
+                    v-b-modal.modal-lg="'customerModal'"
+                    variant="secondary"
+                    class="form-t_quotation-btn"
+                    @click="openCustomerModal"
+                    :disabled="isProcessed"
+                    >Select</b-button
+                  >
+                </b-input-group-append>
+              </b-input-group>
+            </b-form-group>
+          </div>
+
+          <div class="grid-item">
+            <!-- select service form grp-->
+            <b-form-group
+              id="serviceModal"
+              label="Select Service Number:"
+              label-for="input-service"
+              class="b-form-group-t_quotation"
+              v-if="isService"
+            >
+              <b-input-group id="b-input-group-service">
+                <b-form-input
+                  id="input-service"
+                  v-model="form.service.serviceNumber"
+                  required
+                  class="globalInputSize"
+                  placeholder="None"
+                  disabled
+                ></b-form-input>
+                <b-input-group-append>
+                  <b-button
+                    id="b-modal-service"
+                    v-b-modal.modal-lg="'serviceModal'"
+                    variant="secondary"
+                    class="form-t_quotation-btn"
+                    @click="onClickServiceBtnModal"
+                    :disabled="isProcessed"
+                    >Select</b-button
+                  >
+                </b-input-group-append>
+              </b-input-group>
+            </b-form-group>
+          </div>
+        </div>
       </b-form>
       <br />
       <div>

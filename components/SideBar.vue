@@ -147,6 +147,8 @@ export default {
     this.transactionMenus.forEach(function (menu) {
       menu.active = menu.key == menuKey;
     });
+
+    this.setMenuActive(menuKey);
   },
 
   created() {},

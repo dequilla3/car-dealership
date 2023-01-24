@@ -5,36 +5,50 @@
     <div><h6>Manage Customer</h6></div>
     <hr />
     <div>
-      <b-form @submit="onSubmit" v-if="show" class="form-manage_customer">
-        <b-form-group id="name" label="Name:" label-for="input-name">
-          <b-form-input
-            id="input-name"
-            v-model="form.name"
-            placeholder="Enter name"
-            required
-            class="globalInputSize"
-          ></b-form-input>
-        </b-form-group>
+      <b-form @submit="onSubmit" v-if="show" class="form-60">
+        <b-alert
+          :show="alert.showAlert"
+          :variant="alert.variant"
+          @dismissed="alert.showAlert = null"
+        >
+          {{ alert.message }}
+        </b-alert>
+        <div class="grid-container-3">
+          <div class="grid-item">
+            <b-form-group id="name" label="Name:" label-for="input-name">
+              <b-form-input
+                id="input-name"
+                v-model="form.name"
+                placeholder="Enter name"
+                required
+                class="globalInputSize"
+              ></b-form-input>
+            </b-form-group>
+          </div>
+          <div class="grid-item">
+            <b-form-group id="contact" label="Cotanct Number:" label-for="input-contact">
+              <b-form-input
+                id="input-contact"
+                v-model="form.contact"
+                placeholder="Enter contact number"
+                required
+                class="globalInputSize"
+              ></b-form-input>
+            </b-form-group>
+          </div>
 
-        <b-form-group id="contact" label="Cotanct Number:" label-for="input-contact">
-          <b-form-input
-            id="input-contact"
-            v-model="form.contact"
-            placeholder="Enter contact number"
-            required
-            class="globalInputSize"
-          ></b-form-input>
-        </b-form-group>
-
-        <b-form-group id="address" label="Address:" label-for="input-address">
-          <b-form-input
-            id="input-address"
-            v-model="form.address"
-            placeholder="Enter address"
-            required
-            class="globalInputSize"
-          ></b-form-input>
-        </b-form-group>
+          <div class="grid-item">
+            <b-form-group id="address" label="Address:" label-for="input-address">
+              <b-form-input
+                id="input-address"
+                v-model="form.address"
+                placeholder="Enter address"
+                required
+                class="globalInputSize"
+              ></b-form-input>
+            </b-form-group>
+          </div>
+        </div>
 
         <b-button type="submit" variant="primary" class="form-manage_customer-btn">
           <font-awesome-icon :icon="['fa-solid', icn]" /> {{ btnSubmitLabel }}
@@ -75,6 +89,9 @@
         selected-variant="info"
         @row-selected="onRowSelected"
       >
+        <template #cell(date_created)="data">
+          {{ new Date(data.value).toJSON().slice(0, 10) }}
+        </template>
       </b-table>
 
       <b-pagination
@@ -93,12 +110,17 @@ let currentDate = new Date().toJSON().slice(0, 10);
 export default {
   data() {
     return {
+      alert: {
+        showAlert: 0,
+        variant: "",
+        message: "",
+      },
       icn: "fa-user-plus",
       inputSearch: "",
-      perPage: 3,
+      perPage: 5,
       currentPage: 1,
       selected: [],
-      customerTblFields: ["name", "contactNumber", "address", "dateCreated"],
+      customerTblFields: ["name", "contact_number", "address", "date_created"],
       btnSubmitLabel: "Add new Customer",
       customerTblList: [],
 
@@ -109,24 +131,32 @@ export default {
       },
 
       show: true,
+      isUpdate: false,
     };
   },
 
   methods: {
+    showAlert(dissmiss, warning, msg) {
+      this.alert.showAlert = dissmiss;
+      this.alert.variant = warning;
+      this.alert.message = msg;
+    },
     onRowSelected(items) {
       this.selected = items;
       if (this.selected.length > 0) {
         this.form.name = this.selected[0].name;
-        this.form.contact = this.selected[0].contactNumber;
+        this.form.contact = this.selected[0].contact_number;
         this.form.address = this.selected[0].address;
         this.btnSubmitLabel = "Update Customer";
         this.icn = "fa-user-pen";
+        this.isUpdate = true;
       } else {
         this.form.name = "";
         this.form.contact = "";
         this.form.address = "";
         this.btnSubmitLabel = "Add new Customer";
         this.icn = "fa-user-plus";
+        this.isUpdate = false;
       }
     },
     onReset() {
@@ -138,12 +168,70 @@ export default {
     },
     onSubmit(event) {
       event.preventDefault();
-      console.log(JSON.stringify(this.form));
+      if (this.isUpdate) {
+        this.editCustomer();
+      } else {
+        this.addCustomer();
+      }
+    },
+
+    async loadCustomer() {
+      await this.$store
+        .dispatch("customer/loadCustomers", { token: localStorage.token })
+        .then(
+          (res) => {
+            this.customerTblList = this.getCustomerList;
+          },
+          (err) => {
+            this.showAlert(3, "warning", `${err.response.data.error}`);
+          }
+        );
+    },
+
+    async addCustomer() {
+      await this.$store
+        .dispatch("customer/addCustomer", {
+          token: localStorage.token,
+          name: this.form.name,
+          contact_number: this.form.contact,
+          address: this.form.address,
+        })
+        .then(
+          (res) => {
+            this.showAlert(3, "success", "Successfully added new customer!");
+            this.loadCustomer();
+            this.onReset();
+          },
+          (err) => {
+            this.showAlert(3, "warning", `${err.response.data.error}`);
+          }
+        );
+    },
+
+    async editCustomer() {
+      await this.$store
+        .dispatch("customer/editCustomer", {
+          token: localStorage.token,
+          customer_id: this.selected[0].customer_id,
+          name: this.form.name,
+          contact_number: this.form.contact,
+          address: this.form.address,
+        })
+        .then(
+          (res) => {
+            this.showAlert(3, "info", "Successfully updated customer!");
+            this.loadCustomer();
+            this.onReset();
+          },
+          (err) => {
+            this.showAlert(3, "warning", `${err.response.data.error}`);
+          }
+        );
     },
   },
 
-  created() {
-    this.customerTblList = this.getCustomerList;
+  mounted() {
+    this.loadCustomer();
   },
 
   computed: {

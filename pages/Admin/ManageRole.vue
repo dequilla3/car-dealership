@@ -6,6 +6,16 @@
     <hr />
     <div>
       <b-form @submit="onSubmit" v-if="show" class="form-manage_role">
+        <div>
+          <b-alert
+            :show="alert.showAlert"
+            :variant="alert.variant"
+            @dismissed="alert.showAlert = null"
+          >
+            {{ alert.message }} <br />
+            {{ alert.subMsg }}
+          </b-alert>
+        </div>
         <b-form-group id="role" label="Role name:" label-for="input-role">
           <b-form-input
             id="input-role"
@@ -76,9 +86,16 @@ let currentDate = new Date().toJSON().slice(0, 10);
 export default {
   data() {
     return {
+      alert: {
+        showAlert: 0,
+        variant: "",
+        message: "",
+        subMsg: "",
+      },
+
       isUpdate: false,
       inputSearch: "",
-      perPage: 3,
+      perPage: 8,
       currentPage: 1,
       selected: [],
       roleTblFields: ["role"],
@@ -113,12 +130,52 @@ export default {
     },
     onSubmit(event) {
       event.preventDefault();
-      console.log(JSON.stringify(this.form));
+
+      if (this.isUpdate) {
+        this.editRole();
+      } else {
+        this.addRole();
+      }
+    },
+
+    async loadRoles() {
+      await this.$store
+        .dispatch("role/loadRoles", { token: localStorage.token })
+        .then((res) => {
+          this.roleList = this.getRoleList;
+        });
+    },
+
+    async addRole() {
+      await this.$store.dispatch("role/addRole", { role: this.form.role }).then((res) => {
+        this.onReset();
+        this.loadRoles();
+        this.alert.showAlert = 3;
+        this.alert.variant = "success";
+        this.alert.message = "Successfully added new role";
+      });
+    },
+
+    async editRole() {
+      await this.$store
+        .dispatch("role/editRole", {
+          token: localStorage.token,
+          roleId: this.selected[0].user_role_id,
+          role: this.form.role,
+        })
+        .then((res) => {
+          this.alert.showAlert = 5;
+          this.alert.variant = "info";
+          this.alert.message = `Successfully updated role!`;
+          this.alert.subMsg = `FROM: ${this.selected[0].role} TO: ${this.form.role}`;
+          this.onReset();
+          this.loadRoles();
+        });
     },
   },
 
   mounted() {
-    this.roleList = this.getRoleList;
+    this.loadRoles();
   },
 
   computed: {

@@ -4,6 +4,13 @@
     <SideBar />
     <div>
       <b-form @submit="onSubmit" v-if="show" class="form-manage_car">
+        <b-alert
+          :show="alert.showAlert"
+          :variant="alert.variant"
+          @dismissed="alert.showAlert = null"
+        >
+          {{ alert.message }}
+        </b-alert>
         <!-- GRID -->
         <div class="grid-container">
           <!-- Grid1 -->
@@ -44,7 +51,10 @@
                 class="globalInputSize"
               ></b-form-input>
             </b-form-group>
+          </div>
 
+          <!-- Grrid2 -->
+          <div class="grid-item">
             <b-form-group id="brandname" label="Brand Name:" label-for="input-brandname">
               <b-form-input
                 type="text"
@@ -55,10 +65,7 @@
                 class="globalInputSize"
               ></b-form-input>
             </b-form-group>
-          </div>
 
-          <!-- Grrid2 -->
-          <div class="grid-item">
             <b-form-group id="unit" label="Unit:" label-for="input-unit">
               <b-form-input
                 type="text"
@@ -77,16 +84,6 @@
                 v-model="form.cost"
                 placeholder="Enter cost"
                 required
-                class="globalInputSize"
-              ></b-form-input>
-            </b-form-group>
-
-            <b-form-group id="qty" label="Qty:" label-for="input-qty" disabled>
-              <b-form-input
-                type="number"
-                id="input-qty"
-                placeholder="Enter beginning balance"
-                :disabled="isUpdate"
                 class="globalInputSize"
               ></b-form-input>
             </b-form-group>
@@ -163,6 +160,11 @@ let currentDate = new Date().toJSON().slice(0, 10);
 export default {
   data() {
     return {
+      alert: {
+        showAlert: 0,
+        variant: "",
+        message: "",
+      },
       inputSearch: "",
       isUpdate: false,
       perPage: 3,
@@ -171,11 +173,10 @@ export default {
       partsTblFields: [
         { key: "serial_number", label: "Serial Number", thStyle: { width: "10%" } },
         { key: "color", label: "Color", thStyle: { width: "10%" } },
-        { key: "model", label: "Model", thStyle: { width: "25%" } },
-        { key: "brandname", label: "Brand", thStyle: { width: "25%" } },
+        { key: "model", label: "Model", thStyle: { width: "30%" } },
+        { key: "brand_name", label: "Brand", thStyle: { width: "30%" } },
         { key: "unit", label: "Unit", thStyle: { width: "10%" } },
         { key: "cost", label: "Cost", thStyle: { width: "10%" } },
-        { key: "qty", label: "Qty", thStyle: { width: "10%" } },
       ],
       btnSubmitLabel: "Add New Car Details",
       tblItems: [],
@@ -194,13 +195,18 @@ export default {
     };
   },
   methods: {
+    showAlert(dissmiss, warning, msg) {
+      this.alert.showAlert = dissmiss;
+      this.alert.variant = warning;
+      this.alert.message = msg;
+    },
     onRowSelected(items) {
       this.selected = items;
       if (this.selected.length > 0) {
         this.form.serial_number = this.selected[0].serial_number;
         this.form.color = this.selected[0].color;
         this.form.model = this.selected[0].model;
-        this.form.brandname = this.selected[0].brandname;
+        this.form.brandname = this.selected[0].brand_name;
         this.form.unit = this.selected[0].unit;
         this.form.cost = this.selected[0].cost;
         this.form.qty = this.selected[0].qty;
@@ -224,17 +230,72 @@ export default {
       this.form.printname = "";
       this.form.unit = "";
       this.form.cost = "";
-      this.btnSubmitLabel = "Add new Parts";
+      this.btnSubmitLabel = "Add New Car Details";
       this.isUpdate = false;
     },
     onSubmit(event) {
       event.preventDefault();
-      console.log(JSON.stringify(this.form));
+      if (this.isUpdate) {
+        this.editCars();
+      } else {
+        this.addCars();
+      }
+    },
+
+    async loadCars() {
+      await this.$store
+        .dispatch("goods/loadCars", { token: localStorage.token })
+        .then((res) => {
+          this.tblItems = this.getCarList;
+        });
+    },
+
+    async addCars() {
+      await this.$store
+        .dispatch("goods/addCars", {
+          token: localStorage.token,
+          unit: this.form.unit,
+          cost: this.form.cost,
+          serial_number: this.form.serial_number,
+          brand_name: this.form.brandname,
+          model: this.form.model,
+          color: this.form.color,
+        })
+        .then(
+          (res) => {
+            this.showAlert(3, "success", "Successfully added new car!");
+            this.loadCars();
+            this.onReset();
+          },
+          (err) => {}
+        );
+    },
+
+    async editCars() {
+      await this.$store
+        .dispatch("goods/editCars", {
+          token: localStorage.token,
+          product_car_id: this.selected[0].product_car_id,
+          unit: this.form.unit,
+          cost: this.form.cost,
+          serial_number: this.form.serial_number,
+          brand_name: this.form.brandname,
+          model: this.form.model,
+          color: this.form.color,
+        })
+        .then(
+          (res) => {
+            this.showAlert(3, "info", "Successfully updated selected car!");
+            this.loadCars();
+            this.onReset();
+          },
+          (err) => {}
+        );
     },
   },
 
-  created() {
-    this.tblItems = this.getCarList;
+  mounted() {
+    this.loadCars();
   },
 
   computed: {

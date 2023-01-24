@@ -1,11 +1,19 @@
 <template>
   <div class="mainContainer">
+    <b-overlay :show="isBusy" rounded="sm" variant="light" opacity="0.30" no-wrap />
     <Navbar />
     <SideBar />
     <div><h6>Manage User</h6></div>
     <hr />
     <div>
       <b-form @submit="onSubmit" v-if="show" class="form-app_user">
+        <b-alert
+          :show="alert.showAlert"
+          :variant="alert.variant"
+          @dismissed="alert.showAlert = null"
+        >
+          {{ alert.message }}
+        </b-alert>
         <div class="row">
           <div class="col-6 col-sm-4">
             <b-form-group id="name" label="Name:" label-for="input-name">
@@ -120,7 +128,7 @@
       <b-table
         class="customer_list-table"
         hover
-        :items="customerTblList"
+        :items="userTblList"
         :fields="customerTblFields"
         :per-page="perPage"
         :current-page="currentPage"
@@ -130,6 +138,9 @@
         selected-variant="info"
         @row-selected="onRowSelected"
       >
+        <template #cell(date_created)="data">
+          {{ new Date(data.value).toJSON().slice(0, 10) }}
+        </template>
       </b-table>
 
       <b-pagination
@@ -144,10 +155,14 @@
 </template>
 
 <script>
+import axios from "axios";
+
 const currentDate = new Date().toJSON().slice(0, 10);
+
 export default {
   data() {
     return {
+      isUpdate: false,
       isPwShow: false,
       icn: "fa-user-plus",
       dropDownText: "-- Select Role -- ",
@@ -155,9 +170,9 @@ export default {
       perPage: 3,
       currentPage: 1,
       selected: [],
-      customerTblFields: ["name", "contactNumber", "address", "dateCreated"],
+      customerTblFields: ["name", "contact_number", "address", "date_created"],
       btnSubmitLabel: "Add new User",
-      customerTblList: [],
+      userTblList: [],
       roleList: [],
 
       form: {
@@ -175,15 +190,27 @@ export default {
 
       show: true,
       isDisabled: false,
+      isBusy: false,
+
+      alert: {
+        showAlert: 0,
+        variant: "",
+        message: "",
+      },
     };
   },
 
   methods: {
+    showAlert(dissmiss, warning, msg) {
+      this.alert.showAlert = dissmiss;
+      this.alert.variant = warning;
+      this.alert.message = msg;
+    },
     onRowSelected(items) {
       this.selected = items;
       if (this.selected.length > 0) {
         this.form.name = this.selected[0].name;
-        this.form.contact = this.selected[0].contactNumber;
+        this.form.contact = this.selected[0].contact_number;
         this.form.address = this.selected[0].address;
         this.form.username = "N/A";
         this.form.pw = "N/A";
@@ -192,6 +219,15 @@ export default {
 
         this.isDisabled = true;
         this.isPwShow = true;
+        this.isUpdate = true;
+
+        this.roleList.forEach((val) => {
+          if (val.user_role_id === this.selected[0].user_role_id) {
+            this.form.userRole.roleId = val.user_role_id;
+            this.form.userRole.role = val.role;
+            this.dropDownText = val.role;
+          }
+        });
       } else {
         this.form.name = "";
         this.form.contact = "";
@@ -203,8 +239,14 @@ export default {
 
         this.isDisabled = false;
         this.isPwShow = false;
+        this.isUpdate = false;
+
+        this.form.userRole.roleId = "";
+        this.form.userRole.role = "";
+        this.dropDownText = "-- Select Role -- ";
       }
     },
+
     onReset() {
       this.$refs.selectableTable.clearSelected();
       this.form.name = "";
@@ -212,23 +254,42 @@ export default {
       this.form.address = "";
       this.btnSubmitLabel = "Add new Customer";
     },
-    onSubmit(event) {
-      event.preventDefault();
-      this.$store.dispatch("user/addUser", {
-        id: this.rows + 1,
-        name: this.form.name,
-        contactNumber: this.form.contact,
-        address: this.form.address,
-        dateCreated: currentDate,
-      });
 
-      // this.$store.commit("user/ADD_USER", {
-      //   id: this.rows + 1,
-      //   name: this.form.name,
-      //   contactNumber: this.form.contact,
-      //   address: this.form.address,
-      //   dateCreated: currentDate,
-      // });
+    async onSubmit(event) {
+      event.preventDefault();
+
+      if (this.form.userRole.roleId === "") {
+        this.showAlert(3, "warning", "Please select role");
+        return;
+      }
+
+      await axios({
+        method: "POST",
+        url: `${this.$axios.defaults.baseURL}/create-user`,
+        data: {
+          name: this.form.name,
+          contact_number: this.form.contact,
+          address: this.form.address,
+          username: this.form.username,
+          password: this.form.pw,
+          user_role_id: this.form.userRole.roleId,
+        },
+      }).then(
+        (res) => {
+          let existingUserCount = res.data.user === undefined ? 0 : res.data.user.length;
+          if (existingUserCount > 0) {
+            this.showAlert(3, "warning", `${res.data.msg}`);
+            return;
+          }
+          this.showAlert(3, "success", "Successfully added new user!");
+          this.loadRoles();
+          this.loadUser();
+          this.onReset();
+        },
+        (err) => {
+          this.showAlert(3, "warning", `${err.response.data.error}`);
+        }
+      );
     },
 
     onlickShowPw() {
@@ -236,30 +297,55 @@ export default {
     },
 
     onClickRoleDropdownMenu(role) {
-      this.form.userRole.roleId = role.roleId;
+      this.form.userRole.roleId = role.user_role_id;
       this.form.userRole.role = role.role;
       this.dropDownText = this.form.userRole.role;
     },
+
+    //LOAD DATA FROM API
+    async loadRoles() {
+      this.isBusy = true;
+      await this.$store
+        .dispatch("role/loadRoles", { token: localStorage.token })
+        .then((res) => {
+          this.roleList = this.getRoles;
+          this.isBusy = false;
+        });
+    },
+
+    async loadUser() {
+      this.isBusy = true;
+      await this.$store
+        .dispatch("user/loadUsers", {
+          token: localStorage.token,
+        })
+        .then((res) => {
+          this.userTblList = this.getUserList;
+          this.isBusy = false;
+        });
+    },
   },
 
-  created() {
-    setTimeout(() => {
-      this.customerTblList = this.getCustomerList;
-      this.roleList = this.getRoles;
-    }, 1000);
+  mounted() {
+    this.loadRoles();
+    this.loadUser();
   },
 
   computed: {
     rows() {
-      return this.customerTblList.length;
+      return this.userTblList.length;
     },
 
-    getCustomerList() {
+    getUserList() {
       return this.$store.state.user.userList;
     },
 
     getRoles() {
       return this.$store.state.role.roles;
+    },
+
+    getExistingUser() {
+      return this.$store.state.user.existUser;
     },
   },
 };

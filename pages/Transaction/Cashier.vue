@@ -6,7 +6,7 @@
       <SideBar />
       <div><h6>Cashier</h6></div>
       <hr />
-      <b-form class="form-t_cashier">
+      <b-form class="form-60">
         <b-button
           variant="primary"
           class="form-t_cashier-btn t-btn-primary-margin-bottom"
@@ -15,58 +15,69 @@
           New Trasaction
         </b-button>
 
-        <!-- transaction number form group-->
-        <b-form-group id="sI" label="Sales Invoice Number:" label-for="sI">
-          <b-form-input
-            id="sI"
-            v-model="form.salesInvoiceNumber"
-            placeholder="None"
-            required
-            class="globalInputSize"
-            disabled
-          ></b-form-input>
-        </b-form-group>
+        <div class="grid-container-3">
+          <div class="grid-item">
+            <!-- transaction number form group-->
+            <b-form-group id="sI" label="Sales Invoice Number:" label-for="sI">
+              <b-form-input
+                id="sI"
+                v-model="form.salesInvoiceNumber"
+                placeholder="None"
+                required
+                class="globalInputSize"
+                disabled
+              ></b-form-input>
+            </b-form-group>
+          </div>
 
-        <!-- quote -->
-        <b-form-group id="quote" label="Select Quotation:" label-for="input-quote">
-          <b-input-group id="b-input-group-quote">
-            <b-form-input
-              id="input-quote"
-              v-model="form.quote.quoteId"
-              required
-              class="globalInputSize"
-              placeholder="None"
-              disabled
-            ></b-form-input>
-            <b-input-group-append>
-              <b-button id="b-modal-quote" variant="secondary" class="form-t_cashier-btn"
-                >Select</b-button
-              >
-            </b-input-group-append>
-          </b-input-group>
-        </b-form-group>
+          <div class="grid-item">
+            <!-- quote -->
+            <b-form-group id="quote" label="Select Quotation:" label-for="input-quote">
+              <b-input-group id="b-input-group-quote">
+                <b-form-input
+                  id="input-quote"
+                  v-model="form.quote.quoteId"
+                  required
+                  class="globalInputSize"
+                  placeholder="None"
+                  disabled
+                ></b-form-input>
+                <b-input-group-append>
+                  <b-button
+                    id="b-modal-quote"
+                    variant="secondary"
+                    class="form-t_cashier-btn"
+                    >Select</b-button
+                  >
+                </b-input-group-append>
+              </b-input-group>
+            </b-form-group>
+          </div>
 
-        <!-- service -->
-        <b-form-group id="service" label="Select Service:" label-for="input-service">
-          <b-input-group id="b-input-group-quote">
-            <b-form-input
-              id="input-service"
-              v-model="form.service.serviceId"
-              required
-              class="globalInputSize"
-              placeholder="None"
-              disabled
-            ></b-form-input>
-            <b-input-group-append>
-              <b-button
-                id="b-modal-service"
-                variant="secondary"
-                class="form-t_cashier-btn"
-                >Select</b-button
-              >
-            </b-input-group-append>
-          </b-input-group>
-        </b-form-group>
+          <div class="grid-item">
+            <!-- service -->
+            <b-form-group id="service" label="Select Service:" label-for="input-service">
+              <b-input-group id="b-input-group-quote">
+                <b-form-input
+                  id="input-service"
+                  v-model="form.service.serviceId"
+                  required
+                  class="globalInputSize"
+                  placeholder="None"
+                  disabled
+                ></b-form-input>
+                <b-input-group-append>
+                  <b-button
+                    id="b-modal-service"
+                    variant="secondary"
+                    class="form-t_cashier-btn"
+                    >Select</b-button
+                  >
+                </b-input-group-append>
+              </b-input-group>
+            </b-form-group>
+          </div>
+        </div>
       </b-form>
 
       <!-- table service -->

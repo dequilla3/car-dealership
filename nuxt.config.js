@@ -41,5 +41,7 @@ export default {
     extractCSS: process.env.NODE_ENV !== "development",
   },
 
-  axios: {},
+  axios: {
+    baseUrl: "http://172.16.28.13:5000/api",
+  },
 };

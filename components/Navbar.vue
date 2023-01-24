@@ -5,12 +5,12 @@
         ><font-awesome-icon icon="fa-solid fa-car" /> DMS</b-navbar-brand
       >
       <div class="d-flex flex-row-reverse w-100">
-        <b-dropdown id="dropdown-right" right variant="info" class="w-150-px" size="sm">
+        <b-dropdown id="dropdown-right" right variant="info" size="sm">
           <template #button-content
             ><font-awesome-icon icon="fa-solid fa-user" /> {{ userName }}
           </template>
           <hr />
-          <b-dropdown-item class="f-s-13" @click="onLogout"
+          <b-dropdown-item class="standardFontSize" @click="onLogout"
             ><font-awesome-icon icon="fa-solid fa-arrow-right-from-bracket" />
             Logout</b-dropdown-item
           >
@@ -21,6 +21,7 @@
 </template>
 
 <script>
+import axios from "axios";
 export default {
   name: "Navbar",
   data() {
@@ -34,27 +35,16 @@ export default {
       localStorage.clear();
       this.$router.push({ path: "/" });
     },
+
+    async validateUser() {
+      await this.$store.dispatch("login/getUserById");
+    },
   },
   mounted() {
+    this.validateUser();
     this.userName = localStorage.userName;
   },
 };
 </script>
 
-<style scoped>
-.navbar.navbar-dark.bg-dark {
-  background-color: rgb(88, 88, 88) !important;
-}
-
-.w-150-px {
-  width: 150px;
-}
-
-.w-125-px {
-  width: 150px;
-}
-
-.f-s-13 {
-  font-size: 13px !important;
-}
-</style>
+<style scoped></style>
