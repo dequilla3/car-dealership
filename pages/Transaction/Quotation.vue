@@ -1,443 +1,461 @@
 <template>
   <div class="mainContainer">
     <b-overlay no-wrap :show="isBusy" opacity="0.40" />
-    <Navbar />
-    <SideBar />
-    <div><h6>Quotation</h6></div>
-    <hr />
-    <div>
-      <b-form @submit="onSubmit" class="form-60">
-        <b-alert
-          :show="alert.showAlert"
-          :variant="alert.variant"
-          @dismissed="alert.showAlert = null"
-        >
-          {{ alert.message }}
-        </b-alert>
-        <b-button
-          variant="primary"
-          class="form-t_quotation-btn t-btn-primary-margin-bottom"
-          v-if="isProcessed"
-          @click="onClickedNewTrans"
-        >
-          <font-awesome-icon icon="fa-solid fa-plus" />
-          New Transaction
-        </b-button>
+    <div class="dontPrint">
+      <Navbar />
+      <SideBar />
+      <div><h6>Quotation</h6></div>
+      <hr />
+      <div>
+        <b-form @submit="onSubmit" class="form-60">
+          <b-alert
+            :show="alert.showAlert"
+            :variant="alert.variant"
+            @dismissed="alert.showAlert = null"
+          >
+            {{ alert.message }}
+          </b-alert>
+          <b-button
+            variant="primary"
+            class="form-t_quotation-btn t-btn-primary-margin-bottom"
+            v-if="isProcessed"
+            @click="onClickedNewTrans"
+          >
+            <font-awesome-icon icon="fa-solid fa-plus" />
+            New Transaction
+          </b-button>
 
-        <b-form-checkbox
-          id="checkbox-1"
-          v-model="isService"
-          name="checkbox-1"
-          size="sm"
-          :disabled="isProcessed"
-        >
-          Leave check if transaction with service
-        </b-form-checkbox>
+          <b-form-checkbox
+            id="checkbox-1"
+            v-model="isService"
+            name="checkbox-1"
+            size="sm"
+            :disabled="isProcessed"
+          >
+            Leave check if transaction has service
+          </b-form-checkbox>
+          <br />
+
+          <div class="grid-container-3">
+            <div class="grid-item">
+              <!-- transaction number form group-->
+              <b-form-group
+                id="quotationNumber"
+                label="Reference Number:"
+                label-for="input-quotationNumber"
+                class="b-form-group-t_quotation"
+              >
+                <b-form-input
+                  id="input-quotationNumber"
+                  v-model="form.quotationNumber"
+                  placeholder="None"
+                  required
+                  class="globalInputSize docnoInput"
+                  disabled
+                ></b-form-input>
+              </b-form-group>
+            </div>
+
+            <div class="grid-item">
+              <!-- customer form grp-->
+              <b-form-group
+                id="customerName"
+                label="Select Customer:"
+                label-for="input-customerName"
+                class="b-form-group-t_quotation"
+              >
+                <b-input-group id="b-input-group-customerName">
+                  <b-form-input
+                    id="input-customerName"
+                    v-model="form.customer.customerName"
+                    required
+                    class="globalInputSize"
+                    placeholder="None"
+                    disabled
+                  ></b-form-input>
+                  <b-input-group-append>
+                    <b-button
+                      id="b-modal-customer"
+                      v-b-modal.modal-lg="'customerModal'"
+                      variant="secondary"
+                      class="form-t_quotation-btn"
+                      @click="openCustomerModal"
+                      :disabled="isProcessed"
+                      >Select</b-button
+                    >
+                  </b-input-group-append>
+                </b-input-group>
+              </b-form-group>
+            </div>
+
+            <div class="grid-item">
+              <!-- select service form grp-->
+              <b-form-group
+                id="serviceModal"
+                label="Select Service Number:"
+                label-for="input-service"
+                class="b-form-group-t_quotation"
+                v-if="isService"
+              >
+                <b-input-group id="b-input-group-service">
+                  <b-form-input
+                    id="input-service"
+                    v-model="form.service.serviceNumber"
+                    required
+                    class="globalInputSize"
+                    placeholder="None"
+                    disabled
+                  ></b-form-input>
+                  <b-input-group-append>
+                    <b-button
+                      id="b-modal-service"
+                      v-b-modal.modal-lg="'serviceModal'"
+                      variant="secondary"
+                      class="form-t_quotation-btn"
+                      @click="onClickServiceBtnModal"
+                      :disabled="isProcessed"
+                      >Select</b-button
+                    >
+                  </b-input-group-append>
+                </b-input-group>
+              </b-form-group>
+            </div>
+          </div>
+        </b-form>
         <br />
+        <div>
+          <b-button
+            v-b-modal.modal-lg="'insertItemModal'"
+            variant="info"
+            class="form-t_quotation-btn t-btn-secondary-margin-bottom"
+            @click="openItemListModalDialog"
+            :disabled="isProcessed"
+          >
+            <font-awesome-icon icon="fa-solid fa-arrow-down" />
+            Insert Product
+          </b-button>
 
-        <div class="grid-container-3">
-          <div class="grid-item">
-            <!-- transaction number form group-->
-            <b-form-group
-              id="quotationNumber"
-              label="Reference Number:"
-              label-for="input-quotationNumber"
-              class="b-form-group-t_quotation"
-            >
+          <b-button
+            variant="danger"
+            class="form-t_quotation-btn t-btn-secondary-margin-bottom"
+            @click="removeItem"
+            :disabled="isProcessed"
+          >
+            <font-awesome-icon icon="fa-solid fa-close" />
+            Remove Product
+          </b-button>
+
+          <!-- table -->
+          <b-table
+            class="t_quotation-table"
+            hover
+            :items="quotationLineList"
+            :fields="quotationLineTblFields"
+            :per-page="perPage"
+            :current-page="currentPage"
+            select-mode="single"
+            ref="selectableTable"
+            selectable
+            selected-variant="info"
+            @row-selected="setSelectedLine"
+          >
+            <template #cell(qty)="data">
               <b-form-input
-                id="input-quotationNumber"
-                v-model="form.quotationNumber"
-                placeholder="None"
-                required
-                class="globalInputSize docnoInput"
+                :disabled="isProcessed"
+                class="b-table-input"
+                type="number"
+                v-model="quotationLineList[data.index].qty"
+                :value="data.value"
+                @keyup="onKeypressInputQty"
+              ></b-form-input>
+            </template>
+
+            <template #cell(amount)="data">
+              <b-form-input
                 disabled
+                class="b-table-input"
+                type="number"
+                :value="
+                  quotationLineList[data.index].qty * quotationLineList[data.index].cost
+                "
+              ></b-form-input>
+            </template>
+          </b-table>
+
+          <hr />
+
+          <!-- Total amount section -->
+          <div class="d-flex flex-row-reverse">
+            <div class="p-2">
+              <b-input-group class="input--total-size" size="sm" prepend="Total:">
+                <b-form-input disabled v-model="totalAmount" type="text"></b-form-input>
+              </b-input-group>
+            </div>
+            <div class="p-2">
+              <b-pagination
+                v-model="currentPage"
+                :total-rows="rows"
+                :per-page="perPage"
+                aria-controls="my-table"
+                v-if="rows > 0"
+                class="pagination"
+              ></b-pagination>
+            </div>
+          </div>
+
+          <hr />
+
+          <!-- Proecss and Print button -->
+          <div class="div-content-left">
+            <b-button
+              variant="info"
+              class="form-t_quotation-btn btn-transaction"
+              @click="onClickProcess"
+            >
+              <font-awesome-icon icon="fa-solid fa-cogs" /> Process Transaction
+            </b-button>
+
+            <b-button
+              @click="onPrint"
+              variant="info"
+              class="form-t_quotation-btn btn-transaction"
+              :disabled="!isProcessed"
+            >
+              <font-awesome-icon icon="fa-solid fa-file" />
+              Print Receipt
+            </b-button>
+          </div>
+        </div>
+
+        <!-- Customer Modals -->
+        <b-modal
+          id="customerModal"
+          size="lg"
+          hide-footer
+          hide-header
+          title="Select Customer"
+          centered
+        >
+          <div class="modal-container">
+            <h6>Select Customer</h6>
+            <hr />
+            <!-- search input -->
+            <b-form-group id="inputSearch" label="Search:" label-for="input-search">
+              <b-form-input
+                id="input-search"
+                v-model="customerModal.inputSearch"
+                placeholder="Search . . ."
+                class="modal-input"
+                @keyup.enter="onSearchCustomer"
               ></b-form-input>
             </b-form-group>
-          </div>
 
-          <div class="grid-item">
-            <!-- customer form grp-->
-            <b-form-group
-              id="customerName"
-              label="Select Customer:"
-              label-for="input-customerName"
-              class="b-form-group-t_quotation"
+            <!-- customer modal table -->
+            <b-table
+              class="t_quotation-table"
+              hover
+              :items="customerModal.customerTblList"
+              :fields="customerModal.customerTblFields"
+              :per-page="customerModal.perPage"
+              :current-page="customerModal.currentPage"
+              select-mode="single"
+              ref="selectableTable"
+              selectable
+              selected-variant="info"
+              @row-selected="customerModalRowSelected"
             >
-              <b-input-group id="b-input-group-customerName">
-                <b-form-input
-                  id="input-customerName"
-                  v-model="form.customer.customerName"
-                  required
-                  class="globalInputSize"
-                  placeholder="None"
-                  disabled
-                ></b-form-input>
-                <b-input-group-append>
-                  <b-button
-                    id="b-modal-customer"
-                    v-b-modal.modal-lg="'customerModal'"
-                    variant="secondary"
-                    class="form-t_quotation-btn"
-                    @click="openCustomerModal"
-                    :disabled="isProcessed"
-                    >Select</b-button
-                  >
-                </b-input-group-append>
-              </b-input-group>
-            </b-form-group>
-          </div>
+            </b-table>
 
-          <div class="grid-item">
-            <!-- select service form grp-->
-            <b-form-group
-              id="serviceModal"
-              label="Select Service Number:"
-              label-for="input-service"
-              class="b-form-group-t_quotation"
-              v-if="isService"
-            >
-              <b-input-group id="b-input-group-service">
-                <b-form-input
-                  id="input-service"
-                  v-model="form.service.serviceNumber"
-                  required
-                  class="globalInputSize"
-                  placeholder="None"
-                  disabled
-                ></b-form-input>
-                <b-input-group-append>
-                  <b-button
-                    id="b-modal-service"
-                    v-b-modal.modal-lg="'serviceModal'"
-                    variant="secondary"
-                    class="form-t_quotation-btn"
-                    @click="onClickServiceBtnModal"
-                    :disabled="isProcessed"
-                    >Select</b-button
-                  >
-                </b-input-group-append>
-              </b-input-group>
-            </b-form-group>
-          </div>
-        </div>
-      </b-form>
-      <br />
-      <div>
-        <b-button
-          v-b-modal.modal-lg="'insertItemModal'"
-          variant="info"
-          class="form-t_quotation-btn t-btn-secondary-margin-bottom"
-          @click="openItemListModalDialog"
-          :disabled="isProcessed"
-        >
-          <font-awesome-icon icon="fa-solid fa-arrow-down" />
-          Insert Product
-        </b-button>
-
-        <b-button
-          variant="danger"
-          class="form-t_quotation-btn t-btn-secondary-margin-bottom"
-          @click="removeItem"
-          :disabled="isProcessed"
-        >
-          <font-awesome-icon icon="fa-solid fa-close" />
-          Remove Product
-        </b-button>
-
-        <!-- table -->
-        <b-table
-          class="t_quotation-table"
-          hover
-          :items="quotationLineList"
-          :fields="quotationLineTblFields"
-          :per-page="perPage"
-          :current-page="currentPage"
-          select-mode="single"
-          ref="selectableTable"
-          selectable
-          selected-variant="info"
-          @row-selected="setSelectedLine"
-        >
-          <template #cell(qty)="data">
-            <b-form-input
-              :disabled="isProcessed"
-              class="b-table-input"
-              type="number"
-              v-model="quotationLineList[data.index].qty"
-              :value="data.value"
-              @keyup="onKeypressInputQty"
-            ></b-form-input>
-          </template>
-
-          <template #cell(amount)="data">
-            <b-form-input
-              disabled
-              class="b-table-input"
-              type="number"
-              :value="
-                quotationLineList[data.index].qty * quotationLineList[data.index].cost
-              "
-            ></b-form-input>
-          </template>
-        </b-table>
-
-        <hr />
-
-        <!-- Total amount section -->
-        <div class="d-flex flex-row-reverse">
-          <div class="p-2">
-            <b-input-group class="input--total-size" size="sm" prepend="Total:">
-              <b-form-input disabled v-model="totalAmount" type="text"></b-form-input>
-            </b-input-group>
-          </div>
-          <div class="p-2">
+            <!-- tbl pages -->
             <b-pagination
-              v-model="currentPage"
-              :total-rows="rows"
-              :per-page="perPage"
+              v-model="customerModal.currentPage"
+              :total-rows="totalRowsCustomerModal"
+              :per-page="customerModal.perPage"
               aria-controls="my-table"
-              v-if="rows > 0"
               class="pagination"
             ></b-pagination>
+
+            <hr />
+
+            <!-- customer modal action btn -->
+            <div class="div-content-left">
+              <b-button
+                variant="success"
+                class="form-t_quotation-btn modal-action-btn"
+                @click="selectCustomer"
+              >
+                <font-awesome-icon icon="fa-solid fa-check" /> Select
+              </b-button>
+
+              <b-button
+                variant="danger"
+                class="form-t_quotation-btn modal-action-btn"
+                @click="$bvModal.hide('customerModal')"
+              >
+                <font-awesome-icon icon="fa-solid fa-xmark" /> Cancel
+              </b-button>
+            </div>
           </div>
-        </div>
+        </b-modal>
 
-        <hr />
+        <!-- Service Modals -->
+        <b-modal
+          id="serviceModal"
+          size="lg"
+          hide-footer
+          hide-header
+          title="Select Service"
+        >
+          <div class="modal-container">
+            <h6>Select Service</h6>
+            <hr />
+            <!-- search input -->
+            <b-form-group id="inputSearch" label="Search:" label-for="input-search">
+              <b-form-input
+                id="input-search"
+                v-model="serviceModal.inputSearch"
+                placeholder="Search . . ."
+                class="modal-input"
+              ></b-form-input>
+            </b-form-group>
 
-        <!-- Proecss and Print button -->
-        <div class="div-content-left">
-          <b-button
-            variant="info"
-            class="form-t_quotation-btn btn-transaction"
-            @click="onClickProcess"
-          >
-            <font-awesome-icon icon="fa-solid fa-cogs" /> Process Transaction
-          </b-button>
+            <!-- service modal table -->
+            <b-table
+              class="t_quotation-table"
+              hover
+              :items="serviceModal.serviceTblList"
+              :fields="serviceModal.serviceTblFields"
+              :per-page="serviceModal.perPage"
+              :current-page="serviceModal.currentPage"
+              select-mode="single"
+              ref="selectableTable"
+              selectable
+              selected-variant="info"
+              @row-selected="setSelectedService"
+            >
+            </b-table>
 
-          <b-button
-            variant="info"
-            class="form-t_quotation-btn btn-transaction"
-            :disabled="!isProcessed"
-          >
-            <font-awesome-icon icon="fa-solid fa-file" />
-            Print Receipt
-          </b-button>
-        </div>
+            <!-- tbl pages -->
+            <b-pagination
+              v-model="serviceModal.currentPage"
+              :total-rows="totalRowsServiceModal"
+              :per-page="serviceModal.perPage"
+              aria-controls="my-table"
+              class="pagination"
+            ></b-pagination>
+
+            <hr />
+
+            <!-- service modal action btn -->
+            <div class="div-content-left">
+              <b-button
+                variant="success"
+                class="form-t_quotation-btn modal-action-btn"
+                @click="selectService"
+              >
+                <font-awesome-icon icon="fa-solid fa-check" /> Select
+              </b-button>
+
+              <b-button
+                variant="danger"
+                class="form-t_quotation-btn modal-action-btn"
+                @click="$bvModal.hide('serviceModal')"
+              >
+                <font-awesome-icon icon="fa-solid fa-xmark" /> Cancel
+              </b-button>
+            </div>
+          </div>
+        </b-modal>
+
+        <!-- Insert Item Modal -->
+        <b-modal
+          id="insertItemModal"
+          size="xl"
+          hide-footer
+          hide-header
+          title="Insert Customer"
+        >
+          <div class="modal-container">
+            <h6>Insert Item</h6>
+            <hr />
+
+            <!-- search input -->
+            <b-form-group
+              id="inputSearchInsertItemModal"
+              label="Search:"
+              label-for="input-search"
+            >
+              <b-form-input
+                id="input-search"
+                v-model="insertItemModal.inputSearch"
+                placeholder="Search . . ."
+                class="modal-input"
+                @keyup.enter="onSearchProducts"
+              ></b-form-input>
+            </b-form-group>
+
+            <!-- item modal table -->
+            <b-table
+              class="t_quotation-table"
+              hover
+              :items="insertItemModal.itemList"
+              :fields="insertItemModal.itemTblFields"
+              :per-page="insertItemModal.perPage"
+              :current-page="insertItemModal.currentPage"
+              select-mode="single"
+              ref="selectableTable"
+              selectable
+              selected-variant="info"
+              @row-selected="insertSelectedItem"
+            >
+            </b-table>
+
+            <!-- tbl pages -->
+            <b-pagination
+              v-model="insertItemModal.currentPage"
+              :total-rows="totalRowsItemListModal"
+              :per-page="insertItemModal.perPage"
+              aria-controls="my-table"
+              class="pagination"
+            ></b-pagination>
+
+            <hr />
+
+            <!-- item modal action btn -->
+            <div class="div-content-left">
+              <b-button
+                variant="success"
+                class="form-t_quotation-btn modal-action-btn"
+                @click="insertItem"
+              >
+                <font-awesome-icon icon="fa-solid fa-check" /> Insert
+              </b-button>
+
+              <b-button
+                variant="danger"
+                class="form-t_quotation-btn modal-action-btn"
+                @click="$bvModal.hide('insertItemModal')"
+              >
+                <font-awesome-icon icon="fa-solid fa-xmark" /> Cancel
+              </b-button>
+            </div>
+          </div>
+        </b-modal>
       </div>
+    </div>
 
-      <!-- Customer Modals -->
-      <b-modal
-        id="customerModal"
-        size="lg"
-        hide-footer
-        hide-header
-        title="Select Customer"
-        centered
-      >
-        <div class="modal-container">
-          <h6>Select Customer</h6>
-          <hr />
-          <!-- search input -->
-          <b-form-group id="inputSearch" label="Search:" label-for="input-search">
-            <b-form-input
-              id="input-search"
-              v-model="customerModal.inputSearch"
-              placeholder="Search . . ."
-              class="modal-input"
-            ></b-form-input>
-          </b-form-group>
-
-          <!-- customer modal table -->
-          <b-table
-            class="t_quotation-table"
-            hover
-            :items="customerModal.customerTblList"
-            :fields="customerModal.customerTblFields"
-            :per-page="customerModal.perPage"
-            :current-page="customerModal.currentPage"
-            select-mode="single"
-            ref="selectableTable"
-            selectable
-            selected-variant="info"
-            @row-selected="customerModalRowSelected"
-          >
-          </b-table>
-
-          <!-- tbl pages -->
-          <b-pagination
-            v-model="customerModal.currentPage"
-            :total-rows="totalRowsCustomerModal"
-            :per-page="customerModal.perPage"
-            aria-controls="my-table"
-            class="pagination"
-          ></b-pagination>
-
-          <hr />
-
-          <!-- customer modal action btn -->
-          <div class="div-content-left">
-            <b-button
-              variant="success"
-              class="form-t_quotation-btn modal-action-btn"
-              @click="selectCustomer"
-            >
-              <font-awesome-icon icon="fa-solid fa-check" /> Select
-            </b-button>
-
-            <b-button
-              variant="danger"
-              class="form-t_quotation-btn modal-action-btn"
-              @click="$bvModal.hide('customerModal')"
-            >
-              <font-awesome-icon icon="fa-solid fa-xmark" /> Cancel
-            </b-button>
-          </div>
-        </div>
-      </b-modal>
-
-      <!-- Service Modals -->
-      <b-modal id="serviceModal" size="lg" hide-footer hide-header title="Select Service">
-        <div class="modal-container">
-          <h6>Select Service</h6>
-          <hr />
-          <!-- search input -->
-          <b-form-group id="inputSearch" label="Search:" label-for="input-search">
-            <b-form-input
-              id="input-search"
-              v-model="serviceModal.inputSearch"
-              placeholder="Search . . ."
-              class="modal-input"
-            ></b-form-input>
-          </b-form-group>
-
-          <!-- service modal table -->
-          <b-table
-            class="t_quotation-table"
-            hover
-            :items="serviceModal.serviceTblList"
-            :fields="serviceModal.serviceTblFields"
-            :per-page="serviceModal.perPage"
-            :current-page="serviceModal.currentPage"
-            select-mode="single"
-            ref="selectableTable"
-            selectable
-            selected-variant="info"
-            @row-selected="setSelectedService"
-          >
-          </b-table>
-
-          <!-- tbl pages -->
-          <b-pagination
-            v-model="serviceModal.currentPage"
-            :total-rows="totalRowsServiceModal"
-            :per-page="serviceModal.perPage"
-            aria-controls="my-table"
-            class="pagination"
-          ></b-pagination>
-
-          <hr />
-
-          <!-- service modal action btn -->
-          <div class="div-content-left">
-            <b-button
-              variant="success"
-              class="form-t_quotation-btn modal-action-btn"
-              @click="selectService"
-            >
-              <font-awesome-icon icon="fa-solid fa-check" /> Select
-            </b-button>
-
-            <b-button
-              variant="danger"
-              class="form-t_quotation-btn modal-action-btn"
-              @click="$bvModal.hide('serviceModal')"
-            >
-              <font-awesome-icon icon="fa-solid fa-xmark" /> Cancel
-            </b-button>
-          </div>
-        </div>
-      </b-modal>
-
-      <!-- Insert Item Modal -->
-      <b-modal
-        id="insertItemModal"
-        size="xl"
-        hide-footer
-        hide-header
-        title="Insert Customer"
-      >
-        <div class="modal-container">
-          <h6>Insert Item</h6>
-          <hr />
-
-          <!-- search input -->
-          <b-form-group
-            id="inputSearchInsertItemModal"
-            label="Search:"
-            label-for="input-search"
-          >
-            <b-form-input
-              id="input-search"
-              v-model="insertItemModal.inputSearch"
-              placeholder="Search . . ."
-              class="modal-input"
-            ></b-form-input>
-          </b-form-group>
-
-          <!-- item modal table -->
-          <b-table
-            class="t_quotation-table"
-            hover
-            :items="insertItemModal.itemList"
-            :fields="insertItemModal.itemTblFields"
-            :per-page="insertItemModal.perPage"
-            :current-page="insertItemModal.currentPage"
-            select-mode="single"
-            ref="selectableTable"
-            selectable
-            selected-variant="info"
-            @row-selected="insertSelectedItem"
-          >
-          </b-table>
-
-          <!-- tbl pages -->
-          <b-pagination
-            v-model="insertItemModal.currentPage"
-            :total-rows="totalRowsItemListModal"
-            :per-page="insertItemModal.perPage"
-            aria-controls="my-table"
-            class="pagination"
-          ></b-pagination>
-
-          <hr />
-
-          <!-- item modal action btn -->
-          <div class="div-content-left">
-            <b-button
-              variant="success"
-              class="form-t_quotation-btn modal-action-btn"
-              @click="insertItem"
-            >
-              <font-awesome-icon icon="fa-solid fa-check" /> Insert
-            </b-button>
-
-            <b-button
-              variant="danger"
-              class="form-t_quotation-btn modal-action-btn"
-              @click="$bvModal.hide('insertItemModal')"
-            >
-              <font-awesome-icon icon="fa-solid fa-xmark" /> Cancel
-            </b-button>
-          </div>
-        </div>
-      </b-modal>
+    <div class="print">
+      <QuotationReceipt />
     </div>
   </div>
 </template>
 
 <script>
-let currentDate = new Date().toJSON().slice(0, 10);
+import QuotationReceipt from "../../components/Reports/QuotationReceipt.vue";
 export default {
+  components: {
+    QuotationReceipt,
+  },
   data() {
     return {
       isBusy: false,
@@ -517,10 +535,43 @@ export default {
   },
 
   methods: {
+    async onSearchCustomer() {
+      await this.loadCustomer().then((res) => {
+        let textSearch = this.customerModal.inputSearch;
+        var filteredList = this.customerModal.customerTblList.filter(function (val) {
+          return (
+            val.name.toLowerCase().includes(textSearch.toLowerCase()) ||
+            val.address.toLowerCase().includes(textSearch.toLowerCase()) ||
+            val.contact_number.toLowerCase().includes(textSearch.toLowerCase())
+          );
+        });
+        this.customerModal.customerTblList = filteredList;
+      });
+    },
+
+    async onSearchProducts() {
+      this.insertItemModal.itemList = [];
+      await this.loadAllProducts().then((res) => {
+        let textSearch = this.insertItemModal.inputSearch;
+        var filteredList = this.insertItemModal.itemList.filter(function (val) {
+          return (
+            val.productCode.toLowerCase().includes(textSearch.toLowerCase()) ||
+            val.productName.toLowerCase().includes(textSearch.toLowerCase()) ||
+            val.unit.toLowerCase().includes(textSearch.toLowerCase())
+          );
+        });
+        this.insertItemModal.itemList = filteredList;
+      });
+    },
+
+    onPrint() {
+      window.print();
+    },
     onSubmit() {},
 
     setSelectedLine(items) {
       this.selectedLine = items;
+      console.log(items);
     },
 
     // SELECT CUSTOMER MODAL
@@ -530,7 +581,6 @@ export default {
 
     setSelectedService(items) {
       this.serviceModal.selected = items;
-      console.log(this.serviceModal.selected);
     },
 
     openCustomerModal() {
@@ -542,12 +592,20 @@ export default {
     },
 
     onKeypressInputQty() {
-      this.totalAmount = this.computeTotalAmount;
+      this.computeTotalAmount();
+    },
+
+    computeTotalAmount() {
+      let amt = 0;
+      this.quotationLineList.forEach(function (val) {
+        amt = amt + Number(val.cost) * Number(val.qty);
+      });
+
+      this.totalAmount = amt.toLocaleString("en-US");
     },
 
     openItemListModalDialog() {
-      this.insertItemModal.selected = [];
-      this.insertItemModal.itemList = this.getItemList;
+      this.loadAllProducts();
     },
 
     onClickedNewTrans() {
@@ -565,26 +623,41 @@ export default {
       this.form.quotationNumber = "";
     },
 
-    onClickProcess() {
+    async onClickProcess() {
       this.isBusy = true;
 
-      setTimeout(() => {
-        this.form.quotationNumber = "TEST123";
-        this.isProcessed = true;
-        this.isBusy = false;
-        this.alert = {
-          showAlert: 3,
-          variant: "success",
-          message: "Successfully processed!",
-        };
-      }, 3000);
+      return await this.$store
+        .dispatch("customer/loadCustomerById", {
+          customerId: this.form.customer.customerId,
+        })
+        .then(
+          (res) => {
+            //TODO Save quotation transaction
+
+            this.form.quotationNumber = "TEST321QUOTENUMBER";
+            this.isProcessed = true;
+            this.isBusy = false;
+            this.alert = {
+              showAlert: 3,
+              variant: "success",
+              message: "Successfully processed!",
+            };
+
+            this.$store.commit("quotation/SET_QUOTE_LINE", this.quotationLineList);
+            this.$store.commit("quotation/SET_QUOTE_HEADER", {
+              quoteNum: this.form.quotationNumber,
+              serviceNum: this.form.service.serviceNumber,
+            });
+          },
+          (err) => {}
+        );
     },
 
     //select btn on customerModal
     selectCustomer() {
       this.$bvModal.hide("customerModal");
       if (this.customerModal.selected.length > 0) {
-        this.form.customer.customerId = this.customerModal.selected[0].id;
+        this.form.customer.customerId = this.customerModal.selected[0].customer_id;
         this.form.customer.customerName = this.customerModal.selected[0].name;
       } else {
         this.form.customer.customerId = "";
@@ -631,7 +704,7 @@ export default {
         }
 
         //set total amount
-        this.totalAmount = this.computeTotalAmount;
+        this.computeTotalAmount();
       }
     },
 
@@ -655,17 +728,59 @@ export default {
         message,
       };
     },
+
+    async loadCustomer() {
+      return await this.$store
+        .dispatch("customer/loadCustomers", { token: localStorage.token })
+        .then(
+          (res) => {
+            this.customerTblList = this.getCustomerList;
+          },
+          (err) => {}
+        );
+    },
+
+    async loadAllProducts() {
+      return await this.$store.dispatch("item/loadAllProducts").then(
+        (res) => {
+          this.insertItemModal.selected = [];
+          this.setAllProducts();
+          return res;
+        },
+        (err) => {
+          console.log(err);
+        }
+      );
+    },
+
+    //set all products from $store to local list with customized columns
+    setAllProducts() {
+      let list = this.insertItemModal.itemList;
+      let tempList = [];
+      this.getItemList.forEach(function (val) {
+        //reset temporary list every iteration
+        tempList = [];
+
+        // set customized column
+        tempList.skuId = val.sku_id;
+        tempList.productCode = val.barcode == null ? val.serial_number : val.barcode;
+        tempList.productName =
+          val.printname == null ? `${val.brand_name} ${val.model}` : val.printname;
+        tempList.unit = val.unit;
+        tempList.cost = Number(val.cost);
+        tempList.qty = 1;
+
+        // push temp list to actual list
+        list.push(tempList);
+      });
+    },
+  },
+
+  mounted() {
+    this.loadCustomer();
   },
 
   computed: {
-    computeTotalAmount() {
-      let totalAmount = 0;
-
-      this.quotationLineList.forEach(function (val) {
-        totalAmount = totalAmount + val.cost * val.qty;
-      });
-      return totalAmount.toLocaleString("en-US");
-    },
     rows() {
       return this.quotationLineList.length;
     },
@@ -679,13 +794,14 @@ export default {
     },
 
     totalRowsItemListModal() {
-      return this.insertItemModal.itemTblFields.length;
+      return this.insertItemModal.itemList.length;
     },
 
     getCustomerList() {
       return this.$store.state.customer.customerList;
     },
 
+    //get union products from store
     getItemList() {
       return this.$store.state.item.itemList;
     },

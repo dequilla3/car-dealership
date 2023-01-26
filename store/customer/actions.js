@@ -49,4 +49,20 @@ export default {
       },
     });
   },
+
+
+  async loadCustomerById({ commit }, { customerId }) {
+    return await axios({
+      method: "GET",
+      url: `${this.$axios.defaults.baseURL}/customer/view/${customerId}`,
+      headers: {
+        Authorization: `Bearer ${localStorage.token}`,
+      },
+    }).then(
+      (res) => {
+        commit("SET_CUSTOMER", res.data);
+      },
+      (err) => { }
+    );
+  },
 };

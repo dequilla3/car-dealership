@@ -10,6 +10,7 @@
         <b-button
           variant="primary"
           class="form-t_cashier-btn t-btn-primary-margin-bottom"
+          v-if="isProccessed"
         >
           <font-awesome-icon icon="fa-solid fa-plus" />
           New Trasaction
@@ -71,6 +72,7 @@
                     id="b-modal-service"
                     variant="secondary"
                     class="form-t_cashier-btn"
+                    v-b-modal.modal-lg="'serviceModal'"
                     >Select</b-button
                   >
                 </b-input-group-append>
@@ -93,6 +95,7 @@
         selectable
         selected-variant="info"
         @row-selected="setSelectedServiceLine"
+        v-if="showServiceTable"
       >
       </b-table>
 
@@ -109,11 +112,12 @@
         selectable
         selected-variant="info"
         @row-selected="setSelectedQuoteLine"
+        v-if="showGoodsTable"
       >
       </b-table>
 
       <!-- Proecss and Print button -->
-      <div class="div-content-left">
+      <div class="div-content-left" v-if="showServiceTable || showServiceTable">
         <b-button
           variant="info"
           class="form-t_cashier-btn btn-transaction"
@@ -132,7 +136,71 @@
           Print Receipt
         </b-button>
       </div>
+
+      <!-- Service Modals -->
+      <b-modal id="serviceModal" size="lg" hide-footer hide-header title="Select Service">
+        <div class="font-13">
+          <h6>Select Service</h6>
+          <hr />
+          <!-- search input -->
+          <b-form-group id="inputSearch" label="Search:" label-for="input-search">
+            <b-form-input
+              id="input-search"
+              v-model="serviceModalProps.inputSearch"
+              placeholder="Search . . ."
+              class="standardFontSize"
+            ></b-form-input>
+          </b-form-group>
+
+          <!-- service modal table -->
+          <b-table
+            class="standardTable"
+            hover
+            :items="serviceModalProps.serviceTblList"
+            :fields="serviceModalProps.serviceTblFields"
+            :per-page="serviceModalProps.perPage"
+            :current-page="serviceModalProps.currentPage"
+            select-mode="single"
+            ref="selectableTable"
+            selectable
+            selected-variant="info"
+            @row-selected="setSelectedService"
+          >
+          </b-table>
+
+          <!-- tbl pages -->
+          <b-pagination
+            v-model="serviceModalProps.currentPage"
+            :total-rows="totalRowsServiceModal"
+            :per-page="serviceModalProps.perPage"
+            aria-controls="my-table"
+            class="pagination"
+          ></b-pagination>
+
+          <hr />
+
+          <!-- service modal action btn -->
+          <div class="div-content-left">
+            <b-button
+              variant="success"
+              class="form-btn modal-action-btn"
+              @click="selectService"
+            >
+              <font-awesome-icon icon="fa-solid fa-check" /> Select
+            </b-button>
+
+            <b-button
+              variant="danger"
+              class="form-btn modal-action-btn"
+              @click="$bvModal.hide('serviceModal')"
+            >
+              <font-awesome-icon icon="fa-solid fa-xmark" /> Cancel
+            </b-button>
+          </div>
+        </div>
+      </b-modal>
     </div>
+
     <div class="print">
       <SalesInvoice />
     </div>
@@ -149,6 +217,7 @@ export default {
   data() {
     return {
       isBusy: false,
+      isProccessed: false,
       form: {
         salesInvoiceNumber: "",
         quote: {
@@ -183,6 +252,19 @@ export default {
           { key: "amount", label: "Amount", thStyle: { width: "10%" } },
         ],
       },
+
+      serviceModalProps: {
+        inputSearch: "",
+        perPage: 5,
+        currentPage: 1,
+        selected: [],
+        serviceTblFields: [
+          { key: "serviceNumber", label: "Service Reference Number" },
+          "dateTrans",
+        ],
+        serviceTblList: [],
+      },
+      quotationDialogProps: {},
     };
   },
 
@@ -196,12 +278,14 @@ export default {
       this.isBusy = true;
       setTimeout(() => {
         this.isBusy = false;
+        this.isProccessed = true;
         //SET 1 seconds delay after load
         //OPEN print dialog
-        setTimeout(() => {
-          this.onPrint();
-        }, 1000);
       }, 3000);
+    },
+
+    selectService() {
+      this.form.service.serviceId = this.serviceModalProps.selected[0].service_id;
     },
 
     //SET METHODS
@@ -210,6 +294,24 @@ export default {
     },
     setSelectedQuoteLine(items) {
       this.selectedLine = items;
+    },
+
+    setSelectedService(items) {
+      this.serviceModalProps.selected = items;
+    },
+  },
+
+  computed: {
+    totalRowsServiceModal() {
+      return this.serviceModalProps.serviceTblList.length;
+    },
+
+    showServiceTable() {
+      return this.serviceProps.serviceLineList.length > 0;
+    },
+
+    showGoodsTable() {
+      return this.quotationProps.quotationLineList.length > 0;
     },
   },
 };

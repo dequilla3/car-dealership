@@ -52,6 +52,7 @@
           v-model="inputSearch"
           placeholder="Enter text . . ."
           class="globalInputSize"
+          @keyup.enter="onSearch"
         ></b-form-input>
       </b-form-group>
 
@@ -111,6 +112,15 @@ export default {
   },
 
   methods: {
+    async onSearch() {
+      await this.loadRoles().then((res) => {
+        let textSearch = this.inputSearch;
+        var filteredList = this.roleList.filter(function (val) {
+          return val.role.toLowerCase().includes(textSearch.toLowerCase());
+        });
+        this.roleList = filteredList;
+      });
+    },
     onRowSelected(items) {
       this.selected = items;
       if (this.selected.length > 0) {
@@ -139,10 +149,11 @@ export default {
     },
 
     async loadRoles() {
-      await this.$store
+      return await this.$store
         .dispatch("role/loadRoles", { token: localStorage.token })
         .then((res) => {
           this.roleList = this.getRoleList;
+          return res;
         });
     },
 

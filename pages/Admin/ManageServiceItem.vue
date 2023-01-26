@@ -81,6 +81,7 @@
           v-model="inputSearch"
           placeholder="Enter text . . ."
           class="globalInputSize"
+          @keyup.enter="onSearch"
         ></b-form-input>
       </b-form-group>
 
@@ -129,9 +130,9 @@ export default {
       perPage: 3,
       currentPage: 1,
       selected: [],
+      serviceTblList: [],
       serviceTblFields: ["service_name", "unit", "cost", "date_created"],
       btnSubmitLabel: "Add New Service Item",
-      serviceTblList: [],
 
       form: {
         service_name: "",
@@ -148,6 +149,18 @@ export default {
       this.alert.showAlert = dissmiss;
       this.alert.variant = warning;
       this.alert.message = msg;
+    },
+    async onSearch() {
+      await this.loadServiceItems().then((res) => {
+        let textSearch = this.inputSearch;
+        var filteredList = this.serviceTblList.filter(function (val) {
+          return (
+            val.service_name.toLowerCase().includes(textSearch.toLowerCase()) ||
+            val.unit.toLowerCase().includes(textSearch.toLowerCase())
+          );
+        });
+        this.serviceTblList = filteredList;
+      });
     },
     onRowSelected(items) {
       this.selected = items;

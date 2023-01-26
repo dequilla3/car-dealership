@@ -122,14 +122,15 @@
           v-model="inputSearch"
           placeholder="Enter text . . ."
           class="globalInputSize"
+          @keyup.enter="onSearch"
         ></b-form-input>
       </b-form-group>
 
       <b-table
-        class="customer_list-table"
+        class="user-table"
         hover
         :items="userTblList"
-        :fields="customerTblFields"
+        :fields="userTblFields"
         :per-page="perPage"
         :current-page="currentPage"
         select-mode="single"
@@ -170,9 +171,9 @@ export default {
       perPage: 3,
       currentPage: 1,
       selected: [],
-      customerTblFields: ["name", "contact_number", "address", "date_created"],
-      btnSubmitLabel: "Add new User",
       userTblList: [],
+      userTblFields: ["name", "contact_number", "address", "date_created"],
+      btnSubmitLabel: "Add new User",
       roleList: [],
 
       form: {
@@ -252,7 +253,21 @@ export default {
       this.form.name = "";
       this.form.contact = "";
       this.form.address = "";
-      this.btnSubmitLabel = "Add new Customer";
+      this.btnSubmitLabel = "Add new User";
+    },
+
+    async onSearch() {
+      await this.loadUser().then((res) => {
+        let textSearch = this.inputSearch;
+        var filteredList = this.userTblList.filter(function (val) {
+          return (
+            val.name.toLowerCase().includes(textSearch.toLowerCase()) ||
+            val.address.toLowerCase().includes(textSearch.toLowerCase()) ||
+            val.contact_number.toLowerCase().includes(textSearch.toLowerCase())
+          );
+        });
+        this.userTblList = filteredList;
+      });
     },
 
     async onSubmit(event) {
@@ -315,13 +330,14 @@ export default {
 
     async loadUser() {
       this.isBusy = true;
-      await this.$store
+      return await this.$store
         .dispatch("user/loadUsers", {
           token: localStorage.token,
         })
         .then((res) => {
           this.userTblList = this.getUserList;
           this.isBusy = false;
+          return res;
         });
     },
   },
@@ -375,7 +391,7 @@ export default {
   }
 }
 
-.customer_list-table {
+.user-table {
   width: 100%;
   font-size: 12px;
 }

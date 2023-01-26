@@ -96,6 +96,7 @@
           v-model="inputSearch"
           placeholder="Enter text . . ."
           class="globalInputSize"
+          @keyup.enter="onSearch"
         ></b-form-input>
       </b-form-group>
 
@@ -142,9 +143,9 @@ export default {
       perPage: 3,
       currentPage: 1,
       selected: [],
+      tblList: [],
       partsTblFields: ["barcode", "printname", "unit", "cost"],
       btnSubmitLabel: "Add new Parts",
-      tblList: [],
 
       form: {
         barcode: "",
@@ -163,6 +164,19 @@ export default {
       this.alert.showAlert = dissmiss;
       this.alert.variant = warning;
       this.alert.message = msg;
+    },
+    async onSearch() {
+      await this.loadParts().then((res) => {
+        let textSearch = this.inputSearch;
+        var filteredList = this.tblList.filter(function (val) {
+          return (
+            val.printname.toLowerCase().includes(textSearch.toLowerCase()) ||
+            val.barcode.toLowerCase().includes(textSearch.toLowerCase()) ||
+            val.unit.toLowerCase().includes(textSearch.toLowerCase())
+          );
+        });
+        this.tblList = filteredList;
+      });
     },
     onRowSelected(items) {
       this.selected = items;

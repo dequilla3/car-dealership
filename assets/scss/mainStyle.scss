@@ -7,13 +7,26 @@ $lgFSize: 13px;
 $smFSize: 12px;
 $mainContainerSize: 80px 10px 0 300px;
 
+
+.font-13{
+  font-size: $lgFSize; 
+}
+
+.standardTable{
+  width: 100%;
+  font-size: $smFSize;
+}
+
 .form-60 {
   width: 60%;
   font-size: $smFSize;
 }
-
+.form-80 {
+  width: 80%;
+  font-size: $smFSize;
+}
 .form-100 {
-  width: 60%;
+  width: 100%;
   font-size: $smFSize;
 }
 
@@ -66,8 +79,19 @@ $mainContainerSize: 80px 10px 0 300px;
   font-size: $lgFSize;
 }
 
+.form-btn{
+  height: 35px;
+  font-size: 12px;
+}
+
 .print {
   display: none;
+}
+
+.modal-action-btn {
+  width: 130px;
+  margin-top: 20px;
+  margin-left: 5px;
 }
 
 .print-body {
@@ -91,4 +115,5 @@ $mainContainerSize: 80px 10px 0 300px;
     size: auto;
     margin: 0mm;
   }
+
 }

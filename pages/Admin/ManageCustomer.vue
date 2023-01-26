@@ -73,6 +73,7 @@
           v-model="inputSearch"
           placeholder="Enter text . . ."
           class="globalInputSize"
+          @keyup.enter="onSearch"
         ></b-form-input>
       </b-form-group>
 
@@ -141,6 +142,21 @@ export default {
       this.alert.variant = warning;
       this.alert.message = msg;
     },
+
+    async onSearch() {
+      await this.loadCustomer().then((res) => {
+        let textSearch = this.inputSearch;
+        var filteredList = this.customerTblList.filter(function (val) {
+          return (
+            val.name.toLowerCase().includes(textSearch.toLowerCase()) ||
+            val.address.toLowerCase().includes(textSearch.toLowerCase()) ||
+            val.contact_number.toLowerCase().includes(textSearch.toLowerCase())
+          );
+        });
+        this.customerTblList = filteredList;
+      });
+    },
+
     onRowSelected(items) {
       this.selected = items;
       if (this.selected.length > 0) {
@@ -176,11 +192,12 @@ export default {
     },
 
     async loadCustomer() {
-      await this.$store
+      return await this.$store
         .dispatch("customer/loadCustomers", { token: localStorage.token })
         .then(
           (res) => {
             this.customerTblList = this.getCustomerList;
+            return res;
           },
           (err) => {
             this.showAlert(3, "warning", `${err.response.data.error}`);

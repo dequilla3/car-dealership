@@ -87,6 +87,21 @@
               ></b-form-input>
             </b-form-group>
           </div>
+
+          <div class="grid-item">
+            <!-- car serial number -->
+            <b-form-group id="textarea" label="Comment:" label-for="textarea">
+              <b-form-textarea
+                id="textarea"
+                v-model="form.comment"
+                placeholder="Enter something..."
+                rows="3"
+                max-rows="6"
+                class="standardFontSize"
+                :disabled="isProcessed"
+              ></b-form-textarea>
+            </b-form-group>
+          </div>
         </div>
 
         <!-- Customer Modals -->
@@ -108,6 +123,7 @@
                 v-model="customerModal.inputSearch"
                 placeholder="Search . . ."
                 class="modal-input"
+                @keyup.enter="onSearchCustomer"
               ></b-form-input>
             </b-form-group>
 
@@ -258,6 +274,7 @@
           @click="onPrint"
           variant="info"
           class="form-t_service-btn btn-transaction"
+          :disabled="!isProcessed"
         >
           <font-awesome-icon icon="fa-solid fa-file" />
           Print Receipt
@@ -287,6 +304,7 @@
               v-model="insertItemModal.inputSearch"
               placeholder="Search . . ."
               class="modal-input"
+              @keyup.enter="onSearchServiceItems"
             ></b-form-input>
           </b-form-group>
 
@@ -368,6 +386,7 @@ export default {
       form: {
         serviceNumber: "",
         serialNum: "",
+        comment: "",
         customer: {
           customerId: "",
           customerName: "",
@@ -376,7 +395,7 @@ export default {
 
       serviceLineList: [],
       serviceLineTblField: [
-        { key: "serviceName", label: "Service Item", thStyle: { width: "60%" } },
+        { key: "service_name", label: "Service Item", thStyle: { width: "60%" } },
         { key: "unit", label: "Unit", thStyle: { width: "10%" } },
         { key: "cost", label: "Cost", thStyle: { width: "10%" } },
         { key: "qty", label: "Qty", thStyle: { width: "10%" } },
@@ -389,7 +408,7 @@ export default {
         perPage: 5,
         currentPage: 1,
         selected: [],
-        customerTblFields: ["name", "contactNumber", "address", "dateCreated"],
+        customerTblFields: ["name", "contact_number", "address", "date_created"],
         customerTblList: [],
       },
 
@@ -398,13 +417,40 @@ export default {
         perPage: 5,
         currentPage: 1,
         selected: [],
-        itemTblFields: ["serviceName", "unit", "cost"],
+        itemTblFields: ["service_name", "unit", "cost"],
         itemList: [],
       },
     };
   },
 
   methods: {
+    async onSearchCustomer() {
+      await this.loadCustomer().then((res) => {
+        let textSearch = this.customerModal.inputSearch;
+        var filteredList = this.customerModal.customerTblList.filter(function (val) {
+          return (
+            val.name.toLowerCase().includes(textSearch.toLowerCase()) ||
+            val.address.toLowerCase().includes(textSearch.toLowerCase()) ||
+            val.contact_number.toLowerCase().includes(textSearch.toLowerCase())
+          );
+        });
+        this.customerModal.customerTblList = filteredList;
+      });
+    },
+
+    async onSearchServiceItems() {
+      await this.loadServiceItems().then((res) => {
+        let textSearch = this.insertItemModal.inputSearch;
+        var filteredList = this.insertItemModal.itemList.filter(function (val) {
+          return (
+            val.service_name.toLowerCase().includes(textSearch.toLowerCase()) ||
+            val.unit.toLowerCase().includes(textSearch.toLowerCase())
+          );
+        });
+        this.insertItemModal.itemList = filteredList;
+      });
+    },
+
     // SETTER
     setSelectedLine(items) {
       this.selectedServiceLine = items;
@@ -428,33 +474,52 @@ export default {
 
     onSubmuit() {},
 
-    onPrint() {
-      window.print();
-    },
-
     onNewTrans() {
       this.totalAmount = "";
       this.form.serviceNumber = "";
       this.form.serialNum = "";
+      this.form.comment = "";
       this.form.customer.customerId = "";
       this.form.customer.customerName = "";
+
       this.isProcessed = false;
       this.serviceLineList = [];
     },
 
-    onProcess() {
+    async onProcess() {
       this.isBusy = true;
+      return await this.$store
+        .dispatch("customer/loadCustomerById", {
+          customerId: this.form.customer.customerId,
+        })
+        .then(
+          (res) => {
+            //TODO Save service transaction
+            this.$store.commit("service/SET_SERVICE_LINE", this.serviceLineList);
+            this.$store.commit("service/SET_SERVICE_HEADER", {
+              serviceNumber: "TEST123",
+              serialNumber: this.form.serialNum,
+              dateTrans: "TEST_DATE",
+              comment: this.form.comment,
+            });
 
-      setTimeout(() => {
-        this.isBusy = false;
-        this.isProcessed = true;
-        this.form.serviceNumber = "TEST123";
-        this.alert = {
-          showAlert: 3,
-          variant: "success",
-          message: "Successfully processed!",
-        };
-      }, 3000);
+            this.isBusy = false;
+            this.isProcessed = true;
+            this.form.serviceNumber;
+            this.alert = {
+              showAlert: 3,
+              variant: "success",
+              message: "Successfully processed!",
+            };
+          },
+          (err) => {
+            this.isBusy = false;
+          }
+        );
+    },
+
+    onPrint() {
+      window.print();
     },
 
     openCustomerModal() {
@@ -467,13 +532,22 @@ export default {
     },
 
     onKeypressInputQty() {
-      this.totalAmount = this.computeTotalAmount;
+      this.computeTotalAmount();
+    },
+
+    computeTotalAmount() {
+      let amt = 0;
+      this.serviceLineList.forEach(function (val) {
+        amt = amt + Number(val.cost) * Number(val.qty);
+      });
+
+      this.totalAmount = amt;
     },
 
     selectCustomer() {
       this.$bvModal.hide("customerModal");
       if (this.customerModal.selected.length > 0) {
-        this.form.customer.customerId = this.customerModal.selected[0].id;
+        this.form.customer.customerId = this.customerModal.selected[0].customer_id;
         this.form.customer.customerName = this.customerModal.selected[0].name;
       } else {
         this.form.customer.customerId = "";
@@ -492,6 +566,8 @@ export default {
         });
         this.serviceLineList.splice(selectedIndex, 1);
       }
+
+      this.computeTotalAmount();
     },
 
     onClickInsertItemModal() {
@@ -500,8 +576,8 @@ export default {
 
       // if exist in list increase qty
       this.serviceLineList.forEach(function (line) {
-        if (selectedLine.serviceId === line.serviceId) {
-          line.qty++;
+        if (selectedLine.service_item_id === line.service_item_id) {
+          line.qty = Number(line.qty) + 1;
           isNotExist = false;
           return;
         }
@@ -510,23 +586,49 @@ export default {
       // if not exist push to list
       if (isNotExist) {
         this.serviceLineList.push(this.insertItemModal.selected[0]);
+        //add column qty
+        this.serviceLineList.forEach(function (val) {
+          val.qty = 1;
+          val.cost = val.cost;
+        });
       }
 
       //set total amount
-      this.totalAmount = this.computeTotalAmount;
+      this.computeTotalAmount();
+    },
+
+    async loadServiceItems() {
+      return await this.$store
+        .dispatch("service/loadServiceItemList", {
+          token: localStorage.token,
+        })
+        .then((res) => {
+          this.insertItemModal.itemList = this.getServiceItems;
+          return res;
+        });
+    },
+
+    async loadCustomer() {
+      return await this.$store
+        .dispatch("customer/loadCustomers", { token: localStorage.token })
+        .then(
+          (res) => {
+            this.customerModal.customerTblList = this.getCustomerList;
+            return res;
+          },
+          (err) => {
+            this.showAlert(3, "warning", `${err.response.data.error}`);
+          }
+        );
     },
   },
 
+  mounted() {
+    this.loadServiceItems();
+    this.loadCustomer();
+  },
+
   computed: {
-    computeTotalAmount() {
-      let totalAmount = 0;
-
-      this.serviceLineList.forEach(function (val) {
-        totalAmount = totalAmount + val.cost * val.qty;
-      });
-      return totalAmount.toLocaleString("en-US");
-    },
-
     getCustomerList() {
       return this.$store.state.customer.customerList;
     },
@@ -541,6 +643,10 @@ export default {
     },
     rows() {
       return this.serviceLineList.length;
+    },
+
+    getService() {
+      return this.$store.state.service.serviceList;
     },
   },
 };

@@ -1,5 +1,5 @@
 <template>
-  <div v-if="this.isLoggedIn">
+  <div>
     <Navbar />
     <SideBar />
     <div class="mainContainer">
@@ -30,13 +30,6 @@ export default {
         { id: 3, title: "Monthly Sales", value: 13032.99 },
       ],
     };
-  },
-  mounted() {
-    this.isLoggedIn = localStorage.isLoggedIn;
-
-    if (!this.isLoggedIn) {
-      // this.$router.push({ path: "/" }); // LOG OUT
-    }
   },
 };
 </script>

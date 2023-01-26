@@ -5,9 +5,14 @@ export default () => ({
     {
       serviceId: 1,
       serviceNumber: "T021390-89412j-2143213",
+      serial_number: "",
       dateTrans: currentDate,
     },
   ],
 
   serviceItemsList: [],
+  serviceHeader: [],
+  serviceTransactionLines: []
+
+
 });

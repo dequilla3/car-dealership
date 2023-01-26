@@ -7,27 +7,34 @@
             <ReceiptHeader />
           </b-col>
 
+          <!-- HEAD -->
           <b-col>
-            <h2>Service Ticket</h2>
+            <h2>Quotation</h2>
             <h6>
+              <b>Quotation No.:</b>
+              {{ this.quotationHeader.quoteNum }}
+            </h6>
+            <h6 v-if="this.hasService">
               <b>Service No.:</b>
-              {{ this.service.serviceNumber }}
+              {{ this.quotationHeader.serviceNum }}
             </h6>
             <h6>
-              <b>Service Date: </b>
-              {{ this.service.serialNumber }}
+              <b>Date: </b>
+              {{ currentDate }}
             </h6>
             <h6>
-              <b>Serial Number: </b>
-              {{ this.service.dateTrans }}
+              <b>Valid Until: </b>
+              {{ currentDate }}
             </h6>
           </b-col>
 
           <div class="w-100"></div>
           <br />
 
+          <!-- BODY -->
           <b-col>
-            <h5><b>REQUESTOR</b></h5>
+            <h5><b>Customer Details</b></h5>
+            <hr />
             <label
               ><b>Name:</b>
               {{ this.customer[0] === undefined ? "" : this.customer[0].name }}</label
@@ -45,13 +52,17 @@
               }}</label
             >
             <hr />
-            <h5><b>COMMENT BY MECHANIC:</b></h5>
-            {{ this.service.comment }}
-            <hr />
+
             <br />
 
-            <h5><b>REQUESTED SERVICES</b></h5>
-            <b-table small striped hover :items="this.getLines" :fields="reportFields" />
+            <h5><b>Description</b></h5>
+            <b-table
+              small
+              striped
+              hover
+              :items="this.getLines"
+              :fields="quotationLineTblFields"
+            />
 
             <hr />
             <br />
@@ -69,14 +80,21 @@
 import ReceiptHeader from "./ReceiptHeader.vue";
 
 export default {
-  name: "ServiceTicket",
+  name: "QuotationReceipt",
   components: {
     ReceiptHeader,
   },
   data() {
     return {
       currentDate: new Date().toJSON().slice(0, 10),
-      reportFields: ["service_name", "unit", "cost", "qty", "amount"],
+      quotationLineTblFields: [
+        { key: "productCode", label: "Product Code", thStyle: { width: "10%" } },
+        { key: "productName", label: "Product Name", thStyle: { width: "50%" } },
+        { key: "unit", label: "Unit", thStyle: { width: "10%" } },
+        { key: "cost", label: "Cost", thStyle: { width: "10%" } },
+        { key: "qty", label: "Quantity", thStyle: { width: "10%" } },
+        { key: "amount", label: "Amount", thStyle: { width: "10%" } },
+      ],
     };
   },
 
@@ -89,12 +107,12 @@ export default {
       return this.$store.state.customer.customer;
     },
 
-    service() {
-      return this.$store.state.service.serviceHeader;
+    quotationHeader() {
+      return this.$store.state.quotation.quoteHeader;
     },
 
     getLines() {
-      let lines = this.$store.state.service.serviceTransactionLines;
+      let lines = this.$store.state.quotation.quotationLineList;
       //insert additional coulumn (amount)
       lines.forEach(function (val) {
         val.amount = Number(val.qty) * Number(val.cost);
@@ -108,6 +126,10 @@ export default {
         lineAmt = lineAmt + val.amount;
       });
       return lineAmt;
+    },
+
+    hasService() {
+      return this.quotationHeader.serviceNum != "";
     },
   },
 };

@@ -1,5 +1,6 @@
 <template>
   <div>
+    <b-overlay no-wrap :show="isBusy && !isLoggedIn" opacity="1" />
     <b-navbar class="navbar" fixed="top" toggleable="lg" type="dark" variant="dark">
       <b-navbar-brand href="/dashboard"
         ><font-awesome-icon icon="fa-solid fa-car" /> DMS</b-navbar-brand
@@ -26,7 +27,9 @@ export default {
   name: "Navbar",
   data() {
     return {
+      isLoggedIn: false,
       userName: "",
+      isBusy: true,
     };
   },
 
@@ -37,12 +40,40 @@ export default {
     },
 
     async validateUser() {
-      await this.$store.dispatch("login/getUserById");
+      return await this.$store.dispatch("login/getUserById").then((res) => {
+        if (res === undefined) {
+          this.onLogout();
+          return;
+        }
+
+        if (res.data != []) {
+          this.isBusy = false;
+          localStorage.isLoggedIn = true;
+          this.isLoggedIn = true;
+        } else {
+          localStorage.clear();
+          this.$router.push({ path: "/" });
+        }
+      });
     },
   },
   mounted() {
-    this.validateUser();
+    if (this.validateLogin) {
+      this.onLogout();
+    }
+
     this.userName = localStorage.userName;
+    this.validateUser();
+  },
+
+  computed: {
+    validateLogin() {
+      return (
+        localStorage.userId === undefined ||
+        localStorage.userName === undefined ||
+        localStorage.token === undefined
+      );
+    },
   },
 };
 </script>

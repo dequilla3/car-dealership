@@ -104,7 +104,6 @@ export default {
         })
         .then(
           (res) => {
-            localStorage.isLoggedIn = true;
             localStorage.userId = res.data.user_id;
             localStorage.userName = `${res.data.name} (${res.data.username})`;
             localStorage.token = res.data.token;
@@ -130,19 +129,14 @@ export default {
         message,
       };
     },
-
-    async validateUser() {
-      await this.$store.dispatch("login/getUserById");
-    },
   },
 
   mounted() {
     this.isLoggedIn = localStorage.isLoggedIn;
     if (this.isLoggedIn) {
       this.show = true;
-      setTimeout(() => {
-        this.$router.push({ path: "/dashboard" });
-      }, 3000);
+      localStorage.isLoggedIn = true;
+      this.$router.push({ path: "/dashboard" });
     } else {
       this.$router.push({ path: "./" });
     }

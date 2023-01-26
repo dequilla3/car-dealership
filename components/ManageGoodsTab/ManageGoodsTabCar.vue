@@ -118,6 +118,7 @@
           v-model="inputSearch"
           placeholder="Enter text . . ."
           class="globalInputSize"
+          @keyup.enter="onSearch"
         ></b-form-input>
       </b-form-group>
 
@@ -170,6 +171,7 @@ export default {
       perPage: 3,
       currentPage: 1,
       selected: [],
+      tblItems: [],
       partsTblFields: [
         { key: "serial_number", label: "Serial Number", thStyle: { width: "10%" } },
         { key: "color", label: "Color", thStyle: { width: "10%" } },
@@ -179,7 +181,6 @@ export default {
         { key: "cost", label: "Cost", thStyle: { width: "10%" } },
       ],
       btnSubmitLabel: "Add New Car Details",
-      tblItems: [],
 
       form: {
         serial_number: "",
@@ -199,6 +200,22 @@ export default {
       this.alert.showAlert = dissmiss;
       this.alert.variant = warning;
       this.alert.message = msg;
+    },
+
+    async onSearch() {
+      await this.loadCars().then((res) => {
+        let textSearch = this.inputSearch;
+        var filteredList = this.tblItems.filter(function (val) {
+          return (
+            val.serial_number.toLowerCase().includes(textSearch.toLowerCase()) ||
+            val.brand_name.toLowerCase().includes(textSearch.toLowerCase()) ||
+            val.model.toLowerCase().includes(textSearch.toLowerCase()) ||
+            val.color.toLowerCase().includes(textSearch.toLowerCase()) ||
+            val.unit.toLowerCase().includes(textSearch.toLowerCase())
+          );
+        });
+        this.tblItems = filteredList;
+      });
     },
     onRowSelected(items) {
       this.selected = items;

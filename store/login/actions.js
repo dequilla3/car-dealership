@@ -22,11 +22,13 @@ export default {
         Authorization: `Bearer ${localStorage.token}`,
       },
     }).then(
-      (res) => {},
+      (res) => { return res; },
       (err) => {
-        localStorage.isLoggedIn = false;
-        this.$router.push({ path: "/" });
+        if (err.response.status === 401) {
+          this.$router.push({ path: "/" });
+        }
       }
     );
+
   },
 };
