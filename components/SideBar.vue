@@ -24,7 +24,7 @@
           <div
             v-for="adminMenu in adminMenus"
             :key="adminMenu.key"
-            class="sidebar-menus-list"
+            class="sidebar-menus-list mt-1"
             :class="{ active: adminMenu.active }"
             @click="setMenuActive(adminMenu.key)"
           >
@@ -47,7 +47,7 @@
           <div
             v-for="transactionMenu in transactionMenus"
             :key="transactionMenu.id"
-            class="sidebar-menus-list"
+            class="sidebar-menus-list mt-1"
             :class="{ active: transactionMenu.active }"
             @click="setMenuActive(transactionMenu.key)"
           >
