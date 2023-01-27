@@ -118,6 +118,8 @@ export default {
             } else {
               this.showAlert(err.response.data.error, "danger");
             }
+
+            this.show = false;
           }
         );
     },

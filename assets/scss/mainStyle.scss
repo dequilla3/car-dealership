@@ -12,6 +12,10 @@ $mainContainerSize: 80px 10px 0 300px;
   font-size: $lgFSize; 
 }
 
+.font-12{
+  font-size: $smFSize; 
+}
+
 .standardTable{
   width: 100%;
   font-size: $smFSize;
@@ -73,6 +77,8 @@ $mainContainerSize: 80px 10px 0 300px;
 .standardFontSize {
   font-size: $lgFSize;
 }
+
+
 
 .standardButton {
   width: 100%;
