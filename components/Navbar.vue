@@ -7,14 +7,15 @@
       >
       <div class="d-flex flex-row-reverse w-100">
         <b-dropdown id="dropdown-right" right variant="info" size="sm">
-          <template #button-content
-            ><font-awesome-icon icon="fa-solid fa-user" /> {{ userName }}
+          <template #button-content>
+            <font-awesome-icon icon="fa-solid fa-user" />
+            <span class="font-12"> {{ userName }}</span>
           </template>
           <hr />
-          <b-dropdown-item class="standardFontSize" @click="onLogout"
-            ><font-awesome-icon icon="fa-solid fa-arrow-right-from-bracket" />
-            Logout</b-dropdown-item
-          >
+          <b-dropdown-item class="standardFontSize" @click="onLogout">
+            <font-awesome-icon icon="fa-solid fa-arrow-right-from-bracket" />
+            Logout
+          </b-dropdown-item>
         </b-dropdown>
       </div>
     </b-navbar>

@@ -48,6 +48,8 @@
                     id="b-modal-quote"
                     variant="secondary"
                     class="form-t_cashier-btn"
+                    v-b-modal.modal-lg="'quoteModal'"
+                    @click="openQuoteModal"
                     >Select</b-button
                   >
                 </b-input-group-append>
@@ -61,7 +63,7 @@
               <b-input-group id="b-input-group-quote">
                 <b-form-input
                   id="input-service"
-                  v-model="form.service.serviceId"
+                  v-model="form.service.serviceNum"
                   required
                   class="globalInputSize"
                   placeholder="None"
@@ -73,6 +75,7 @@
                     variant="secondary"
                     class="form-t_cashier-btn"
                     v-b-modal.modal-lg="'serviceModal'"
+                    @click="openServiceModal"
                     >Select</b-button
                   >
                 </b-input-group-append>
@@ -116,8 +119,24 @@
       >
       </b-table>
 
+      <div v-if="showServiceTable || showGoodsTable">
+        <br />
+        <hr />
+
+        <!-- total section -->
+        <div class="d-flex flex-row-reverse">
+          <div class="p-2">
+            <b-input-group class="input--total-size" size="sm" prepend="Total:">
+              <b-form-input disabled v-model="totalAmount" type="text"></b-form-input>
+            </b-input-group>
+          </div>
+        </div>
+
+        <hr />
+      </div>
+
       <!-- Proecss and Print button -->
-      <div class="div-content-left" v-if="showServiceTable || showServiceTable">
+      <div class="div-content-left" v-if="showServiceTable || showGoodsTable">
         <b-button
           variant="info"
           class="form-t_cashier-btn btn-transaction"
@@ -199,6 +218,69 @@
           </div>
         </div>
       </b-modal>
+
+      <!-- Quotation Modals -->
+      <b-modal id="quoteModal" size="lg" hide-footer hide-header title="Select Quotation">
+        <div class="font-13">
+          <h6>Select Service</h6>
+          <hr />
+          <!-- search input -->
+          <b-form-group id="inputSearch" label="Search:" label-for="input-search">
+            <b-form-input
+              id="input-search"
+              v-model="quotationModalProps.inputSearch"
+              placeholder="Search . . ."
+              class="standardFontSize"
+            ></b-form-input>
+          </b-form-group>
+
+          <!-- quotation modal table -->
+          <b-table
+            class="standardTable"
+            hover
+            :items="quotationModalProps.quotationTblList"
+            :fields="quotationModalProps.quotationTblFields"
+            :per-page="quotationModalProps.perPage"
+            :current-page="quotationModalProps.currentPage"
+            select-mode="single"
+            ref="selectableTable"
+            selectable
+            selected-variant="info"
+            @row-selected="setSelectedQuote"
+          >
+          </b-table>
+
+          <!-- tbl pages -->
+          <b-pagination
+            v-model="quotationModalProps.currentPage"
+            :total-rows="totalRowsQuoteModal"
+            :per-page="quotationModalProps.perPage"
+            aria-controls="my-table"
+            class="pagination"
+          ></b-pagination>
+
+          <hr />
+
+          <!-- quote modal action btn -->
+          <div class="div-content-left">
+            <b-button
+              variant="success"
+              class="form-btn modal-action-btn"
+              @click="selectQuote"
+            >
+              <font-awesome-icon icon="fa-solid fa-check" /> Select
+            </b-button>
+
+            <b-button
+              variant="danger"
+              class="form-btn modal-action-btn"
+              @click="$bvModal.hide('quoteModal')"
+            >
+              <font-awesome-icon icon="fa-solid fa-xmark" /> Cancel
+            </b-button>
+          </div>
+        </div>
+      </b-modal>
     </div>
 
     <div class="print">
@@ -216,8 +298,10 @@ export default {
   name: "Cashier",
   data() {
     return {
+      totalAmount: 0,
       isBusy: false,
       isProccessed: false,
+
       form: {
         salesInvoiceNumber: "",
         quote: {
@@ -225,20 +309,23 @@ export default {
         },
         service: {
           serviceId: "",
+          serviceNum: "",
         },
       },
+
       serviceProps: {
         perPage: 4,
         currentPage: 1,
         serviceLineList: [],
         serviceLineTblField: [
-          { key: "serviceName", label: "Service Item", thStyle: { width: "60%" } },
+          { key: "service_name", label: "Service Item", thStyle: { width: "60%" } },
           { key: "unit", label: "Unit", thStyle: { width: "10%" } },
           { key: "cost", label: "Cost", thStyle: { width: "10%" } },
           { key: "qty", label: "Qty", thStyle: { width: "10%" } },
           { key: "amount", label: "Amount", thStyle: { width: "10%" } },
         ],
       },
+
       quotationProps: {
         perPage: 4,
         currentPage: 1,
@@ -258,13 +345,26 @@ export default {
         perPage: 5,
         currentPage: 1,
         selected: [],
+        serviceTblList: [],
         serviceTblFields: [
-          { key: "serviceNumber", label: "Service Reference Number" },
+          { key: "serviceNumber", label: "Service Number", thStyle: { width: "20%" } },
+          { key: "customerName", label: "Customer Name", thStyle: { width: "30%" } },
+          { key: "serial_number", label: "Serial Number", thStyle: { width: "30%" } },
           "dateTrans",
         ],
-        serviceTblList: [],
       },
-      quotationDialogProps: {},
+
+      quotationModalProps: {
+        inputSearch: "",
+        perPage: 5,
+        currentPage: 1,
+        selected: [],
+        quotationTblList: [],
+        quotationTblFields: [
+          { key: "quotation_id", label: "Quotation Number", thStyle: { width: "30%" } },
+          { key: "customer_name", label: "Customer Name" },
+        ],
+      },
     };
   },
 
@@ -285,7 +385,53 @@ export default {
     },
 
     selectService() {
-      this.form.service.serviceId = this.serviceModalProps.selected[0].service_id;
+      this.form.service.serviceId = this.serviceModalProps.selected[0].serviceId;
+      this.form.service.serviceNum = `${this.serviceModalProps.selected[0].serviceId}-${this.serviceModalProps.selected[0].serial_number}`;
+      this.$bvModal.hide("serviceModal");
+      this.populateServiceLine();
+      this.computeTotalAmount();
+    },
+
+    populateServiceLine() {
+      let proxyList = this.serviceProps.serviceLineList;
+      this.getServiceLines.forEach(function (val) {
+        val.amount = Number(val.qty) * Number(val.cost);
+        proxyList.push(val);
+      });
+    },
+
+    selectQuote() {
+      this.form.quote.quoteId = this.quotationModalProps.selected[0].quotation_id;
+      this.$bvModal.hide("quoteModal");
+      this.populateQuoteLine();
+      this.computeTotalAmount();
+    },
+
+    populateQuoteLine() {
+      let proxyList = this.quotationProps.quotationLineList;
+      this.getQuoteLinesToBill.forEach(function (val) {
+        val.amount = Number(val.qty) * Number(val.cost);
+        proxyList.push(val);
+      });
+    },
+
+    computeTotalAmount() {
+      let totalAmount = 0;
+      this.quotationProps.quotationLineList.forEach(function (val) {
+        totalAmount = totalAmount + Number(val.amount);
+      });
+
+      this.serviceProps.serviceLineList.forEach(function (val) {
+        totalAmount = totalAmount + Number(val.amount);
+      });
+      this.totalAmount = totalAmount;
+    },
+
+    openServiceModal() {
+      this.serviceModalProps.serviceTblList = this.getServicedList;
+    },
+    openQuoteModal() {
+      this.quotationModalProps.quotationTblList = this.getQuoteToBill;
     },
 
     //SET METHODS
@@ -299,11 +445,21 @@ export default {
     setSelectedService(items) {
       this.serviceModalProps.selected = items;
     },
+
+    setSelectedQuote(items) {
+      this.quotationModalProps.selected = items;
+    },
   },
 
   computed: {
     totalRowsServiceModal() {
       return this.serviceModalProps.serviceTblList.length;
+    },
+
+    totalRowsQuoteModal() {
+      return this.quotationModalProps.quotationTblList === undefined
+        ? 0
+        : this.quotationModalProps.quotationTblList.length;
     },
 
     showServiceTable() {
@@ -312,6 +468,22 @@ export default {
 
     showGoodsTable() {
       return this.quotationProps.quotationLineList.length > 0;
+    },
+
+    getServicedList() {
+      return this.$store.state.service.serviceList;
+    },
+
+    getServiceLines() {
+      return this.$store.state.service.serviceLines;
+    },
+
+    getQuoteToBill() {
+      return this.$store.state.quotation.quotationToBill;
+    },
+
+    getQuoteLinesToBill() {
+      return this.$store.state.quotation.quotationLineToBill;
     },
   },
 };

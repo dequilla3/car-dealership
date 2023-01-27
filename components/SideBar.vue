@@ -1,7 +1,11 @@
 <template>
   <div class="sidenav">
-    <div class="sidebar-menus-parent" id="dashboard" @click="setMenuActive(dashboardKey)">
-      <a href="/dashboard">
+    <div
+      class="sidebar-menus-parent"
+      id="dashboard"
+      @click="setMenuActive('dashboard', '/dashboard')"
+    >
+      <a>
         <font-awesome-icon icon="fa-solid fa-bars" />
         Dashboard</a
       >
@@ -55,8 +59,8 @@
     </div>
 
     <!-- Report menu -->
-    <div class="sidebar-menus-parent">
-      <a href="#reports"> <font-awesome-icon icon="fa-solid fa-file" /> Reports</a>
+    <div class="sidebar-menus-parent" @click="setMenuActive('report', '/report')">
+      <a> <font-awesome-icon icon="fa-solid fa-file" /> Reports</a>
     </div>
   </div>
 </template>
@@ -104,7 +108,7 @@ export default {
 
     setActiveMenus() {},
 
-    setMenuActive(menuKey) {
+    setMenuActive(menuKey, route) {
       localStorage.activeMenuId = menuKey;
       var path = "";
 
@@ -127,7 +131,8 @@ export default {
         }
       });
 
-      this.$router.push({ path: path });
+      // if #path is empty then use #route
+      this.$router.push({ path: path === "" ? route : path });
     },
   },
 
