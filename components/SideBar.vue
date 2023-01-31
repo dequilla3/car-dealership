@@ -1,5 +1,5 @@
 <template>
-  <div class="sidenav">
+  <div class="sidenav dontPrint">
     <div
       class="sidebar-menus-parent"
       id="dashboard"
@@ -12,7 +12,7 @@
     </div>
 
     <!-- Admin menu parent-->
-    <div class="sidebar-menus-parent">
+    <div class="sidebar-menus-parent" v-if="role.toLowerCase() === 'admin'">
       <button @click="dropDownTriggerAdmin()" class="dropdown-btn">
         <font-awesome-icon icon="fa-solid fa-users" /> Admin
         <i :class="dropDownAdminArrowIcon()" />
@@ -27,6 +27,7 @@
             class="sidebar-menus-list mt-1"
             :class="{ active: adminMenu.active }"
             @click="setMenuActive(adminMenu.key)"
+            v-show="showMenu(adminMenu)"
           >
             <font-awesome-icon :icon="['fa-solid', adminMenu.icon]" />
             {{ adminMenu.title }}
@@ -50,6 +51,7 @@
             class="sidebar-menus-list mt-1"
             :class="{ active: transactionMenu.active }"
             @click="setMenuActive(transactionMenu.key)"
+            v-show="showMenu(transactionMenu)"
           >
             <font-awesome-icon :icon="['fa-solid', transactionMenu.icon]" />
             {{ transactionMenu.title }}
@@ -69,6 +71,7 @@
 export default {
   data() {
     return {
+      role: "",
       isActiveTransaction: true,
       isActiveAdmin: true,
       isDashboardActive: false,
@@ -134,14 +137,36 @@ export default {
       // if #path is empty then use #route
       this.$router.push({ path: path === "" ? route : path });
     },
+
+    showMenu(menu) {
+      try {
+        let useRole = localStorage.userRole;
+        let access = menu.access.filter(function (val) {
+          return val.toLowerCase() === useRole.toLowerCase();
+        });
+        return access.length > 0;
+      } catch (err) {
+        return false;
+      }
+    },
   },
 
   mounted() {
     var menuKey = localStorage.activeMenuId;
 
-    //load menus
-    this.transactionMenus = this.getTransactionMenus;
-    this.adminMenus = this.getAdminMenus;
+    //init menus
+    if (localStorage.userRole !== undefined) {
+      this.transactionMenus = this.getTransactionMenus;
+      this.adminMenus = this.getAdminMenus;
+      this.role = localStorage.userRole;
+    } else {
+      //reload menus every 1
+      setInterval(() => {
+        this.transactionMenus = this.getTransactionMenus;
+        this.adminMenus = this.getAdminMenus;
+        this.role = localStorage.userRole;
+      }, 1000);
+    }
 
     //for admin menus
     this.adminMenus.forEach(function (menu) {
@@ -155,8 +180,6 @@ export default {
 
     this.setMenuActive(menuKey);
   },
-
-  created() {},
 
   computed: {
     getTransactionMenus() {
@@ -172,6 +195,7 @@ export default {
 
 <style scoped>
 /* Fixed sidenav, full height */
+
 .sidenav {
   height: 100%;
   width: 280px;
@@ -263,15 +287,16 @@ export default {
 /* Dropdown container (hidden by default). Optional: add a lighter background color and some left padding to change the design of the dropdown content */
 .dropdown-container-none {
   display: none;
+  transition-timing-function: ease-out;
 }
 
 .dropdown-container-block {
+  height: 100%;
   display: block;
-  transition: all 0.2s ease-in-out;
+  transition-timing-function: ease-out;
 }
 
 .btn-icon {
-  height: 100%;
   width: 18px;
   margin-right: 10px;
 }

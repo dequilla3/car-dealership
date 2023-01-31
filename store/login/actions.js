@@ -14,7 +14,7 @@ export default {
     });
   },
 
-  async getUserById() {
+  async getUserById({ commit }) {
     return await axios({
       method: "GET",
       url: `${this.$axios.defaults.baseURL}/user-details/${localStorage.userId}`,
@@ -22,7 +22,10 @@ export default {
         Authorization: `Bearer ${localStorage.token}`,
       },
     }).then(
-      (res) => { return res; },
+      (res) => {
+        commit("SET_USER", res.data);
+        return res;
+      },
       (err) => {
         if (err.response.status === 401) {
           this.$router.push({ path: "/" });

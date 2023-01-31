@@ -211,6 +211,7 @@
               variant="info"
               class="form-t_quotation-btn btn-transaction"
               @click="onClickProcess"
+              :disabled="isProcessed"
             >
               <font-awesome-icon icon="fa-solid fa-cogs" /> Process Transaction
             </b-button>
@@ -316,6 +317,7 @@
                 v-model="serviceModal.inputSearch"
                 placeholder="Search . . ."
                 class="modal-input"
+                @keyup.enter="onSearchServices"
               ></b-form-input>
             </b-form-group>
 
@@ -333,6 +335,9 @@
               selected-variant="info"
               @row-selected="setSelectedService"
             >
+              <template #cell(date_transaction)="data">
+                {{ new Date(data.value).toJSON().slice(0, 10) }}
+              </template>
             </b-table>
 
             <!-- tbl pages -->
@@ -452,6 +457,7 @@
 
 <script>
 import QuotationReceipt from "../../components/Reports/QuotationReceipt.vue";
+import axios from "axios";
 export default {
   components: {
     QuotationReceipt,
@@ -511,11 +517,12 @@ export default {
         perPage: 5,
         currentPage: 1,
         selected: [],
+        serviceTblList: [],
         serviceTblFields: [
           { key: "serviceNumber", label: "Service Reference Number" },
-          "dateTrans",
+          "name",
+          "date_transaction",
         ],
-        serviceTblList: [],
       },
 
       insertItemModal: {
@@ -538,7 +545,7 @@ export default {
     async onSearchCustomer() {
       await this.loadCustomer().then((res) => {
         let textSearch = this.customerModal.inputSearch;
-        var filteredList = this.customerModal.customerTblList.filter(function (val) {
+        let filteredList = this.customerModal.customerTblList.filter(function (val) {
           return (
             val.name.toLowerCase().includes(textSearch.toLowerCase()) ||
             val.address.toLowerCase().includes(textSearch.toLowerCase()) ||
@@ -553,7 +560,7 @@ export default {
       this.insertItemModal.itemList = [];
       await this.loadAllProducts().then((res) => {
         let textSearch = this.insertItemModal.inputSearch;
-        var filteredList = this.insertItemModal.itemList.filter(function (val) {
+        let filteredList = this.insertItemModal.itemList.filter(function (val) {
           return (
             val.productCode.toLowerCase().includes(textSearch.toLowerCase()) ||
             val.productName.toLowerCase().includes(textSearch.toLowerCase()) ||
@@ -564,6 +571,21 @@ export default {
       });
     },
 
+    async onSearchServices() {
+      await this.loadServices().then((res) => {
+        let textSearch = this.serviceModal.inputSearch;
+        let filteredList = this.serviceModal.serviceTblList.filter(function (val) {
+          return (
+            val.serviceNumber.toLowerCase().includes(textSearch.toLowerCase()) ||
+            val.name.toLowerCase().includes(textSearch.toLowerCase())
+          );
+        });
+        filteredList.sort();
+        filteredList.reverse();
+        this.serviceModal.serviceTblList = filteredList;
+      });
+    },
+
     onPrint() {
       window.print();
     },
@@ -571,7 +593,6 @@ export default {
 
     setSelectedLine(items) {
       this.selectedLine = items;
-      console.log(items);
     },
 
     // SELECT CUSTOMER MODAL
@@ -588,7 +609,7 @@ export default {
     },
 
     onClickServiceBtnModal() {
-      this.serviceModal.serviceTblList = this.getServiceList;
+      this.loadServices();
     },
 
     onKeypressInputQty() {
@@ -632,25 +653,50 @@ export default {
         })
         .then(
           (res) => {
-            //TODO Save quotation transaction
-
-            this.form.quotationNumber = "TEST321QUOTENUMBER";
-            this.isProcessed = true;
-            this.isBusy = false;
-            this.alert = {
-              showAlert: 3,
-              variant: "success",
-              message: "Successfully processed!",
-            };
-
-            this.$store.commit("quotation/SET_QUOTE_LINE", this.quotationLineList);
-            this.$store.commit("quotation/SET_QUOTE_HEADER", {
-              quoteNum: this.form.quotationNumber,
-              serviceNum: this.form.service.serviceNumber,
-            });
+            //POST quote
+            this.postQuote();
           },
-          (err) => {}
+          (err) => {
+            this.isBusy = false;
+          }
         );
+    },
+
+    async postQuote() {
+      await axios({
+        method: "POST",
+        url: `${this.$axios.defaults.baseURL}/quotation/create`,
+        headers: {
+          Authorization: `Bearer ${localStorage.token}`,
+        },
+        data: {
+          customer_id: this.form.customer.customerId,
+          user_id: localStorage.userId,
+          service_id:
+            this.form.service.serviceId === "" ? null : this.form.service.serviceId,
+          products: this.productsToPost,
+        },
+      }).then(
+        (res) => {
+          //SET Docno
+          this.form.quotationNumber = `${this.getDocQuote}-${res.data.quotation_id}`;
+
+          this.$store.commit("quotation/SET_QUOTE_LINE", this.quotationLineList);
+          this.$store.commit("quotation/SET_QUOTE_HEADER", {
+            quoteNum: this.form.quotationNumber,
+            serviceNum: this.form.service.serviceNumber,
+          });
+
+          this.isProcessed = true;
+          this.isBusy = false;
+          this.showAlert(3, "success", "Successfully processed!");
+
+          return res;
+        },
+        (err) => {
+          this.isBusy = false;
+        }
+      );
     },
 
     //select btn on customerModal
@@ -721,12 +767,11 @@ export default {
       }
     },
 
-    showAlert(message, variant) {
-      this.alert = {
-        showAlert: 2,
-        variant,
-        message,
-      };
+    showAlert(showAlert, variant, message) {
+      this.alert.showAlert = showAlert;
+      this.alert.variant = variant;
+      this.alert.message = message;
+      this.isBusy = false;
     },
 
     async loadCustomer() {
@@ -734,7 +779,7 @@ export default {
         .dispatch("customer/loadCustomers", { token: localStorage.token })
         .then(
           (res) => {
-            this.customerTblList = this.getCustomerList;
+            this.customerModal.customerTblList = this.getCustomerList;
           },
           (err) => {}
         );
@@ -751,6 +796,12 @@ export default {
           console.log(err);
         }
       );
+    },
+
+    async loadServices() {
+      return await this.$store.dispatch("service/loadServices").then((res) => {
+        this.serviceModal.serviceTblList = this.getServiceList;
+      });
     },
 
     //set all products from $store to local list with customized columns
@@ -781,6 +832,12 @@ export default {
   },
 
   computed: {
+    getDocQuote() {
+      let doc = this.$store.state.doc.docModules.filter(function (val) {
+        return val.module === undefined ? "" : val.module === "QUOTATION";
+      });
+      return doc[0].code;
+    },
     rows() {
       return this.quotationLineList.length;
     },
@@ -807,7 +864,42 @@ export default {
     },
 
     getServiceList() {
-      return this.$store.state.service.serviceList;
+      let doc = this.getDocService;
+      let servicesList = this.$store.state.service.serviceList;
+      let tempList = [];
+      let curList = [];
+
+      servicesList.forEach(function (val) {
+        // set temp list to empty
+        tempList = [];
+        tempList.service_id = val.service_id;
+        tempList.serviceNumber = `${doc}-${val.service_id}`;
+        tempList.name = val.name;
+        tempList.date_transaction = val.date_transaction;
+        curList.push(tempList);
+      });
+      curList.sort();
+      curList.reverse();
+      return curList;
+    },
+
+    productsToPost() {
+      let products = [];
+      this.quotationLineList.forEach(function (val) {
+        let tempObj = {};
+        tempObj.sku_id = val.skuId;
+        tempObj.qty = val.qty;
+        tempObj.amount = val.qty * val.cost;
+        products.push(tempObj);
+      });
+      return products;
+    },
+
+    getDocService() {
+      let doc = this.$store.state.doc.docModules.filter(function (val) {
+        return val.module === undefined ? "" : val.module === "SERVICE";
+      });
+      return doc[0].code;
     },
   },
 };

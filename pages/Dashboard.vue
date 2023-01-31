@@ -53,12 +53,13 @@ export default {
 p {
   font-size: 13px;
   cursor: pointer;
+  transition: 0.5s;
 }
 
 .db-content:hover {
   height: 130px;
   width: 290px;
-  transition: all 0.3s ease-in-out;
+  transition-timing-function: ease-out;
 }
 
 @media (max-width: 1800px) {

@@ -14,11 +14,11 @@
               {{ this.service.serviceNumber }}
             </h6>
             <h6>
-              <b>Service Date: </b>
+              <b>Serial Number: </b>
               {{ this.service.serialNumber }}
             </h6>
             <h6>
-              <b>Serial Number: </b>
+              <b>Date Transcation: </b>
               {{ this.service.dateTrans }}
             </h6>
           </b-col>

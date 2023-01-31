@@ -68,6 +68,7 @@
         selectable
         selected-variant="info"
         @row-selected="onRowSelected"
+        :busy="isBusy"
       >
       </b-table>
 
@@ -102,6 +103,7 @@ export default {
       roleTblFields: ["role"],
       roleList: [],
       btnSubmitLabel: "Add new Role",
+      isBusy: false,
 
       form: {
         role: "",
@@ -149,10 +151,12 @@ export default {
     },
 
     async loadRoles() {
+      this.isBusy = true;
       return await this.$store
         .dispatch("role/loadRoles", { token: localStorage.token })
         .then((res) => {
           this.roleList = this.getRoleList;
+          this.isBusy = false;
           return res;
         });
     },

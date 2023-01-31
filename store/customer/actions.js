@@ -35,7 +35,6 @@ export default {
     { commit },
     { token, customer_id, name, contact_number, address }
   ) {
-    console.log(name);
     return await axios({
       method: "PATCH",
       url: `${this.$axios.defaults.baseURL}/customer/edit/${customer_id}`,

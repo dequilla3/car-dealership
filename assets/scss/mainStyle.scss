@@ -7,16 +7,23 @@ $lgFSize: 13px;
 $smFSize: 12px;
 $mainContainerSize: 80px 10px 0 300px;
 
-
-.font-13{
-  font-size: $lgFSize; 
+.font-13 {
+  font-size: $lgFSize;
 }
 
-.font-12{
-  font-size: $smFSize; 
+.font-12 {
+  font-size: $smFSize;
 }
 
-.standardTable{
+.font-10 {
+  font-size: 10px;
+}
+
+.m-bttm-10 {
+  margin-bottom: 10px;
+}
+
+.standardTable {
   width: 100%;
   font-size: $smFSize;
 }
@@ -78,14 +85,22 @@ $mainContainerSize: 80px 10px 0 300px;
   font-size: $lgFSize;
 }
 
-
-
 .standardButton {
   width: 100%;
   font-size: $lgFSize;
 }
 
-.form-btn{
+.btn-100 {
+  width: 100px;
+  font-size: $lgFSize;
+}
+
+.btn-200 {
+  width: 200px;
+  font-size: $lgFSize;
+}
+
+.form-btn {
   height: 35px;
   font-size: 12px;
 }
@@ -113,6 +128,7 @@ $mainContainerSize: 80px 10px 0 300px;
     margin: 0;
     padding: 0;
   }
+
   .mainContainer {
     margin: 0;
     padding: 0;
@@ -121,5 +137,4 @@ $mainContainerSize: 80px 10px 0 300px;
     size: auto;
     margin: 0mm;
   }
-
 }

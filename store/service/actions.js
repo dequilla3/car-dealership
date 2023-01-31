@@ -50,5 +50,35 @@ export default {
     });
   },
 
+  async loadServices({ commit }) {
+    return await axios({
+      method: "GET",
+      url: `${this.$axios.defaults.baseURL}/services`,
+      headers: {
+        Authorization: `Bearer ${localStorage.token}`,
+      },
+    }).then(res => {
+
+      let servicesList = res.data;
+      let curList = [];
+
+      servicesList.forEach(function (val) {
+        //filter duplicates
+        let duplicates = curList.filter(function (filteredVal) {
+          //get duplicates using id
+          return val.service_id === filteredVal.service_id;
+        });
+
+        // if no duplicates push to currlist
+        if (duplicates.length < 1) {
+          curList.push(val);
+        }
+      });
+
+      commit("SET_SERVICES", curList);
+      return res;
+    });
+  },
+
 
 };

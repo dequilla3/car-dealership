@@ -6,7 +6,7 @@
       <SideBar />
       <div><h6>Service</h6></div>
       <hr />
-      <b-form @submit="onSubmuit" class="form-60">
+      <b-form class="form-60">
         <b-alert
           :show="alert.showAlert"
           :variant="alert.variant"
@@ -266,6 +266,7 @@
           @click="onProcess"
           variant="info"
           class="form-t_service-btn btn-transaction"
+          :disabled="isProcessed"
         >
           <font-awesome-icon icon="fa-solid fa-cogs" /> Process Transaction
         </b-button>
@@ -365,6 +366,8 @@
 
 <script>
 import ServiceTicket from "../../components/Reports/ServiceTicket.vue";
+import axios from "axios";
+
 export default {
   components: {
     ServiceTicket,
@@ -464,15 +467,12 @@ export default {
     },
 
     // EVENTS
-    showAlert(message, variant) {
-      this.alert = {
-        showAlert: 2,
-        variant,
-        message,
-      };
+    showAlert(showAlert, variant, message) {
+      this.alert.showAlert = showAlert;
+      this.alert.variant = variant;
+      this.alert.message = message;
+      this.isBusy = false;
     },
-
-    onSubmuit() {},
 
     onNewTrans() {
       this.totalAmount = "";
@@ -488,34 +488,81 @@ export default {
 
     async onProcess() {
       this.isBusy = true;
+
+      if (this.form.customer.customerId === "") {
+        this.showAlert(3, "warning", "Please select customer!");
+        return;
+      }
+
+      if (this.form.serialNum === "") {
+        this.showAlert(3, "warning", "Please encode serial number!");
+        return;
+      }
+
+      if (this.form.comment === "") {
+        this.showAlert(3, "warning", "Please encode comment!");
+        return;
+      }
+
+      if (this.serviceLineList.length < 1) {
+        this.showAlert(3, "warning", "Please select services!");
+        return;
+      }
+
       return await this.$store
         .dispatch("customer/loadCustomerById", {
           customerId: this.form.customer.customerId,
         })
         .then(
           (res) => {
-            //TODO Save service transaction
-            this.$store.commit("service/SET_SERVICE_LINE", this.serviceLineList);
-            this.$store.commit("service/SET_SERVICE_HEADER", {
-              serviceNumber: "TEST123",
-              serialNumber: this.form.serialNum,
-              dateTrans: "TEST_DATE",
-              comment: this.form.comment,
-            });
-
-            this.isBusy = false;
-            this.isProcessed = true;
-            this.form.serviceNumber;
-            this.alert = {
-              showAlert: 3,
-              variant: "success",
-              message: "Successfully processed!",
-            };
+            //POST SERVICE
+            this.postService();
           },
           (err) => {
             this.isBusy = false;
           }
         );
+    },
+
+    async postService() {
+      await axios({
+        method: "POST",
+        url: `${this.$axios.defaults.baseURL}/service/create`,
+        headers: {
+          Authorization: `Bearer ${localStorage.token}`,
+        },
+        data: {
+          customer_id: this.form.customer.customerId,
+          user_id: localStorage.userId,
+          serial_number: this.form.serialNum,
+          comment: this.form.comment,
+          services: this.services,
+        },
+      }).then(
+        (res) => {
+          //SET DOC NUMBER
+          this.form.serviceNumber = `${this.getDoc}-${res.data.service_id}`;
+
+          // SET Service STATE
+          this.$store.commit("service/SET_SERVICE_LINE", this.serviceLineList);
+          this.$store.commit("service/SET_SERVICE_HEADER", {
+            serviceNumber: this.form.serviceNumber,
+            serialNumber: this.form.serialNum,
+            dateTrans: new Date(res.data.date_transaction).toJSON().slice(0, 10),
+            comment: this.form.comment,
+          });
+
+          this.isProcessed = true;
+          this.showAlert(3, "success", "Successfully processed!");
+          this.isBusy = false;
+        },
+        (err) => {
+          if (err.response.status === 400) {
+            this.showAlert(3, "warning", err.response.data.error);
+          }
+          this.isBusy = false;
+        }
+      );
     },
 
     onPrint() {
@@ -624,11 +671,23 @@ export default {
   },
 
   mounted() {
+    this.isProcessed = this.getDoc === "";
+
+    if (this.getDoc === "") {
+      this.$router.push({ path: "/dashboard" });
+      return;
+    }
     this.loadServiceItems();
     this.loadCustomer();
   },
 
   computed: {
+    getDoc() {
+      let doc = this.$store.state.doc.docModules.filter(function (val) {
+        return val.module === undefined ? "" : val.module === "SERVICE";
+      });
+      return doc[0].code;
+    },
     getCustomerList() {
       return this.$store.state.customer.customerList;
     },
@@ -647,6 +706,29 @@ export default {
 
     getService() {
       return this.$store.state.service.serviceList;
+    },
+
+    //convert serviceLineList[] columns based to res body
+    services() {
+      let services = [];
+      this.serviceLineList.forEach(function (val) {
+        let tempObj = {};
+        tempObj.service_item_id = val.service_item_id;
+        tempObj.qty = val.qty;
+        tempObj.amount = Number(val.qty) * Number(val.cost);
+        services.push(tempObj);
+      });
+      return services;
+    },
+
+    serviecReqBody() {
+      return {
+        customer_id: this.form.customer.customerId,
+        user_id: localStorage.userId,
+        serial_number: this.form.serialNum,
+        comment: this.form.comment,
+        services: this.services,
+      };
     },
   },
 };

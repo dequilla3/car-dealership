@@ -134,6 +134,10 @@ export default {
   },
 
   mounted() {
+    if (localStorage.loaded === undefined) {
+      location.reload();
+      localStorage.loaded = "done";
+    }
     this.isLoggedIn = localStorage.isLoggedIn;
     if (this.isLoggedIn) {
       this.show = true;

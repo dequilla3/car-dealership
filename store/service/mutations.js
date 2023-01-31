@@ -9,6 +9,10 @@ export default {
 
     SET_SERVICE_HEADER(state, data) {
         state.serviceHeader = data;
+    },
+
+    SET_SERVICES(state, data) {
+        state.serviceList = data;
     }
 
 };
