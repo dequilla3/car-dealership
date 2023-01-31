@@ -105,7 +105,7 @@ export default {
         .then(
           (res) => {
             localStorage.userId = res.data.user_id;
-            localStorage.userName = `${res.data.name} (${res.data.username})`;
+            localStorage.userName = `${res.data.name} `;
             localStorage.token = res.data.token;
 
             this.show = false;
