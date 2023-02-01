@@ -13,6 +13,10 @@ export default {
 
     SET_SERVICES(state, data) {
         state.serviceList = data;
+    },
+
+    SET_SERVICELINE_BY_ID(state, data) {
+        state.serviceLines = data;
     }
 
 };

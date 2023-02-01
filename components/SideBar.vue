@@ -14,7 +14,7 @@
     <!-- Admin menu parent-->
     <div class="sidebar-menus-parent" v-if="role.toLowerCase() === 'admin'">
       <button @click="dropDownTriggerAdmin()" class="dropdown-btn">
-        <font-awesome-icon icon="fa-solid fa-users" /> Admin
+        <font-awesome-icon icon="fa-solid fa-user-tie" /> Admin
         <i :class="dropDownAdminArrowIcon()" />
       </button>
 

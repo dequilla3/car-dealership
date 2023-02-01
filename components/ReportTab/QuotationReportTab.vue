@@ -4,7 +4,7 @@
     <b-table
       class="standardTable"
       hover
-      :items="services"
+      :items="quotes"
       :fields="tblFields"
       :per-page="perPage"
       :current-page="currentPage"
@@ -17,7 +17,7 @@
 
       <template #cell(viewDetails)="data">
         <b-button
-          v-b-modal="'viewDetailsModalService'"
+          v-b-modal="'viewDetailsModalQuote'"
           size="sm"
           class="font-10"
           variant="info"
@@ -29,7 +29,7 @@
 
       <template #cell(print)="data">
         <b-button size="sm" class="font-10" variant="info" @click="onPrint(data)">
-          <font-awesome-icon icon="fa-solid fa-print" /> Print Ticket</b-button
+          <font-awesome-icon icon="fa-solid fa-print" /> Print</b-button
         >
       </template>
     </b-table>
@@ -45,15 +45,9 @@
     <!-- MODALS -->
 
     <!-- view details modal -->
-    <b-modal
-      id="viewDetailsModalService"
-      size="xl"
-      hide-footer
-      hide-header
-      title="Details"
-    >
+    <b-modal id="viewDetailsModalQuote" size="xl" hide-footer hide-header title="Details">
       <div class="modal-container">
-        <h6>Service Details</h6>
+        <h6>Quotation Details Details</h6>
         <hr />
 
         <!-- details modal table -->
@@ -87,7 +81,7 @@
           <b-button
             variant="danger"
             class="form-btn modal-action-btn"
-            @click="$bvModal.hide('viewDetailsModalService')"
+            @click="$bvModal.hide('viewDetailsModalQuote')"
           >
             <font-awesome-icon icon="fa-solid fa-xmark" /> Close
           </b-button>
@@ -101,21 +95,21 @@
 import ReceiptHeader from "../Reports/ReceiptHeader.vue";
 
 export default {
-  name: "ServiceReportTab",
+  name: "QuotationReportTab",
   components: {
     ReceiptHeader,
   },
 
-  data(item) {
+  data() {
     return {
       show: false,
-      selectedService: [],
+      selectedQuote: [],
       perPage: 5,
       currentPage: 1,
-      services: [],
-      serviceLines: [],
+      quotes: [],
+      quotationLines: [],
       tblFields: [
-        { key: "serviceNumber", label: "Service #", thStyle: { width: "25%" } },
+        { key: "quoteNumber", label: "Quotation #", thStyle: { width: "25%" } },
         { key: "name", label: "Customer Name", thStyle: { width: "25%" } },
         { key: "date_transaction", label: "Date Transaction", thStyle: { width: "25%" } },
         { key: "viewDetails", label: "View Details", thStyle: { width: "15%" } },
@@ -125,10 +119,11 @@ export default {
       viewDetailsModal: {
         detailsList: [],
         detailsFields: [
-          { key: "service_name", label: "Service Item", thStyle: { width: "60%" } },
+          { key: "productCode", label: "Product Code", thStyle: { width: "20%" } },
+          { key: "productName", label: "Product Name", thStyle: { width: "40%" } },
           { key: "unit", label: "Unit", thStyle: { width: "10%" } },
           { key: "cost", label: "Cost", thStyle: { width: "10%" } },
-          { key: "qty", label: "Qty", thStyle: { width: "10%" } },
+          { key: "qty", label: "Quantity", thStyle: { width: "10%" } },
           { key: "amount", label: "Amount", thStyle: { width: "10%" } },
         ],
         perPage: 5,
@@ -139,23 +134,53 @@ export default {
 
   methods: {
     onViewDetails(data) {
-      this.selectedService = data.item;
-      this.loadServiceLineById();
+      this.selectedQuote = data.item;
+      this.loadQuoteLineById();
     },
 
-    async loadServiceLineById() {
+    async loadQuoteLineById() {
       await this.$store
-        .dispatch("service/loadServiceLineById", {
-          serviceId: this.selectedService.service_id,
+        .dispatch("quotation/loadQuoteLineByID", {
+          quoteId: this.selectedQuote.quotation_id,
         })
         .then(
           (res) => {
-            this.viewDetailsModal.detailsList = this.getServiceLinesById;
+            this.setAllProducts();
           },
           (err) => {
             console.log(err);
           }
         );
+    },
+
+    setAllProducts() {
+      //temporary list to create custom columns
+      let tempList = [];
+      // temporary details list to store all temp list
+      let tempDetailList = [];
+
+      this.getQuoteLineById.forEach(function (val) {
+        //reset temporary list upon iteration
+        tempList = [];
+
+        // set customized column
+        tempList.skuId = val.sku_id;
+        tempList.productCode = val.barcode == null ? val.serial_number : val.barcode;
+        tempList.productName =
+          val.printname == null ? `${val.brand_name} ${val.model}` : val.printname;
+        tempList.unit = val.unit;
+        tempList.cost = val.cost;
+        tempList.qty = val.qty;
+        tempList.amount = val.amount;
+        tempList.customer_id = val.customer_id;
+
+        // push temp list to temp details list
+        tempDetailList.push(tempList);
+      });
+
+      //set to actual list
+      this.viewDetailsModal.detailsList = tempDetailList;
+      this.quotationLines = tempDetailList;
     },
 
     async onPrint(data) {
@@ -167,7 +192,7 @@ export default {
           })
           .then((res) => {
             //SET selected item then load specific lines
-            this.selectedService = data.item;
+            this.selectedQuote = data.item;
             this.loadLinesOnPrint();
           });
       } catch (err) {
@@ -177,13 +202,13 @@ export default {
 
     async loadLinesOnPrint() {
       await this.$store
-        .dispatch("service/loadServiceLineById", {
-          serviceId: this.selectedService.service_id,
+        .dispatch("quotation/loadQuoteLineByID", {
+          quoteId: this.selectedQuote.quotation_id,
         })
         .then(
           (res) => {
             //SET loaded lines from global state to local state
-            this.serviceLines = this.getServiceLinesById;
+            this.setAllProducts();
 
             // SET Service STATE
             this.setStateForPrint();
@@ -201,70 +226,60 @@ export default {
     },
 
     setStateForPrint() {
-      this.$store.commit("service/SET_SERVICE_LINE", this.serviceLines);
-      this.$store.commit("service/SET_SERVICE_HEADER", {
-        serviceNumber: this.selectedService.serviceNumber,
-        serialNumber: this.selectedService.serial_number,
-        dateTrans: new Date(this.selectedService.date_transaction).toJSON().slice(0, 10),
-        comment: this.selectedService.comment,
+      this.$store.commit("quotation/SET_QUOTE_LINE", this.quotationLines);
+      this.$store.commit("quotation/SET_QUOTE_HEADER", {
+        quoteNum: this.selectedQuote.quoteNumber,
+        serviceNum: this.getDoc("SERVICE", this.selectedQuote.service_id),
       });
+    },
+
+    getDoc(module, id) {
+      let doc = this.$store.state.doc.docModules.filter(function (val) {
+        return val.module === undefined ? "" : val.module === module;
+      });
+      return id === null ? "NONE" : `${doc[0].code}-${id}`;
     },
   },
 
   mounted() {
     setInterval(() => {
-      this.services = this.getServiceList;
+      this.quotes = this.getQuotes;
     }, 3000);
   },
 
   computed: {
-    getDoc() {
-      let doc = this.$store.state.doc.docModules.filter(function (val) {
-        return val.module === undefined ? "" : val.module === "SERVICE";
-      });
-      return doc[0].code;
-    },
-
-    getServiceLinesById() {
-      return this.$store.state.service.serviceLines;
+    getQuoteLineById() {
+      return this.$store.state.quotation.quoteLines;
     },
 
     isListEmpty() {
       return this.services.length < 1;
     },
 
-    getServiceList() {
-      let doc = this.getDocService;
-      let servicesList = this.$store.state.service.serviceList;
+    getQuotes() {
+      let quotesList = this.$store.state.quotation.quotes;
       let tempList = [];
       let curList = [];
 
-      servicesList.forEach(function (val) {
-        // set temp list to empty
-        tempList = [];
-        tempList.service_id = val.service_id;
-        tempList.customer_id = val.customer_id;
-        tempList.serviceNumber = `${doc}-${val.service_id}`;
-        tempList.name = val.name;
-        tempList.date_transaction = val.date_transaction;
-        tempList.serial_number = val.serial_number;
-        tempList.comment = val.comment;
-        curList.push(tempList);
-      });
-      curList.sort();
-      curList.reverse();
+      quotesList.forEach(
+        function (val) {
+          // set temp list to empty
+          tempList = [];
+          tempList.quotation_id = val.quotation_id;
+          tempList.service_id = val.service_id;
+          tempList.customer_id = val.customer_id;
+          tempList.quoteNumber = this.getDoc("QUOTATION", val.quotation_id);
+          tempList.name = val.name;
+          tempList.date_transaction = val.date_transaction;
+          curList.push(tempList);
+        }.bind(this)
+      );
+
       return curList;
     },
 
-    getDocService() {
-      let doc = this.$store.state.doc.docModules.filter(function (val) {
-        return val.module === undefined ? "" : val.module === "SERVICE";
-      });
-      return doc[0].code;
-    },
-
     rows() {
-      return this.services === undefined ? 0 : this.services.length;
+      return this.quotes === undefined ? 0 : this.quotes.length;
     },
 
     detailsTotalRows() {

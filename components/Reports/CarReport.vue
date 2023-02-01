@@ -20,7 +20,7 @@ export default {
 
   data() {
     return {
-      tblFields: ["serial_number", "color", "model", "brand", "unit", "cost"],
+      tblFields: ["serial_number", "color", "model", "brand_name", "unit", "cost"],
       tblList: [],
     };
   },

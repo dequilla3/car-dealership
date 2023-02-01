@@ -5,10 +5,8 @@ export default () => ({
   serviceLines: [],
 
   serviceItemsList: [],
+
+  // for reports
   serviceHeader: [],
   serviceTransactionLines: [],
-
-
-
-
 });

@@ -3,7 +3,7 @@
     <div class="dontPrint">
       <Navbar />
       <SideBar />
-      <div><h6>Report</h6></div>
+      <div><h6>Reports</h6></div>
       <hr />
 
       <b-card no-body class="print-parent">
@@ -30,7 +30,9 @@
           <b-tab @click="setReportName('services')" title="Services">
             <ServiceReportTab />
           </b-tab>
-          <b-tab title="Quotations"> </b-tab>
+          <b-tab @click="setReportName('quotes')" title="Quotations">
+            <QuotationReportTab />
+          </b-tab>
           <b-tab title="Invoices"> </b-tab>
         </b-tabs>
       </b-card>
@@ -51,6 +53,12 @@
       <div v-if="reportName === 'serviceItem'">
         <ServiceItemReport />
       </div>
+      <div v-if="reportName === 'services'">
+        <ServiceTicket />
+      </div>
+      <div v-if="reportName === 'quotes'">
+        <QuotationReceipt />
+      </div>
     </div>
   </div>
 </template>
@@ -67,6 +75,9 @@ import RoleReport from "../components/Reports/RoleReport.vue";
 import ServiceItemReportTab from "../components/ReportTab/ServiceItemReportTab.vue";
 import ServiceItemReport from "../components/Reports/ServiceItemReport.vue";
 import ServiceReportTab from "../components/ReportTab/ServiceReportTab.vue";
+import ServiceTicket from "../components/Reports/ServiceTicket.vue";
+import QuotationReportTab from "../components/ReportTab/QuotationReportTab.vue";
+import QuotationReceipt from "../components/Reports/QuotationReceipt.vue";
 
 export default {
   name: "Report",
@@ -94,6 +105,11 @@ export default {
 
     //seervices
     ServiceReportTab,
+    ServiceTicket,
+
+    //quotes
+    QuotationReportTab,
+    QuotationReceipt,
   },
 
   data() {
@@ -140,6 +156,9 @@ export default {
     async loadServices() {
       return await this.$store.dispatch("service/loadServices");
     },
+    async loadQuotes() {
+      return await this.$store.dispatch("quotation/loadQuotes");
+    },
   },
 
   mounted() {
@@ -151,6 +170,7 @@ export default {
         this.loadRoles();
         this.loadServiceItems();
         this.loadServices();
+        this.loadQuotes();
       } catch (err) {
         console.log(err);
       }

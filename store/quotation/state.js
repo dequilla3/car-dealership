@@ -1,4 +1,7 @@
 export default () => ({
+    quotes: [],
+    quoteLines: [],
+
     quotationLineList: [],
     quoteHeader: [],
 

@@ -65,7 +65,7 @@ export default {
       servicesList.forEach(function (val) {
         //filter duplicates
         let duplicates = curList.filter(function (filteredVal) {
-          //get duplicates using id
+          //get duplicates using pk_id
           return val.service_id === filteredVal.service_id;
         });
 
@@ -79,6 +79,19 @@ export default {
       return res;
     });
   },
+
+  async loadServiceLineById({ commit }, { serviceId }) {
+    return await axios({
+      method: "GET",
+      url: `${this.$axios.defaults.baseURL}/service/view/${serviceId}`,
+      headers: {
+        Authorization: `Bearer ${localStorage.token}`,
+      },
+    }).then(res => {
+      commit("SET_SERVICELINE_BY_ID", res.data);
+      return res;
+    });
+  }
 
 
 };

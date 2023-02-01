@@ -37,7 +37,7 @@
               <b-input-group id="b-input-group-quote">
                 <b-form-input
                   id="input-quote"
-                  v-model="form.quote.quoteId"
+                  v-model="form.quote.quoteNum"
                   required
                   class="globalInputSize"
                   placeholder="None"
@@ -138,7 +138,7 @@
       <!-- Proecss and Print button -->
       <div class="div-content-left" v-if="showServiceTable || showGoodsTable">
         <b-button
-          variant="info"
+          variant="primary"
           class="form-t_cashier-btn btn-transaction"
           @click="onClickProcess"
         >
@@ -150,9 +150,19 @@
           variant="info"
           class="form-t_cashier-btn btn-transaction"
           @click="onPrint"
+          :disabled="!isProccessed"
         >
           <font-awesome-icon icon="fa-solid fa-file" />
           Print Receipt
+        </b-button>
+
+        <b-button
+          variant="danger"
+          class="form-t_cashier-btn btn-transaction"
+          @click="onReset"
+        >
+          <font-awesome-icon icon="fa-solid fa-redo" />
+          Reset
         </b-button>
       </div>
 
@@ -185,6 +195,9 @@
             selected-variant="info"
             @row-selected="setSelectedService"
           >
+            <template #cell(dateTrans)="data">
+              {{ new Date(data.value).toJSON().slice(0, 10) }}
+            </template>
           </b-table>
 
           <!-- tbl pages -->
@@ -248,6 +261,9 @@
             selected-variant="info"
             @row-selected="setSelectedQuote"
           >
+            <template #cell(dateTrans)="data">
+              {{ new Date(data.value).toJSON().slice(0, 10) }}
+            </template>
           </b-table>
 
           <!-- tbl pages -->
@@ -306,6 +322,7 @@ export default {
         salesInvoiceNumber: "",
         quote: {
           quoteId: "",
+          quoteNum: "",
         },
         service: {
           serviceId: "",
@@ -331,8 +348,8 @@ export default {
         currentPage: 1,
         quotationLineList: [],
         quotationLineTblFields: [
-          { key: "productCode", label: "Product Code", thStyle: { width: "30%" } },
-          { key: "productName", label: "Product Name", thStyle: { width: "30%" } },
+          { key: "productCode", label: "Product Code", thStyle: { width: "20%" } },
+          { key: "productName", label: "Product Name", thStyle: { width: "40%" } },
           { key: "unit", label: "Unit", thStyle: { width: "10%" } },
           { key: "cost", label: "Cost", thStyle: { width: "10%" } },
           { key: "qty", label: "Quantity", thStyle: { width: "10%" } },
@@ -361,8 +378,9 @@ export default {
         selected: [],
         quotationTblList: [],
         quotationTblFields: [
-          { key: "quotation_id", label: "Quotation Number", thStyle: { width: "30%" } },
-          { key: "customer_name", label: "Customer Name" },
+          { key: "quoteNumber", label: "Qoutation #", thStyle: { width: "20%" } },
+          { key: "customerName", label: "Customer Name", thStyle: { width: "30%" } },
+          { key: "dateTrans", label: "Date Transaction", thStyle: { width: "30%" } },
         ],
       },
     };
@@ -379,40 +397,82 @@ export default {
       setTimeout(() => {
         this.isBusy = false;
         this.isProccessed = true;
-        //SET 1 seconds delay after load
-        //OPEN print dialog
       }, 3000);
     },
 
     selectService() {
-      this.form.service.serviceId = this.serviceModalProps.selected[0].serviceId;
-      this.form.service.serviceNum = `${this.serviceModalProps.selected[0].serviceId}-${this.serviceModalProps.selected[0].serial_number}`;
+      this.form.service.serviceId = this.serviceModalProps.selected[0].service_id;
+      this.form.service.serviceNum = this.serviceModalProps.selected[0].serviceNumber;
+      this.loadServiceLineById();
       this.$bvModal.hide("serviceModal");
-      this.populateServiceLine();
-      this.computeTotalAmount();
     },
 
-    populateServiceLine() {
-      let proxyList = this.serviceProps.serviceLineList;
-      this.getServiceLines.forEach(function (val) {
-        val.amount = Number(val.qty) * Number(val.cost);
-        proxyList.push(val);
-      });
+    async loadServiceLineById() {
+      await this.$store
+        .dispatch("service/loadServiceLineById", {
+          serviceId: this.form.service.serviceId,
+        })
+        .then(
+          (res) => {
+            this.serviceProps.serviceLineList = this.getServiceLinesById;
+            this.computeTotalAmount();
+          },
+          (err) => {
+            console.log(err);
+          }
+        );
     },
 
     selectQuote() {
       this.form.quote.quoteId = this.quotationModalProps.selected[0].quotation_id;
+      this.form.quote.quoteNum = this.quotationModalProps.selected[0].quoteNumber;
+      this.loadQuoteLineById();
       this.$bvModal.hide("quoteModal");
-      this.populateQuoteLine();
-      this.computeTotalAmount();
     },
 
-    populateQuoteLine() {
-      let proxyList = this.quotationProps.quotationLineList;
-      this.getQuoteLinesToBill.forEach(function (val) {
-        val.amount = Number(val.qty) * Number(val.cost);
-        proxyList.push(val);
+    async loadQuoteLineById() {
+      await this.$store
+        .dispatch("quotation/loadQuoteLineByID", {
+          quoteId: this.form.quote.quoteId,
+        })
+        .then(
+          (res) => {
+            this.setAllProducts();
+            this.computeTotalAmount();
+          },
+          (err) => {
+            console.log(err);
+          }
+        );
+    },
+
+    setAllProducts() {
+      //temporary list to create custom columns
+      let tempList = [];
+      // temporary details list to store all temp list
+      let tempDetailList = [];
+
+      this.getQuoteLineById.forEach(function (val) {
+        //reset temporary list upon iteration
+        tempList = [];
+
+        // set customized column
+        tempList.skuId = val.sku_id;
+        tempList.productCode = val.barcode == null ? val.serial_number : val.barcode;
+        tempList.productName =
+          val.printname == null ? `${val.brand_name} ${val.model}` : val.printname;
+        tempList.unit = val.unit;
+        tempList.cost = val.cost;
+        tempList.qty = val.qty;
+        tempList.amount = val.amount;
+        tempList.customer_id = val.customer_id;
+
+        // push temp list to temp details list
+        tempDetailList.push(tempList);
       });
+
+      //set to actual list
+      this.quotationProps.quotationLineList = tempDetailList;
     },
 
     computeTotalAmount() {
@@ -428,10 +488,10 @@ export default {
     },
 
     openServiceModal() {
-      this.serviceModalProps.serviceTblList = this.getServicedList;
+      this.loadServices();
     },
     openQuoteModal() {
-      this.quotationModalProps.quotationTblList = this.getQuoteToBill;
+      this.loadQuotes();
     },
 
     //SET METHODS
@@ -448,6 +508,29 @@ export default {
 
     setSelectedQuote(items) {
       this.quotationModalProps.selected = items;
+    },
+
+    getDoc(mod) {
+      let doc = this.$store.state.doc.docModules.filter(function (val) {
+        return val.module === undefined ? "" : val.module === mod;
+      });
+      return doc[0].code;
+    },
+
+    async loadServices() {
+      return await this.$store.dispatch("service/loadServices").then((res) => {
+        this.serviceModalProps.serviceTblList = this.getServicedList;
+      });
+    },
+
+    async loadQuotes() {
+      return await this.$store.dispatch("quotation/loadQuotes").then((res) => {
+        this.quotationModalProps.quotationTblList = this.getQuotes;
+      });
+    },
+
+    onReset() {
+      location.reload();
     },
   },
 
@@ -471,19 +554,55 @@ export default {
     },
 
     getServicedList() {
-      return this.$store.state.service.serviceList;
+      let doc = this.getDoc("SERVICE");
+      let servicesList = this.$store.state.service.serviceList;
+      let tempList = [];
+      let curList = [];
+
+      servicesList.forEach(function (val) {
+        // set temp list to empty
+        tempList = [];
+        tempList.service_id = val.service_id;
+        tempList.customer_id = val.customer_id;
+        tempList.serviceNumber = `${doc}-${val.service_id}`;
+        tempList.customerName = val.name;
+        tempList.dateTrans = val.date_transaction;
+        tempList.serial_number = val.serial_number;
+        tempList.comment = val.comment;
+        curList.push(tempList);
+      });
+      curList.sort();
+      curList.reverse();
+      return curList;
+      // return this.$store.state.service.serviceList;
     },
 
-    getServiceLines() {
+    getServiceLinesById() {
       return this.$store.state.service.serviceLines;
     },
-
-    getQuoteToBill() {
-      return this.$store.state.quotation.quotationToBill;
+    getQuoteLineById() {
+      return this.$store.state.quotation.quoteLines;
     },
 
-    getQuoteLinesToBill() {
-      return this.$store.state.quotation.quotationLineToBill;
+    getQuotes() {
+      let doc = this.getDoc("QUOTATION");
+      let quotesList = this.$store.state.quotation.quotes;
+      let tempList = [];
+      let curList = [];
+
+      quotesList.forEach(function (val) {
+        // set temp list to empty
+        tempList = [];
+        tempList.quotation_id = val.quotation_id;
+        tempList.service_id = val.service_id;
+        tempList.customer_id = val.customer_id;
+        tempList.quoteNumber = `${doc}-${val.quotation_id}`;
+        tempList.customerName = val.name;
+        tempList.dateTrans = val.date_transaction;
+        curList.push(tempList);
+      });
+
+      return curList;
     },
   },
 };

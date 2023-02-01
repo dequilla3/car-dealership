@@ -6,7 +6,7 @@ export default () => ({
       href: "/transaction/quotation",
       active: false,
       key: "t1",
-      icon: "fa-quote-right",
+      icon: "fa-comment-dollar",
       access: ["admin", "sales person"]
     },
     {
@@ -36,7 +36,7 @@ export default () => ({
       href: "/admin/manageAppUser",
       active: false,
       key: "admin1",
-      icon: "fa-user",
+      icon: "fa-users-gear",
       access: ["admin"]
     },
 

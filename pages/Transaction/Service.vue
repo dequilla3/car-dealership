@@ -141,6 +141,9 @@
               selected-variant="info"
               @row-selected="setSelectedCustomer"
             >
+              <template #cell(date_created)="data">
+                {{ new Date(data.value).toJSON().slice(0, 10) }}
+              </template>
             </b-table>
 
             <!-- tbl pages -->
@@ -264,7 +267,7 @@
       <div class="div-content-left">
         <b-button
           @click="onProcess"
-          variant="info"
+          variant="primary"
           class="form-t_service-btn btn-transaction"
           :disabled="isProcessed"
         >
@@ -747,10 +750,7 @@ export default {
 .pagination {
   font-size: 12px;
 }
-.div-content-left {
-  display: flex;
-  justify-content: flex-end;
-}
+
 .form-t_service-btn {
   height: 35px;
   font-size: 12px;

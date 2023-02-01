@@ -7,6 +7,11 @@ $lgFSize: 13px;
 $smFSize: 12px;
 $mainContainerSize: 80px 10px 0 300px;
 
+.div-content-left {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .font-13 {
   font-size: $lgFSize;
 }
@@ -97,6 +102,10 @@ $mainContainerSize: 80px 10px 0 300px;
 
 .btn-200 {
   width: 200px;
+  font-size: $lgFSize;
+}
+
+.modal-container {
   font-size: $lgFSize;
 }
 

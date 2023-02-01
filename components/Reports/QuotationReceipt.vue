@@ -88,8 +88,8 @@ export default {
     return {
       currentDate: new Date().toJSON().slice(0, 10),
       quotationLineTblFields: [
-        { key: "productCode", label: "Product Code", thStyle: { width: "10%" } },
-        { key: "productName", label: "Product Name", thStyle: { width: "50%" } },
+        { key: "productCode", label: "Product Code", thStyle: { width: "20%" } },
+        { key: "productName", label: "Product Name", thStyle: { width: "40%" } },
         { key: "unit", label: "Unit", thStyle: { width: "10%" } },
         { key: "cost", label: "Cost", thStyle: { width: "10%" } },
         { key: "qty", label: "Quantity", thStyle: { width: "10%" } },

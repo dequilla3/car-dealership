@@ -208,7 +208,7 @@
           <!-- Proecss and Print button -->
           <div class="div-content-left">
             <b-button
-              variant="info"
+              variant="primary"
               class="form-t_quotation-btn btn-transaction"
               @click="onClickProcess"
               :disabled="isProcessed"
@@ -265,6 +265,9 @@
               selected-variant="info"
               @row-selected="customerModalRowSelected"
             >
+              <template #cell(date_created)="data">
+                {{ new Date(data.value).toJSON().slice(0, 10) }}
+              </template>
             </b-table>
 
             <!-- tbl pages -->
@@ -509,7 +512,7 @@ export default {
         currentPage: 1,
         selected: [],
         customerTblList: [],
-        customerTblFields: ["name", "contactNumber", "address", "dateCreated"],
+        customerTblFields: ["name", "contact_number", "address", "date_created"],
       },
 
       serviceModal: {
@@ -961,10 +964,6 @@ export default {
   display: flex;
   justify-content: space-between;
   width: 410px;
-}
-
-.modal-container {
-  font-size: 13px;
 }
 
 .modal-input {
