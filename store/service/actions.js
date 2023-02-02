@@ -74,7 +74,6 @@ export default {
           curList.push(val);
         }
       });
-
       commit("SET_SERVICES", curList);
       return res;
     });

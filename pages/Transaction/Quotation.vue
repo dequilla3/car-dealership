@@ -109,7 +109,6 @@
                   <b-input-group-append>
                     <b-button
                       id="b-modal-service"
-                      v-b-modal.modal-lg="'serviceModal'"
                       variant="secondary"
                       class="form-t_quotation-btn"
                       @click="onClickServiceBtnModal"
@@ -611,8 +610,22 @@ export default {
       this.customerModal.customerTblList = this.getCustomerList;
     },
 
-    onClickServiceBtnModal() {
-      this.loadServices();
+    async onClickServiceBtnModal() {
+      if (this.form.customer.customerId === "") {
+        this.$bvModal.hide("serviceModal");
+        this.showAlert(3, "warning", "Please select customer!");
+        return;
+      }
+      this.$bvModal.show("serviceModal");
+
+      await this.loadQuotes().then(
+        (res) => {
+          this.loadServices();
+        },
+        (err) => {
+          console.log(err);
+        }
+      );
     },
 
     onKeypressInputQty() {
@@ -648,8 +661,12 @@ export default {
     },
 
     async onClickProcess() {
-      this.isBusy = true;
+      if (this.quotationLineList.length < 1) {
+        this.showAlert(3, "warning", "Please select Item!");
+        return;
+      }
 
+      this.isBusy = true;
       return await this.$store
         .dispatch("customer/loadCustomerById", {
           customerId: this.form.customer.customerId,
@@ -675,8 +692,7 @@ export default {
         data: {
           customer_id: this.form.customer.customerId,
           user_id: localStorage.userId,
-          service_id:
-            this.form.service.serviceId === "" ? null : this.form.service.serviceId,
+          service_id: this.form.service.serviceId,
           products: this.productsToPost,
         },
       }).then(
@@ -718,7 +734,7 @@ export default {
     selectService() {
       this.$bvModal.hide("serviceModal");
       if (this.serviceModal.selected.length > 0) {
-        this.form.service.serviceId = this.serviceModal.selected[0].serviceId;
+        this.form.service.serviceId = this.serviceModal.selected[0].service_id;
         this.form.service.serviceNumber = this.serviceModal.selected[0].serviceNumber;
         this.form.service.dateTrans = this.serviceModal.selected[0].dateTrans;
       } else {
@@ -801,9 +817,43 @@ export default {
       );
     },
 
+    async loadQuotes() {
+      return await this.$store.dispatch("quotation/loadQuotes");
+    },
+
     async loadServices() {
       return await this.$store.dispatch("service/loadServices").then((res) => {
-        this.serviceModal.serviceTblList = this.getServiceList;
+        this.serviceModal.serviceTblList = [];
+        let custId = this.form.customer.customerId;
+        let serviceByCustomerNotOnQtn = [];
+        let serviceIdFromQtn = [];
+
+        //filter serviced base on selected customer
+        let serviceByCustomer = this.getServiceList.filter(function (val) {
+          return val.customerId === custId;
+        });
+
+        //select all service_id from qtn where service id !== null
+        this.getQuotes.forEach(function (val) {
+          if (val.service_id !== null) {
+            serviceIdFromQtn.push(val.service_id);
+          }
+        });
+
+        // fetch services not yet tagged in quotation
+        serviceByCustomer.forEach(
+          function (val) {
+            let tmpList = serviceIdFromQtn.filter(function (svcId) {
+              return val.service_id === svcId;
+            });
+            if (tmpList.length < 1) {
+              serviceByCustomerNotOnQtn.push(val);
+            }
+          }.bind(this)
+        );
+
+        //return final filtered list
+        this.serviceModal.serviceTblList = serviceByCustomerNotOnQtn;
       });
     },
 
@@ -832,6 +882,7 @@ export default {
 
   mounted() {
     this.loadCustomer();
+    this.loadQuotes();
   },
 
   computed: {
@@ -879,6 +930,7 @@ export default {
         tempList.serviceNumber = `${doc}-${val.service_id}`;
         tempList.name = val.name;
         tempList.date_transaction = val.date_transaction;
+        tempList.customerId = val.customer_id;
         curList.push(tempList);
       });
       curList.sort();
@@ -903,6 +955,10 @@ export default {
         return val.module === undefined ? "" : val.module === "SERVICE";
       });
       return doc[0].code;
+    },
+
+    getQuotes() {
+      return this.$store.state.quotation.quotes;
     },
   },
 };

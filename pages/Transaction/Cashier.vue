@@ -7,10 +7,18 @@
       <div><h6>Cashier</h6></div>
       <hr />
       <b-form class="form-60">
+        <b-alert
+          :show="alert.showAlert"
+          :variant="alert.variant"
+          @dismissed="alert.showAlert = null"
+        >
+          {{ alert.message }}
+        </b-alert>
         <b-button
           variant="primary"
           class="form-t_cashier-btn t-btn-primary-margin-bottom"
-          v-if="isProccessed"
+          v-if="isPr"
+          @click="onReset"
         >
           <font-awesome-icon icon="fa-solid fa-plus" />
           New Trasaction
@@ -50,6 +58,7 @@
                     class="form-t_cashier-btn"
                     v-b-modal.modal-lg="'quoteModal'"
                     @click="openQuoteModal"
+                    :disabled="isDisableQuote || isPr"
                     >Select</b-button
                   >
                 </b-input-group-append>
@@ -76,6 +85,7 @@
                     class="form-t_cashier-btn"
                     v-b-modal.modal-lg="'serviceModal'"
                     @click="openServiceModal"
+                    :disabled="isDisableService || isPr"
                     >Select</b-button
                   >
                 </b-input-group-append>
@@ -141,6 +151,7 @@
           variant="primary"
           class="form-t_cashier-btn btn-transaction"
           @click="onClickProcess"
+          :disabled="isPr"
         >
           <b-spinner v-if="false" small></b-spinner>
           <font-awesome-icon v-if="true" icon="fa-solid fa-cogs" /> Process Transaction
@@ -150,7 +161,7 @@
           variant="info"
           class="form-t_cashier-btn btn-transaction"
           @click="onPrint"
-          :disabled="!isProccessed"
+          :disabled="!isPr"
         >
           <font-awesome-icon icon="fa-solid fa-file" />
           Print Receipt
@@ -307,6 +318,7 @@
 
 <script>
 import SalesInvoice from "../../components/Reports/SalesInvoice.vue";
+import axios from "axios";
 export default {
   components: {
     SalesInvoice,
@@ -316,9 +328,12 @@ export default {
     return {
       totalAmount: 0,
       isBusy: false,
-      isProccessed: false,
+      isPr: false,
+      isDisableService: false,
+      isDisableQuote: false,
 
       form: {
+        customderId: "",
         salesInvoiceNumber: "",
         quote: {
           quoteId: "",
@@ -383,6 +398,12 @@ export default {
           { key: "dateTrans", label: "Date Transaction", thStyle: { width: "30%" } },
         ],
       },
+
+      alert: {
+        showAlert: 0,
+        variant: "",
+        message: "",
+      },
     };
   },
 
@@ -392,18 +413,49 @@ export default {
       window.print();
     },
 
-    onClickProcess() {
+    async onClickProcess() {
       this.isBusy = true;
-      setTimeout(() => {
-        this.isBusy = false;
-        this.isProccessed = true;
-      }, 3000);
-    },
 
+      await axios({
+        method: "POST",
+        url: `${this.$axios.defaults.baseURL}/billing/create`,
+        headers: {
+          Authorization: `Bearer ${localStorage.token}`,
+        },
+        data: {
+          customer_id: this.form.customderId,
+          user_id: localStorage.userId,
+          quotation_id: this.form.quote.quoteId === "" ? null : this.form.quote.quoteId,
+          service_id:
+            this.form.service.serviceId == "" ? null : this.form.service.serviceId,
+        },
+      }).then(
+        (res) => {
+          this.form.salesInvoiceNumber = `SI-${res.data.data[0].billing_id}`;
+
+          this.isPr = true;
+          this.isBusy = false;
+
+          this.showAlert(3, "success", "Successfully Processed!");
+        },
+        (err) => {
+          console.log(err.response);
+          this.isBusy = false;
+        }
+      );
+    },
+    showAlert(showAlert, variant, message) {
+      this.alert.showAlert = showAlert;
+      this.alert.variant = variant;
+      this.alert.message = message;
+      this.isBusy = false;
+    },
     selectService() {
       this.form.service.serviceId = this.serviceModalProps.selected[0].service_id;
       this.form.service.serviceNum = this.serviceModalProps.selected[0].serviceNumber;
+      this.form.customderId = this.serviceModalProps.selected[0].customer_id;
       this.loadServiceLineById();
+      this.isDisableQuote = true;
       this.$bvModal.hide("serviceModal");
     },
 
@@ -426,6 +478,7 @@ export default {
     selectQuote() {
       this.form.quote.quoteId = this.quotationModalProps.selected[0].quotation_id;
       this.form.quote.quoteNum = this.quotationModalProps.selected[0].quoteNumber;
+      this.form.customderId = this.quotationModalProps.selected[0].customer_id;
       this.loadQuoteLineById();
       this.$bvModal.hide("quoteModal");
     },
@@ -439,6 +492,21 @@ export default {
           (res) => {
             this.setAllProducts();
             this.computeTotalAmount();
+            this.isDisableService = true;
+
+            //Populate service data here if quotation has service
+            if (res.data[0].service_id !== null) {
+              this.form.service.serviceId = res.data[0].service_id;
+              this.form.service.serviceNum = `SVC-${res.data[0].service_id}`;
+              this.loadServiceLineById();
+            } else {
+              //if no service found then reset service data
+              this.serviceProps.serviceLineList = [];
+              this.form.service.serviceId = "";
+              this.form.service.serviceNum = "";
+
+              this.computeTotalAmount();
+            }
           },
           (err) => {
             console.log(err);
@@ -487,11 +555,19 @@ export default {
       this.totalAmount = totalAmount;
     },
 
-    openServiceModal() {
-      this.loadServices();
+    async openServiceModal() {
+      try {
+        await this.loadBillings().then((res) => {
+          this.loadQuotes();
+        });
+      } catch (err) {
+        console.log(err);
+      }
     },
-    openQuoteModal() {
-      this.loadQuotes();
+    async openQuoteModal() {
+      await this.loadBillings().then((res) => {
+        this.loadQuotes();
+      });
     },
 
     //SET METHODS
@@ -526,15 +602,35 @@ export default {
     async loadQuotes() {
       return await this.$store.dispatch("quotation/loadQuotes").then((res) => {
         this.quotationModalProps.quotationTblList = this.getQuotes;
+        this.loadServices();
       });
     },
 
+    async loadBillings() {
+      return await this.$store.dispatch("cashier/loadBilling");
+    },
+
     onReset() {
-      location.reload();
+      this.form.salesInvoiceNumber = "";
+      this.isPr = false;
+      this.isDisableService = false;
+      this.isDisableQuote = false;
+      this.form.quote.quoteId = "";
+      this.form.quote.quoteNum = "";
+      this.form.service.serviceId = "";
+      this.form.service.serviceNum = "";
+      this.serviceProps.serviceLineList = [];
+      this.quotationProps.quotationLineList = [];
+      this.serviceModalProps.serviceTblList = [];
+      this.quotationModalProps.quotationTblList = [];
     },
   },
 
   computed: {
+    getBillings() {
+      return this.$store.state.cashier.billings;
+    },
+
     totalRowsServiceModal() {
       return this.serviceModalProps.serviceTblList.length;
     },
@@ -554,14 +650,42 @@ export default {
     },
 
     getServicedList() {
+      //TODO: SELECT SERVICES WHERE NOT IN QUOTATIONS
+
       let doc = this.getDoc("SERVICE");
       let servicesList = this.$store.state.service.serviceList;
       let tempList = [];
       let curList = [];
+      let serviceIdFromQtn = [];
+      let serviceIdFromBilling = [];
 
-      servicesList.forEach(function (val) {
-        // set temp list to empty
-        tempList = [];
+      //select all service_id from qtn where service id !== null
+      this.getQuotes.forEach(function (val) {
+        if (val.service_id !== null) {
+          serviceIdFromQtn.push(val.service_id);
+        }
+      });
+
+      //select all service list where service id not in quotation
+      let servicedWithoutQuote = servicesList.filter(function (val) {
+        return !serviceIdFromQtn.includes(val.service_id);
+      });
+
+      //select all service_id from billing where is not null
+      this.getBillings.forEach(function (val) {
+        if (val.service_id !== null) {
+          serviceIdFromBilling.push(val.service_id);
+        }
+      });
+
+      // select all quote where not in billing
+      let servicedNotBilled = servicedWithoutQuote.filter(function (val) {
+        return !serviceIdFromBilling.includes(val.service_id);
+      });
+
+      //interate filteredServiceListand do set new columns
+      servicedNotBilled.forEach(function (val) {
+        tempList = []; // set temp list to empty
         tempList.service_id = val.service_id;
         tempList.customer_id = val.customer_id;
         tempList.serviceNumber = `${doc}-${val.service_id}`;
@@ -571,10 +695,13 @@ export default {
         tempList.comment = val.comment;
         curList.push(tempList);
       });
+
+      //sort then reverse
       curList.sort();
       curList.reverse();
+
+      // return final list
       return curList;
-      // return this.$store.state.service.serviceList;
     },
 
     getServiceLinesById() {
@@ -589,8 +716,21 @@ export default {
       let quotesList = this.$store.state.quotation.quotes;
       let tempList = [];
       let curList = [];
+      let quoteIdFromBilling = [];
 
-      quotesList.forEach(function (val) {
+      //select all quote_id from billing where is not null
+      this.getBillings.forEach(function (val) {
+        if (val.quotation_id !== null) {
+          quoteIdFromBilling.push(val.quotation_id);
+        }
+      });
+
+      // select all quote where not in billing
+      let filteredQuoteList = quotesList.filter(function (val) {
+        return !quoteIdFromBilling.includes(val.quotation_id);
+      });
+
+      filteredQuoteList.forEach(function (val) {
         // set temp list to empty
         tempList = [];
         tempList.quotation_id = val.quotation_id;

@@ -11,6 +11,8 @@
             <h1>Sales Invoice</h1>
             <h6><b>Invoice No.:</b> 25645602315</h6>
             <h6><b>Invoice Date: </b> {{ currentDate }}</h6>
+            <h6><b>Service #: </b> {{ currentDate }}</h6>
+            <h6><b>Quote #: </b> {{ currentDate }}</h6>
           </b-col>
 
           <div class="w-100"></div>
@@ -19,6 +21,22 @@
           <b-col>
             <h6>BILL TO</h6>
             <hr />
+            <label
+              ><b>Name:</b>
+              {{ this.customer[0] === undefined ? "" : this.customer[0].name }}</label
+            >
+            <br />
+            <label
+              ><b>Address:</b>
+              {{ this.customer[0] === undefined ? "" : this.customer[0].address }}</label
+            >
+            <br />
+            <label
+              ><b>Contact:</b>
+              {{
+                this.customer[0] === undefined ? "" : this.customer[0].contact_number
+              }}</label
+            >
           </b-col>
         </b-row>
       </div>
@@ -39,6 +57,12 @@ export default {
     return {
       currentDate: new Date().toJSON().slice(0, 10),
     };
+  },
+
+  computed: {
+    customer() {
+      return this.$store.state.customer.customer;
+    },
   },
 };
 </script>
