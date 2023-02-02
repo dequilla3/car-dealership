@@ -33,7 +33,7 @@
                 v-model="form.salesInvoiceNumber"
                 placeholder="None"
                 required
-                class="globalInputSize"
+                class="globalInputSize docnoInput"
                 disabled
               ></b-form-input>
             </b-form-group>
@@ -190,6 +190,7 @@
               v-model="serviceModalProps.inputSearch"
               placeholder="Search . . ."
               class="standardFontSize"
+              @keyup.enter="loadServices"
             ></b-form-input>
           </b-form-group>
 
@@ -433,6 +434,15 @@ export default {
         );
     },
 
+    async getUserById() {
+      await this.$store
+        .dispatch("user/getUserById", { id: Number(localStorage.userId) })
+        .then((res) => {
+          localStorage.userName = res.data[0].name;
+          return res;
+        });
+    },
+
     async postBilling() {
       await axios({
         method: "POST",
@@ -449,9 +459,8 @@ export default {
         },
       }).then(
         (res) => {
-          this.form.salesInvoiceNumber = `SI-${res.data.data[0].billing_id}`;
-
           //SET state for report
+          this.form.salesInvoiceNumber = `SI-${res.data.data[0].billing_id}`;
           this.$store.commit("cashier/SET_HEADER", {
             siNum: this.form.salesInvoiceNumber,
             invoiceDate: new Date().toJSON().slice(0, 10),
@@ -461,6 +470,7 @@ export default {
                 : `SVC-${this.form.service.serviceId}`,
             quoteNum:
               this.form.quote.quoteId === "" ? "None" : `QTN-${this.form.quote.quoteId}`,
+            cashierName: localStorage.userName,
           });
 
           this.$store.commit(
@@ -635,7 +645,13 @@ export default {
 
     async loadServices() {
       return await this.$store.dispatch("service/loadServices").then((res) => {
-        this.serviceModalProps.serviceTblList = this.getServicedList;
+        this.serviceModalProps.serviceTblList = this.getServicedList.filter(
+          function (val) {
+            return val.serviceNumber
+              .toLowerCase()
+              .includes(this.serviceModalProps.inputSearch);
+          }.bind(this)
+        );
       });
     },
 
@@ -671,6 +687,8 @@ export default {
       this.quotationModalProps.quotationTblList = [];
     },
   },
+
+  mounted() {},
 
   computed: {
     getBillings() {

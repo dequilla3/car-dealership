@@ -53,8 +53,6 @@
             >
             <hr />
 
-            <br />
-
             <h5><b>Description</b></h5>
             <b-table
               small
@@ -62,6 +60,7 @@
               hover
               :items="this.getLines"
               :fields="quotationLineTblFields"
+              class="font-12"
             />
 
             <hr />
@@ -69,6 +68,10 @@
             <label class="total"
               >TOTAL: Php {{ this.getTotal.toLocaleString("en-US") }}</label
             >
+            <br />
+            <hr />
+            <label class="user"> {{ this.quotationHeader.userName }}</label>
+            <h5 v-if="!hasUser">SALES PERSON</h5>
           </b-col>
         </b-row>
       </div>
@@ -103,6 +106,9 @@ export default {
   mounted() {},
 
   computed: {
+    hasUser() {
+      return this.quotationHeader.userName === undefined;
+    },
     customer() {
       return this.$store.state.customer.customer;
     },

@@ -65,6 +65,12 @@
             <label class="total"
               >TOTAL: Php {{ this.getTotalAmount.toLocaleString("en-US") }}</label
             >
+
+            <br />
+            <br />
+            <hr />
+            <label class="user"> {{ this.getHeader.cashierName }}</label>
+            <h4>CASHIER</h4>
           </b-col>
         </b-row>
       </div>
@@ -102,6 +108,10 @@ export default {
       ],
     };
   },
+
+  methods: {},
+
+  mounted() {},
 
   computed: {
     getTotalAmount() {
@@ -147,6 +157,11 @@ export default {
 <style scoped>
 .total {
   font-size: 20px;
+  font-weight: bold;
+}
+
+.user {
+  font-size: 16px;
   font-weight: bold;
 }
 </style>

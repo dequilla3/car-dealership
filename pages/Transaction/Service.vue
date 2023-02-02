@@ -553,6 +553,7 @@ export default {
             serialNumber: this.form.serialNum,
             dateTrans: new Date(res.data.date_transaction).toJSON().slice(0, 10),
             comment: this.form.comment,
+            userName: localStorage.userName,
           });
 
           this.isProcessed = true;

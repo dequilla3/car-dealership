@@ -33,4 +33,17 @@ export default {
       commit("LOAD_USER", res.data);
     });
   },
+
+  async getUserById({ commit }, { id }) {
+    return await axios({
+      method: "GET",
+      url: `${this.$axios.defaults.baseURL}/user-details/${id}`,
+      headers: {
+        Authorization: `Bearer ${localStorage.token}`,
+      },
+    }).then((res) => {
+      commit("SET_USER_BY_ID", res.data);
+      return res;
+    }, err => { console.log(err); });
+  },
 };

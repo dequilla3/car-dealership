@@ -683,6 +683,8 @@ export default {
     },
 
     async postQuote() {
+      console.log("TEST");
+      console.log(this.form.service.serviceId);
       await axios({
         method: "POST",
         url: `${this.$axios.defaults.baseURL}/quotation/create`,
@@ -692,11 +694,13 @@ export default {
         data: {
           customer_id: this.form.customer.customerId,
           user_id: localStorage.userId,
-          service_id: this.form.service.serviceId,
+          service_id:
+            this.form.service.serviceId === "" ? null : this.form.service.serviceId,
           products: this.productsToPost,
         },
       }).then(
         (res) => {
+          console.log(res);
           //SET Docno
           this.form.quotationNumber = `${this.getDocQuote}-${res.data.quotation_id}`;
 
@@ -704,6 +708,7 @@ export default {
           this.$store.commit("quotation/SET_QUOTE_HEADER", {
             quoteNum: this.form.quotationNumber,
             serviceNum: this.form.service.serviceNumber,
+            userName: localStorage.userName,
           });
 
           this.isProcessed = true;
@@ -714,6 +719,7 @@ export default {
         },
         (err) => {
           this.isBusy = false;
+          console.log(err);
         }
       );
     },

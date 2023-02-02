@@ -51,13 +51,26 @@
             <br />
 
             <h5><b>REQUESTED SERVICES</b></h5>
-            <b-table small striped hover :items="this.getLines" :fields="reportFields" />
+            <b-table
+              small
+              striped
+              hover
+              :items="this.getLines"
+              :fields="reportFields"
+              class="font-12"
+            />
 
             <hr />
             <br />
             <label class="total"
               >TOTAL: Php {{ this.getTotal.toLocaleString("en-US") }}</label
             >
+
+            <br />
+            <br />
+            <hr />
+            <label class="user"> {{ this.service.userName }}</label>
+            <h5 v-if="!hasUser">MECHANIC</h5>
           </b-col>
         </b-row>
       </div>
@@ -85,6 +98,9 @@ export default {
   mounted() {},
 
   computed: {
+    hasUser() {
+      return this.service.userName === undefined;
+    },
     customer() {
       return this.$store.state.customer.customer;
     },

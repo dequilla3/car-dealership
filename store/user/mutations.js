@@ -6,4 +6,8 @@ export default {
   LOAD_USER(state, data) {
     state.userList = data;
   },
+
+  SET_USER_BY_ID(state, data) {
+    state.userById = data;
+  }
 };
