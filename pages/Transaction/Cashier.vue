@@ -171,6 +171,7 @@
           variant="danger"
           class="form-t_cashier-btn btn-transaction"
           @click="onReset"
+          v-if="!isPr"
         >
           <font-awesome-icon icon="fa-solid fa-redo" />
           Reset
@@ -255,6 +256,7 @@
               v-model="quotationModalProps.inputSearch"
               placeholder="Search . . ."
               class="standardFontSize"
+              @keyup.enter="loadQuotes()"
             ></b-form-input>
           </b-form-group>
 
@@ -416,6 +418,22 @@ export default {
     async onClickProcess() {
       this.isBusy = true;
 
+      return await this.$store
+        .dispatch("customer/loadCustomerById", {
+          customerId: this.form.customderId,
+        })
+        .then(
+          (res) => {
+            //POST quote
+            this.postBilling();
+          },
+          (err) => {
+            this.isBusy = false;
+          }
+        );
+    },
+
+    async postBilling() {
       await axios({
         method: "POST",
         url: `${this.$axios.defaults.baseURL}/billing/create`,
@@ -432,6 +450,28 @@ export default {
       }).then(
         (res) => {
           this.form.salesInvoiceNumber = `SI-${res.data.data[0].billing_id}`;
+
+          //SET state for report
+          this.$store.commit("cashier/SET_HEADER", {
+            siNum: this.form.salesInvoiceNumber,
+            invoiceDate: new Date().toJSON().slice(0, 10),
+            svcNum:
+              this.form.service.serviceId === ""
+                ? "None"
+                : `SVC-${this.form.service.serviceId}`,
+            quoteNum:
+              this.form.quote.quoteId === "" ? "None" : `QTN-${this.form.quote.quoteId}`,
+          });
+
+          this.$store.commit(
+            "quotation/SET_QUOTE_LINE",
+            this.quotationProps.quotationLineList
+          );
+
+          this.$store.commit(
+            "service/SET_SERVICE_LINE",
+            this.serviceProps.serviceLineList
+          );
 
           this.isPr = true;
           this.isBusy = false;
@@ -601,7 +641,13 @@ export default {
 
     async loadQuotes() {
       return await this.$store.dispatch("quotation/loadQuotes").then((res) => {
-        this.quotationModalProps.quotationTblList = this.getQuotes;
+        this.quotationModalProps.quotationTblList = this.getQuotes.filter(
+          function (val) {
+            return val.quoteNumber
+              .toLowerCase()
+              .includes(this.quotationModalProps.inputSearch);
+          }.bind(this)
+        );
         this.loadServices();
       });
     },
