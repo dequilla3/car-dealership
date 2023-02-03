@@ -1,10 +1,5 @@
 <template>
   <div class="dontPrint">
-    <b-overlay
-      no-wrap
-      :show="isBusy && !isLoggedIn"
-      :opacity="this.token === undefined ? 1 : 0.33"
-    />
     <b-navbar class="navbar" fixed="top" toggleable="lg" type="dark" variant="dark">
       <b-navbar-brand href="/dashboard"
         ><font-awesome-icon icon="fa-solid fa-car" /> DMS</b-navbar-brand
@@ -88,6 +83,9 @@ export default {
   },
 
   computed: {
+    getToken() {
+      return localStorage.token;
+    },
     getUser() {
       return this.$store.state.login.user;
     },

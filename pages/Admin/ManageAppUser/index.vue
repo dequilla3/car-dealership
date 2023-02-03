@@ -1,6 +1,5 @@
 <template>
   <div class="mainContainer">
-    <b-overlay :show="isBusy" rounded="sm" variant="light" opacity="0.30" no-wrap />
     <Navbar />
     <SideBar />
     <div><h6>Manage User</h6></div>
