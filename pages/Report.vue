@@ -33,7 +33,6 @@
           <b-tab @click="setReportName('quotes')" title="Quotations">
             <QuotationReportTab />
           </b-tab>
-          <b-tab title="Invoices"> </b-tab>
         </b-tabs>
       </b-card>
     </div>

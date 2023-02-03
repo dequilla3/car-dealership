@@ -9,7 +9,8 @@
         <div class="db-content" v-for="dbContent in dbContents" :key="dbContent.id">
           <p>{{ dbContent.title }}</p>
           <h1>
-            <small class="text-muted">$</small
+            <small class="text-muted">
+              <font-awesome-icon icon="fa-solid fa-peso-sign" /></small
             >{{ dbContent.value.toLocaleString("en-US"), }}
           </h1>
         </div>
@@ -19,17 +20,72 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: "Dashboard",
   data() {
     return {
       isLoggedIn: false,
       dbContents: [
-        { id: 1, title: "Daily Sales", value: 999.99 },
-        { id: 2, title: "Weekly Sales", value: 10000.99 },
-        { id: 3, title: "Monthly Sales", value: 13032.99 },
+        { title: "Daily Sales", value: "" },
+        { title: "Weekly Sales", value: "" },
+        { title: "Monthly Sales", value: "" },
       ],
     };
+  },
+
+  methods: {
+    async loadDailySales() {
+      return await axios({
+        method: "GET",
+        url: `${this.$axios.defaults.baseURL}/daily-sales`,
+        headers: {
+          Authorization: `Bearer ${localStorage.token}`,
+        },
+      }).then((res) => {
+        this.dbContents[0].value = res.data.daily_sales;
+        return res;
+      });
+    },
+
+    async loadWeeklySales() {
+      return await axios({
+        method: "GET",
+        url: `${this.$axios.defaults.baseURL}/weekly-sales`,
+        headers: {
+          Authorization: `Bearer ${localStorage.token}`,
+        },
+      }).then((res) => {
+        this.dbContents[1].value = res.data.weekly_sales;
+        return res;
+      });
+    },
+
+    async loadMonthlySales() {
+      return await axios({
+        method: "GET",
+        url: `${this.$axios.defaults.baseURL}/monthly-sales`,
+        headers: {
+          Authorization: `Bearer ${localStorage.token}`,
+        },
+      }).then((res) => {
+        this.dbContents[2].value = res.data.monthly_sales;
+        return res;
+      });
+    },
+  },
+
+  mounted() {
+    this.loadDailySales();
+    this.loadMonthlySales();
+    this.loadWeeklySales();
+
+    setInterval(() => {
+      this.loadDailySales();
+      this.loadMonthlySales();
+      this.loadWeeklySales();
+    }, 5000);
   },
 };
 </script>

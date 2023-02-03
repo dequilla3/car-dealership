@@ -41,38 +41,38 @@ export default () => ({
     },
 
     {
-      id: 4,
+      id: 2,
       title: "Manage Customer",
       href: "/admin/manageCustomer",
       active: false,
-      key: "admin4",
+      key: "admin2",
       icon: "fa-people-arrows",
       access: ["admin"]
     },
     {
-      id: 5,
+      id: 3,
       title: "Manage Goods",
       href: "/admin/manageGoods",
       active: false,
-      key: "admin5",
+      key: "admin3",
       icon: "fa-parachute-box",
       access: ["admin"]
     },
     {
-      id: 6,
+      id: 4,
       title: "Manage Service Item",
       href: "/admin/manageServiceItem",
       active: false,
-      key: "admin6",
+      key: "admin4",
       icon: "fa-gears",
       access: ["admin"]
     },
     {
-      id: 7,
+      id: 5,
       title: "Manage User Role",
       href: "/admin/managerole",
       active: false,
-      key: "admin7",
+      key: "admin5",
       icon: "fa-briefcase",
       access: ["admin"]
     },
