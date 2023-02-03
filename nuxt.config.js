@@ -42,6 +42,7 @@ export default {
   },
 
   axios: {
-    baseUrl: "http://172.16.28.13:5000/api",
+    // baseUrl: "http://172.16.28.13:5000/api",//dev
+    baseUrl: "https://assessment.biotechfarms.net/api" //assesment
   },
 };
