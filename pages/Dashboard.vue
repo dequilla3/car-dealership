@@ -81,11 +81,15 @@ export default {
     this.loadMonthlySales();
     this.loadWeeklySales();
 
-    setInterval(() => {
+    this.interval = setInterval(() => {
       this.loadDailySales();
       this.loadMonthlySales();
       this.loadWeeklySales();
-    }, 5000);
+    }, 1500);
+  },
+
+  beforeDestroy() {
+    clearTimeout(this.interval);
   },
 };
 </script>

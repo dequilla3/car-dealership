@@ -161,8 +161,8 @@ export default {
   },
 
   mounted() {
-    setInterval(() => {
-      try {
+    try {
+      this.interval = setInterval(() => {
         this.loadCustomer();
         this.loadCars();
         this.loadParts();
@@ -170,10 +170,14 @@ export default {
         this.loadServiceItems();
         this.loadServices();
         this.loadQuotes();
-      } catch (err) {
-        console.log(err);
-      }
-    }, 5000);
+      }, 3000);
+    } catch (err) {
+      console.log(err);
+    }
+  },
+
+  beforeDestroy() {
+    clearInterval(this.interval);
   },
 };
 </script>

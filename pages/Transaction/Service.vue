@@ -611,7 +611,7 @@ export default {
       let selectedLine = this.selectedServiceLine[0];
       if (this.selectedServiceLine.length > 0) {
         this.serviceLineList.forEach(function (line, index) {
-          if (selectedLine.serviceId === line.serviceId) {
+          if (selectedLine.service_item_id === line.service_item_id) {
             selectedIndex = index;
           }
         });

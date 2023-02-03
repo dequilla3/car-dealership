@@ -112,13 +112,13 @@ export default {
             this.$router.push({ path: "/dashboard" });
           },
           (err) => {
-            if (err.response === undefined) {
-              this.showAlert("Not Connected!", "danger");
+            if (err.response === undefined || err.response.status == "502") {
+              this.showAlert("Cannot connect. . .", "warning");
               this.show = false;
-            } else {
-              this.showAlert(err.response.data.error, "danger");
+              return;
             }
 
+            this.showAlert(err.response.data.error, "danger");
             this.show = false;
           }
         );
