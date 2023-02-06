@@ -71,7 +71,6 @@
                 placeholder="Enter username"
                 required
                 class="globalInputSize"
-                :disabled="isDisabled"
               ></b-form-input>
             </b-form-group>
 
@@ -83,7 +82,6 @@
                   placeholder="Enter password"
                   required
                   class="globalInputSize"
-                  :disabled="isDisabled"
                   :type="isPwShow ? 'text' : 'password'"
                 ></b-form-input>
                 <b-input-group-append>
@@ -212,13 +210,12 @@ export default {
         this.form.name = this.selected[0].name;
         this.form.contact = this.selected[0].contact_number;
         this.form.address = this.selected[0].address;
-        this.form.username = "N/A";
-        this.form.pw = "N/A";
+        this.form.username = this.selected[0].username;
+        this.form.pw = "";
         this.btnSubmitLabel = "Update User";
         this.icn = "fa-user-pen";
 
         this.isDisabled = true;
-        this.isPwShow = true;
         this.isUpdate = true;
 
         this.roleList.forEach((val) => {
@@ -252,6 +249,8 @@ export default {
       this.form.name = "";
       this.form.contact = "";
       this.form.address = "";
+      this.form.username = "";
+      this.form.pw = "";
       this.btnSubmitLabel = "Add new User";
     },
 
@@ -277,9 +276,20 @@ export default {
         return;
       }
 
+      if (this.isUpdate) {
+        this.editUser();
+      } else {
+        this.addUser();
+      }
+    },
+
+    async addUser() {
       await axios({
         method: "POST",
         url: `${this.$axios.defaults.baseURL}/create-user`,
+        headers: {
+          Authorization: `Bearer ${localStorage.token}`,
+        },
         data: {
           name: this.form.name,
           contact_number: this.form.contact,
@@ -290,17 +300,41 @@ export default {
         },
       }).then(
         (res) => {
-          let existingUserCount = res.data.user === undefined ? 0 : res.data.user.length;
-          if (existingUserCount > 0) {
-            this.showAlert(3, "warning", `${res.data.msg}`);
-            return;
-          }
           this.showAlert(3, "success", "Successfully added new user!");
           this.loadRoles();
           this.loadUser();
           this.onReset();
         },
         (err) => {
+          this.showAlert(3, "warning", `${err.response.data.error}`);
+        }
+      );
+    },
+
+    async editUser() {
+      await axios({
+        method: "PATCH",
+        url: `${this.$axios.defaults.baseURL}/user/edit/${this.selected[0].user_id}`,
+        headers: {
+          Authorization: `Bearer ${localStorage.token}`,
+        },
+        data: {
+          name: this.form.name,
+          contact_number: this.form.contact,
+          address: this.form.address,
+          username: this.form.username,
+          password: this.form.pw,
+          user_role_id: this.form.userRole.roleId,
+        },
+      }).then(
+        (res) => {
+          this.showAlert(3, "success", "Successfully updated user!");
+          this.loadRoles();
+          this.loadUser();
+          this.onReset();
+        },
+        (err) => {
+          console.log(err.response);
           this.showAlert(3, "warning", `${err.response.data.error}`);
         }
       );
