@@ -1,6 +1,24 @@
 <template>
   <div class="dontPrint">
     <b-overlay no-wrap :show="show" opacity=" 0.33" />
+
+    <b-form-group id="search" label="Search:" label-for="input-search">
+      <b-input-group>
+        <b-form-input
+          id="input-search"
+          v-model="inputSearch"
+          placeholder="Search . . ."
+          class="globalInputSize"
+          @keyup.enter="loadServices"
+        ></b-form-input>
+        <b-input-group-append>
+          <b-button class="btn-100" @click="loadServices">
+            <font-awesome-icon icon="fa-solid fa-filter" /> Filter
+          </b-button>
+        </b-input-group-append>
+      </b-input-group>
+    </b-form-group>
+
     <b-table
       class="standardTable"
       hover
@@ -71,6 +89,24 @@
         >
         </b-table>
 
+        <div class="d-flex flex-row-reverse">
+          <div class="p-2">
+            <b-input-group class="input--total-size" size="sm" prepend="Total:">
+              <b-form-input disabled v-model="getTotal" type="text"></b-form-input>
+            </b-input-group>
+          </div>
+          <div class="p-2">
+            <b-pagination
+              v-model="viewDetailsModal.currentPage"
+              :total-rows="detailsTotalRows"
+              :per-page="viewDetailsModal.perPage"
+              aria-controls="my-table"
+              v-if="rows > 0"
+              class="pagination"
+            ></b-pagination>
+          </div>
+        </div>
+
         <!-- tbl pages -->
         <b-pagination
           v-model="viewDetailsModal.currentPage"
@@ -108,6 +144,7 @@ export default {
 
   data(item) {
     return {
+      inputSearch: "",
       show: false,
       selectedService: [],
       perPage: 5,
@@ -115,10 +152,12 @@ export default {
       services: [],
       serviceLines: [],
       tblFields: [
-        { key: "serviceNumber", label: "Service #", thStyle: { width: "25%" } },
-        { key: "name", label: "Customer Name", thStyle: { width: "25%" } },
-        { key: "date_transaction", label: "Date Transaction", thStyle: { width: "25%" } },
-        { key: "viewDetails", label: "View Details", thStyle: { width: "15%" } },
+        { key: "serviceNumber", label: "Service #", thStyle: { width: "15%" } },
+        { key: "name", label: "Customer Name", thStyle: { width: "15%" } },
+        { key: "serial_number", label: "Serial Number", thStyle: { width: "15%" } },
+        { key: "comment", label: "Comment", thStyle: { width: "15%" } },
+        { key: "date_transaction", label: "Date Transaction", thStyle: { width: "10%" } },
+        { key: "viewDetails", label: "View Details", thStyle: { width: "10%" } },
         { key: "print", label: "Print", thStyle: { width: "10%" } },
       ],
 
@@ -209,11 +248,30 @@ export default {
         comment: this.selectedService.comment,
       });
     },
+
+    async loadServices() {
+      await this.$store.dispatch("service/loadServices").then(
+        (res) => {
+          let searchTxt = this.inputSearch.toLowerCase();
+          let filteredSvc = this.getServiceList.filter(function (val) {
+            return (
+              val.serviceNumber.toLowerCase().includes(searchTxt.toLowerCase()) ||
+              val.name.toLowerCase().includes(searchTxt.toLowerCase()) ||
+              val.serial_number.toLowerCase().includes(searchTxt.toLowerCase())
+            );
+          });
+          this.services = filteredSvc;
+        },
+        (err) => {
+          console.log(err.response);
+        }
+      );
+    },
   },
 
   mounted() {
     setInterval(() => {
-      this.services = this.getServiceList;
+      this.loadServices();
     }, 3000);
   },
 
@@ -271,6 +329,14 @@ export default {
       return this.viewDetailsModal.detailsList === undefined
         ? 0
         : this.viewDetailsModal.detailsList.length;
+    },
+
+    getTotal() {
+      let total = 0;
+      this.viewDetailsModal.detailsList.forEach(function (val) {
+        total = total + Number(val.amount);
+      });
+      return total;
     },
   },
 };

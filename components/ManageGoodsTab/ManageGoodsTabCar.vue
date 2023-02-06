@@ -137,11 +137,7 @@
         @row-selected="onRowSelected"
       >
         <template #cell(cost)="data">
-          <b-form-input
-            disabled
-            class="globalInputSize"
-            :value="Number(data.value).toLocaleString('en-US')"
-          ></b-form-input>
+          {{ Number(data.value).toLocaleString("en-US") }}
         </template>
       </b-table>
 

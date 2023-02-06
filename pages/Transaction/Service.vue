@@ -229,12 +229,7 @@
         </template>
 
         <template #cell(amount)="data">
-          <b-form-input
-            disabled
-            class="b-table-input"
-            type="number"
-            :value="serviceLineList[data.index].qty * serviceLineList[data.index].cost"
-          ></b-form-input>
+          {{ serviceLineList[data.index].qty * serviceLineList[data.index].cost }}
         </template>
       </b-table>
 

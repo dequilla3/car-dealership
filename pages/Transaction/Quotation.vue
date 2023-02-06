@@ -170,14 +170,7 @@
             </template>
 
             <template #cell(amount)="data">
-              <b-form-input
-                disabled
-                class="b-table-input"
-                type="number"
-                :value="
-                  quotationLineList[data.index].qty * quotationLineList[data.index].cost
-                "
-              ></b-form-input>
+              {{ quotationLineList[data.index].qty * quotationLineList[data.index].cost }}
             </template>
           </b-table>
 
@@ -386,20 +379,50 @@
             <h6>Insert Item</h6>
             <hr />
 
-            <!-- search input -->
-            <b-form-group
-              id="inputSearchInsertItemModal"
-              label="Search:"
-              label-for="input-search"
-            >
-              <b-form-input
-                id="input-search"
-                v-model="insertItemModal.inputSearch"
-                placeholder="Search . . ."
-                class="modal-input"
-                @keyup.enter="onSearchProducts"
-              ></b-form-input>
-            </b-form-group>
+            <b-container class="bv-example-row">
+              <b-row
+                ><b-col>
+                  <b-form-group
+                    id="inputSearchInsertItemModal"
+                    label="Search:"
+                    label-for="input-search"
+                  >
+                    <b-input-group id="b-input-group-service">
+                      <b-form-input
+                        id="input-search"
+                        v-model="insertItemModal.inputSearch"
+                        placeholder="Search . . ."
+                        class="globalInputSize"
+                        @keyup.enter="onSearchProducts"
+                      ></b-form-input>
+                      <b-input-group-append>
+                        <b-button class="form-t_quotation-btn" @click="onSearchProducts">
+                          <font-awesome-icon icon="fa-solid fa-filter" /> Filter
+                        </b-button>
+                      </b-input-group-append>
+                    </b-input-group>
+                  </b-form-group></b-col
+                >
+                <b-col col lg="2">
+                  <b-form-group
+                    id="radioBtn"
+                    label="Filter by Category:"
+                    label-for="radio-btn"
+                  >
+                    <b-form-radio-group
+                      id="radio-btn"
+                      v-model="insertItemModal.selectedCategory"
+                      :options="insertItemModal.options"
+                      class="pt-2"
+                      value-field="item"
+                      text-field="name"
+                      disabled-field="notEnabled"
+                      @change="onSearchProducts"
+                    ></b-form-radio-group></b-form-group
+                ></b-col>
+                ></b-row
+              >
+            </b-container>
 
             <!-- item modal table -->
             <b-table
@@ -528,6 +551,11 @@ export default {
       },
 
       insertItemModal: {
+        selectedCategory: "CAR",
+        options: [
+          { item: "CAR", name: "CARS" },
+          { item: "PARTS", name: "PARTS" },
+        ],
         inputSearch: "",
         perPage: 5,
         currentPage: 1,
@@ -562,13 +590,17 @@ export default {
       this.insertItemModal.itemList = [];
       await this.loadAllProducts().then((res) => {
         let textSearch = this.insertItemModal.inputSearch;
-        let filteredList = this.insertItemModal.itemList.filter(function (val) {
-          return (
-            val.productCode.toLowerCase().includes(textSearch.toLowerCase()) ||
-            val.productName.toLowerCase().includes(textSearch.toLowerCase()) ||
-            val.unit.toLowerCase().includes(textSearch.toLowerCase())
-          );
-        });
+        var filteredList = this.insertItemModal.itemList.filter(
+          function (val) {
+            let containsSearchTxt =
+              val.productCode.toLowerCase().includes(textSearch.toLowerCase()) ||
+              val.productName.toLowerCase().includes(textSearch.toLowerCase()) ||
+              val.unit.toLowerCase().includes(textSearch.toLowerCase());
+            return (
+              containsSearchTxt && val.category === this.insertItemModal.selectedCategory
+            );
+          }.bind(this)
+        );
         this.insertItemModal.itemList = filteredList;
       });
     },
@@ -642,7 +674,19 @@ export default {
     },
 
     openItemListModalDialog() {
-      this.loadAllProducts();
+      this.loadFilteredProducts();
+    },
+
+    loadFilteredProducts() {
+      this.loadAllProducts().then((res) => {
+        let filteredList = this.insertItemModal.itemList.filter(
+          function (val) {
+            return val.category === this.insertItemModal.selectedCategory;
+          }.bind(this)
+        );
+
+        this.insertItemModal.itemList = filteredList;
+      });
     },
 
     onClickedNewTrans() {
@@ -779,6 +823,10 @@ export default {
       }
     },
 
+    onSelectCategory() {
+      console.log("test");
+    },
+
     removeItem() {
       let selectedIndex = 0;
       let selectedLine = this.selectedLine[0];
@@ -879,6 +927,7 @@ export default {
         tempList.unit = val.unit;
         tempList.cost = Number(val.cost);
         tempList.qty = 1;
+        tempList.category = val.barcode === null ? "CAR" : "PARTS";
 
         // push temp list to actual list
         list.push(tempList);

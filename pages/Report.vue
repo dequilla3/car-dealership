@@ -162,15 +162,13 @@ export default {
 
   mounted() {
     try {
-      this.interval = setInterval(() => {
-        this.loadCustomer();
-        this.loadCars();
-        this.loadParts();
-        this.loadRoles();
-        this.loadServiceItems();
-        this.loadServices();
-        this.loadQuotes();
-      }, 3000);
+      this.loadCustomer();
+      this.loadCars();
+      this.loadParts();
+      this.loadRoles();
+      this.loadServiceItems();
+      this.loadServices();
+      this.loadQuotes();
     } catch (err) {
       console.log(err);
     }

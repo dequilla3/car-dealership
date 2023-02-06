@@ -1,6 +1,24 @@
 <template>
   <div class="dontPrint">
     <b-overlay no-wrap :show="show" opacity=" 0.33" />
+
+    <b-form-group id="search" label="Search:" label-for="input-search">
+      <b-input-group>
+        <b-form-input
+          id="input-search"
+          v-model="inputSearch"
+          placeholder="Search . . ."
+          class="globalInputSize"
+          @keyup.enter="loadQuotes"
+        ></b-form-input>
+        <b-input-group-append>
+          <b-button class="btn-100" @click="loadQuotes">
+            <font-awesome-icon icon="fa-solid fa-filter" /> Filter
+          </b-button>
+        </b-input-group-append>
+      </b-input-group>
+    </b-form-group>
+
     <b-table
       class="standardTable"
       hover
@@ -65,6 +83,24 @@
         >
         </b-table>
 
+        <div class="d-flex flex-row-reverse">
+          <div class="p-2">
+            <b-input-group class="input--total-size" size="sm" prepend="Total:">
+              <b-form-input disabled v-model="getTotal" type="text"></b-form-input>
+            </b-input-group>
+          </div>
+          <div class="p-2">
+            <b-pagination
+              v-model="viewDetailsModal.currentPage"
+              :total-rows="detailsTotalRows"
+              :per-page="viewDetailsModal.perPage"
+              aria-controls="my-table"
+              v-if="rows > 0"
+              class="pagination"
+            ></b-pagination>
+          </div>
+        </div>
+
         <!-- tbl pages -->
         <b-pagination
           v-model="viewDetailsModal.currentPage"
@@ -102,6 +138,7 @@ export default {
 
   data() {
     return {
+      inputSearch: "",
       show: false,
       selectedQuote: [],
       perPage: 5,
@@ -112,7 +149,7 @@ export default {
         { key: "quoteNumber", label: "Quotation #", thStyle: { width: "25%" } },
         { key: "name", label: "Customer Name", thStyle: { width: "25%" } },
         { key: "date_transaction", label: "Date Transaction", thStyle: { width: "25%" } },
-        { key: "viewDetails", label: "View Details", thStyle: { width: "15%" } },
+        { key: "viewDetails", label: "View Details", thStyle: { width: "10%" } },
         { key: "print", label: "Print", thStyle: { width: "10%" } },
       ],
 
@@ -167,7 +204,9 @@ export default {
         tempList.skuId = val.sku_id;
         tempList.productCode = val.barcode == null ? val.serial_number : val.barcode;
         tempList.productName =
-          val.printname == null ? `${val.brand_name} ${val.model}` : val.printname;
+          val.printname == null
+            ? `${val.brand_name}-${val.model}-${val.color}`
+            : val.printname;
         tempList.unit = val.unit;
         tempList.cost = val.cost;
         tempList.qty = val.qty;
@@ -239,11 +278,27 @@ export default {
       });
       return id === null ? "NONE" : `${doc[0].code}-${id}`;
     },
+
+    async loadQuotes() {
+      await this.$store.dispatch("quotation/loadQuotes").then(
+        (res) => {
+          let searchTxt = this.inputSearch.toLowerCase();
+          let filteredList = this.getQuotes.filter(function (val) {
+            return (
+              val.name.toLowerCase().includes(searchTxt) ||
+              val.quoteNumber.toLowerCase().includes(searchTxt)
+            );
+          });
+          this.quotes = filteredList;
+        },
+        (err) => {}
+      );
+    },
   },
 
   mounted() {
     setInterval(() => {
-      this.quotes = this.getQuotes;
+      this.loadQuotes();
     }, 3000);
   },
 
@@ -286,6 +341,14 @@ export default {
       return this.viewDetailsModal.detailsList === undefined
         ? 0
         : this.viewDetailsModal.detailsList.length;
+    },
+
+    getTotal() {
+      let total = 0;
+      this.viewDetailsModal.detailsList.forEach(function (val) {
+        total = total + Number(val.amount);
+      });
+      return total;
     },
   },
 };
