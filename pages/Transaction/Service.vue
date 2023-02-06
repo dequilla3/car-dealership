@@ -639,7 +639,7 @@ export default {
         this.serviceLineList.push(this.insertItemModal.selected[0]);
         //add column qty
         this.serviceLineList.forEach(function (val) {
-          val.qty = 1;
+          val.qty = val.qty === undefined ? 1 : val.qty;
           val.cost = val.cost;
         });
       }
