@@ -176,7 +176,6 @@ export default {
       }
     },
     onReset() {
-      this.$refs.selectableTable.clearSelected();
       this.form.name = "";
       this.form.contact = "";
       this.form.address = "";

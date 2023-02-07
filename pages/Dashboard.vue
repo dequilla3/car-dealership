@@ -44,7 +44,8 @@ export default {
           Authorization: `Bearer ${localStorage.token}`,
         },
       }).then((res) => {
-        this.dbContents[0].value = res.data.daily_sales;
+        this.dbContents[0].value =
+          res.data.daily_sales === null ? 0.0 : res.data.daily_sales;
         return res;
       });
     },
@@ -57,7 +58,8 @@ export default {
           Authorization: `Bearer ${localStorage.token}`,
         },
       }).then((res) => {
-        this.dbContents[1].value = res.data.weekly_sales;
+        this.dbContents[1].value =
+          res.data.weekly_sales === null ? 0.0 : res.data.weekly_sales;
         return res;
       });
     },
@@ -70,7 +72,8 @@ export default {
           Authorization: `Bearer ${localStorage.token}`,
         },
       }).then((res) => {
-        this.dbContents[2].value = res.data.monthly_sales;
+        this.dbContents[2].value =
+          res.data.monthly_sales === null ? 0.0 : res.data.monthly_sales;
         return res;
       });
     },

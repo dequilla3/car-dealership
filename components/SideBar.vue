@@ -20,7 +20,7 @@
 
       <!-- Admin dropdown menus -->
       <div class="sidebar-menus">
-        <div :class="dropDownAdmin()">
+        <div v-show="isActiveAdmin">
           <div
             v-for="adminMenu in adminMenus"
             :key="adminMenu.key"
@@ -44,7 +44,7 @@
       </button>
       <!-- Transaction dropdown menus -->
       <div class="sidebar-menus">
-        <div :class="dropDownTransaction()">
+        <div v-show="isActiveTransaction">
           <div
             v-for="transactionMenu in transactionMenus"
             :key="transactionMenu.id"
@@ -61,7 +61,11 @@
     </div>
 
     <!-- Report menu -->
-    <div class="sidebar-menus-parent" @click="setMenuActive('report', '/report')">
+    <div
+      v-show="isAdmin"
+      class="sidebar-menus-parent"
+      @click="setMenuActive('report', '/report')"
+    >
       <a> <font-awesome-icon icon="fa-solid fa-file" /> Reports</a>
     </div>
   </div>
@@ -71,6 +75,7 @@
 export default {
   data() {
     return {
+      isAdmin: false,
       role: "",
       isActiveTransaction: true,
       isActiveAdmin: true,
@@ -84,27 +89,16 @@ export default {
   methods: {
     dropDownTriggerAdmin() {
       this.isActiveAdmin = !this.isActiveAdmin;
-      this.dropDownAdmin();
     },
 
     dropDownTriggerTransaction() {
       this.isActiveTransaction = !this.isActiveTransaction;
-      this.dropDownTransaction();
-    },
-
-    dropDownTransaction() {
-      return this.isActiveTransaction
-        ? "dropdown-container-block"
-        : "dropdown-container-none";
     },
 
     dropDownTransactionArrowIcon() {
       return this.isActiveTransaction ? "arrow down" : "arrow right";
     },
 
-    dropDownAdmin() {
-      return this.isActiveAdmin ? "dropdown-container-block" : "dropdown-container-none";
-    },
     dropDownAdminArrowIcon() {
       return this.isActiveAdmin ? "arrow down" : "arrow right";
     },
@@ -153,18 +147,19 @@ export default {
 
   mounted() {
     var menuKey = localStorage.activeMenuId;
-
     //init menus
     if (localStorage.userRole !== undefined) {
       this.transactionMenus = this.getTransactionMenus;
       this.adminMenus = this.getAdminMenus;
       this.role = localStorage.userRole;
+      this.isAdmin = this.role.toLowerCase() === "admin";
     } else {
       //reload menus every 1
       setInterval(() => {
         this.transactionMenus = this.getTransactionMenus;
         this.adminMenus = this.getAdminMenus;
         this.role = localStorage.userRole;
+        this.isAdmin = this.role.toLowerCase() === "admin";
       }, 1000);
     }
 
