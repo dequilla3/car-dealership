@@ -146,9 +146,10 @@ export default {
       quotes: [],
       quotationLines: [],
       tblFields: [
-        { key: "quoteNumber", label: "Quotation #", thStyle: { width: "25%" } },
-        { key: "name", label: "Customer Name", thStyle: { width: "25%" } },
-        { key: "date_transaction", label: "Date Transaction", thStyle: { width: "25%" } },
+        { key: "quoteNumber", label: "Quotation #", thStyle: { width: "15%" } },
+        { key: "name", label: "Customer Name", thStyle: { width: "15%" } },
+        { key: "user_name", label: "Sales Person", thStyle: { width: "15%" } },
+        { key: "date_transaction", label: "Date Transaction", thStyle: { width: "15%" } },
         { key: "viewDetails", label: "View Details", thStyle: { width: "10%" } },
         { key: "print", label: "Print", thStyle: { width: "10%" } },
       ],
@@ -269,6 +270,7 @@ export default {
       this.$store.commit("quotation/SET_QUOTE_HEADER", {
         quoteNum: this.selectedQuote.quoteNumber,
         serviceNum: this.getDoc("SERVICE", this.selectedQuote.service_id),
+        userName: this.selectedQuote.user_name,
       });
     },
 
@@ -326,6 +328,7 @@ export default {
           tempList.quoteNumber = this.getDoc("QUOTATION", val.quotation_id);
           tempList.name = val.name;
           tempList.date_transaction = val.date_transaction;
+          tempList.user_name = val.user_name;
           curList.push(tempList);
         }.bind(this)
       );

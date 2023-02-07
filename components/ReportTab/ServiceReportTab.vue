@@ -152,10 +152,11 @@ export default {
       services: [],
       serviceLines: [],
       tblFields: [
-        { key: "serviceNumber", label: "Service #", thStyle: { width: "15%" } },
-        { key: "name", label: "Customer Name", thStyle: { width: "15%" } },
+        { key: "serviceNumber", label: "Service #", thStyle: { width: "10%" } },
+        { key: "name", label: "Customer Name", thStyle: { width: "10%" } },
         { key: "serial_number", label: "Serial Number", thStyle: { width: "15%" } },
         { key: "comment", label: "Comment", thStyle: { width: "15%" } },
+        { key: "user_name", label: "Mechanic", thStyle: { width: "15%" } },
         { key: "date_transaction", label: "Date Transaction", thStyle: { width: "10%" } },
         { key: "viewDetails", label: "View Details", thStyle: { width: "10%" } },
         { key: "print", label: "Print", thStyle: { width: "10%" } },
@@ -246,6 +247,7 @@ export default {
         serialNumber: this.selectedService.serial_number,
         dateTrans: new Date(this.selectedService.date_transaction).toJSON().slice(0, 10),
         comment: this.selectedService.comment,
+        userName: this.selectedService.user_name,
       });
     },
 
@@ -307,6 +309,7 @@ export default {
         tempList.date_transaction = val.date_transaction;
         tempList.serial_number = val.serial_number;
         tempList.comment = val.comment;
+        tempList.user_name = val.user_name;
         curList.push(tempList);
       });
       curList.sort();

@@ -716,8 +716,6 @@ export default {
     },
 
     async postQuote() {
-      console.log("TEST");
-      console.log(this.form.service.serviceId);
       await axios({
         method: "POST",
         url: `${this.$axios.defaults.baseURL}/quotation/create`,
