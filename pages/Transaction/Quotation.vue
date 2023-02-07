@@ -124,7 +124,7 @@
         <br />
         <div>
           <b-button
-            v-b-modal.modal-lg="'insertItemModal'"
+            v-b-modal.modal-lg="'insertItemModalQuote'"
             variant="info"
             class="form-t_quotation-btn t-btn-secondary-margin-bottom"
             @click="openItemListModalDialog"
@@ -369,7 +369,7 @@
 
         <!-- Insert Item Modal -->
         <b-modal
-          id="insertItemModal"
+          id="insertItemModalQuote"
           size="xl"
           hide-footer
           hide-header
@@ -393,10 +393,13 @@
                         v-model="insertItemModal.inputSearch"
                         placeholder="Search . . ."
                         class="globalInputSize"
-                        @keyup.enter="onSearchProducts"
+                        @keyup.enter="loadPropductByCategory"
                       ></b-form-input>
                       <b-input-group-append>
-                        <b-button class="form-t_quotation-btn" @click="onSearchProducts">
+                        <b-button
+                          class="form-t_quotation-btn"
+                          @click="loadPropductByCategory"
+                        >
                           <font-awesome-icon icon="fa-solid fa-filter" /> Filter
                         </b-button>
                       </b-input-group-append>
@@ -417,7 +420,7 @@
                       value-field="item"
                       text-field="name"
                       disabled-field="notEnabled"
-                      @change="onSearchProducts"
+                      @change="loadPropductByCategory"
                     ></b-form-radio-group></b-form-group
                 ></b-col>
                 ></b-row
@@ -464,7 +467,7 @@
               <b-button
                 variant="danger"
                 class="form-t_quotation-btn modal-action-btn"
-                @click="$bvModal.hide('insertItemModal')"
+                @click="$bvModal.hide('insertItemModalQuote')"
               >
                 <font-awesome-icon icon="fa-solid fa-xmark" /> Cancel
               </b-button>
@@ -586,25 +589,6 @@ export default {
       });
     },
 
-    async onSearchProducts() {
-      this.insertItemModal.itemList = [];
-      await this.loadAllProducts().then((res) => {
-        let textSearch = this.insertItemModal.inputSearch;
-        var filteredList = this.insertItemModal.itemList.filter(
-          function (val) {
-            let containsSearchTxt =
-              val.productCode.toLowerCase().includes(textSearch.toLowerCase()) ||
-              val.productName.toLowerCase().includes(textSearch.toLowerCase()) ||
-              val.unit.toLowerCase().includes(textSearch.toLowerCase());
-            return (
-              containsSearchTxt && val.category === this.insertItemModal.selectedCategory
-            );
-          }.bind(this)
-        );
-        this.insertItemModal.itemList = filteredList;
-      });
-    },
-
     async onSearchServices() {
       await this.loadServices().then((res) => {
         let textSearch = this.serviceModal.inputSearch;
@@ -674,10 +658,10 @@ export default {
     },
 
     openItemListModalDialog() {
-      this.loadFilteredProducts();
+      this.loadPropductByCategory();
     },
 
-    loadFilteredProducts() {
+    loadPropductByCategory() {
       this.loadAllProducts().then((res) => {
         let filteredList = this.insertItemModal.itemList.filter(
           function (val) {
@@ -707,6 +691,11 @@ export default {
     async onClickProcess() {
       if (this.quotationLineList.length < 1) {
         this.showAlert(3, "warning", "Please select Item!");
+        return;
+      }
+
+      if (this.form.customer.customerId === "") {
+        this.showAlert(3, "warning", "Please select customer!");
         return;
       }
 
@@ -913,12 +902,13 @@ export default {
 
     //set all products from $store to local list with customized columns
     setAllProducts() {
-      let list = this.insertItemModal.itemList;
+      let list = [];
       let tempList = [];
+      let textSearch = this.serviceModal.inputSearch;
+
       this.getItemList.forEach(function (val) {
         //reset temporary list every iteration
         tempList = [];
-
         // set customized column
         tempList.skuId = val.sku_id;
         tempList.productCode = val.barcode == null ? val.serial_number : val.barcode;
@@ -932,6 +922,16 @@ export default {
         // push temp list to actual list
         list.push(tempList);
       });
+
+      let filteredList = list.filter(function (val) {
+        return (
+          val.productCode.toLowerCase().includes(textSearch.toLowerCase()) ||
+          val.productName.toLowerCase().includes(textSearch.toLowerCase()) ||
+          val.unit.toLowerCase().includes(textSearch.toLowerCase())
+        );
+      });
+
+      this.insertItemModal.itemList = filteredList;
     },
   },
 

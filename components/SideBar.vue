@@ -20,19 +20,21 @@
 
       <!-- Admin dropdown menus -->
       <div class="sidebar-menus">
-        <div v-show="isActiveAdmin">
-          <div
-            v-for="adminMenu in adminMenus"
-            :key="adminMenu.key"
-            class="sidebar-menus-list mt-1"
-            :class="{ active: adminMenu.active }"
-            @click="setMenuActive(adminMenu.key)"
-            v-show="showMenu(adminMenu)"
-          >
-            <font-awesome-icon :icon="['fa-solid', adminMenu.icon]" />
-            {{ adminMenu.title }}
-          </div>
-        </div>
+        <transition name="slide-fade">
+          <div v-show="isActiveAdmin">
+            <div
+              v-for="adminMenu in adminMenus"
+              :key="adminMenu.key"
+              class="sidebar-menus-list mt-1"
+              :class="{ active: adminMenu.active }"
+              @click="setMenuActive(adminMenu.key)"
+              v-show="showMenu(adminMenu)"
+            >
+              <font-awesome-icon :icon="['fa-solid', adminMenu.icon]" />
+              {{ adminMenu.title }}
+            </div>
+          </div></transition
+        >
       </div>
     </div>
 
@@ -44,19 +46,21 @@
       </button>
       <!-- Transaction dropdown menus -->
       <div class="sidebar-menus">
-        <div v-show="isActiveTransaction">
-          <div
-            v-for="transactionMenu in transactionMenus"
-            :key="transactionMenu.id"
-            class="sidebar-menus-list mt-1"
-            :class="{ active: transactionMenu.active }"
-            @click="setMenuActive(transactionMenu.key)"
-            v-show="showMenu(transactionMenu)"
-          >
-            <font-awesome-icon :icon="['fa-solid', transactionMenu.icon]" />
-            {{ transactionMenu.title }}
+        <transition name="slide-fade">
+          <div v-show="isActiveTransaction">
+            <div
+              v-for="transactionMenu in transactionMenus"
+              :key="transactionMenu.id"
+              class="sidebar-menus-list mt-1"
+              :class="{ active: transactionMenu.active }"
+              @click="setMenuActive(transactionMenu.key)"
+              v-show="showMenu(transactionMenu)"
+            >
+              <font-awesome-icon :icon="['fa-solid', transactionMenu.icon]" />
+              {{ transactionMenu.title }}
+            </div>
           </div>
-        </div>
+        </transition>
       </div>
     </div>
 
@@ -318,5 +322,17 @@ export default {
 .down {
   transform: rotate(45deg);
   -webkit-transform: rotate(45deg);
+}
+
+.slide-fade-enter-active {
+  transition: all 0.1s ease;
+}
+
+.slide-fade-leave-active {
+  transition: all 0.1s cubic-bezier(1, 0.5, 0.8, 1);
+}
+.slide-fade-enter,
+.slide-fade-leave-to {
+  transform: translateX(50px);
 }
 </style>
