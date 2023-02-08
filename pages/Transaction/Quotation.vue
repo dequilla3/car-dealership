@@ -286,7 +286,7 @@
               <b-button
                 variant="danger"
                 class="form-t_quotation-btn modal-action-btn"
-                @click="$bvModal.hide('customerModal')"
+                @click="$bvModal.hide('customerModalQtn')"
               >
                 <font-awesome-icon icon="fa-solid fa-xmark" /> Cancel
               </b-button>
