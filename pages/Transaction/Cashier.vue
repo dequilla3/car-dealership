@@ -101,8 +101,6 @@
         hover
         :items="serviceProps.serviceLineList"
         :fields="serviceProps.serviceLineTblField"
-        :per-page="serviceProps.perPage"
-        :current-page="serviceProps.currentPage"
         select-mode="single"
         ref="selectableTable"
         selectable
@@ -118,8 +116,6 @@
         hover
         :items="quotationProps.quotationLineList"
         :fields="quotationProps.quotationLineTblFields"
-        :per-page="quotationProps.perPage"
-        :current-page="quotationProps.currentPage"
         select-mode="single"
         ref="selectableTable"
         selectable

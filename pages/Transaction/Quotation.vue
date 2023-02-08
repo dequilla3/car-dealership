@@ -76,7 +76,7 @@
                   <b-input-group-append>
                     <b-button
                       id="b-modal-customer"
-                      v-b-modal.modal-lg="'customerModal'"
+                      v-b-modal.modal-lg="'customerModalQtn'"
                       variant="secondary"
                       class="form-t_quotation-btn"
                       @click="openCustomerModal"
@@ -222,7 +222,7 @@
 
         <!-- Customer Modals -->
         <b-modal
-          id="customerModal"
+          id="customerModalQtn"
           size="lg"
           hide-footer
           hide-header
@@ -623,7 +623,7 @@ export default {
     },
 
     openCustomerModal() {
-      this.customerModal.customerTblList = this.getCustomerList;
+      this.loadCustomer();
     },
 
     async onClickServiceBtnModal() {
@@ -757,7 +757,7 @@ export default {
 
     //select btn on customerModal
     selectCustomer() {
-      this.$bvModal.hide("customerModal");
+      this.$bvModal.hide("customerModalQtn");
       if (this.customerModal.selected.length > 0) {
         this.form.customer.customerId = this.customerModal.selected[0].customer_id;
         this.form.customer.customerName = this.customerModal.selected[0].name;
