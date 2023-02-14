@@ -1,169 +1,161 @@
 <template>
   <div>
-    <Navbar />
-    <SideBar />
-    <div>
-      <b-alert
-        :show="alert.showAlert"
-        :variant="alert.variant"
-        @dismissed="alert.showAlert = null"
-      >
-        {{ alert.message }}
-      </b-alert>
-      <b-modal id="manageCarModal" hide-header hide-footer size="lg">
-        <b-form @submit="onSubmit" v-if="show" class="form-100">
-          <b-alert
-            :show="alertModal.showAlert"
-            :variant="alertModal.variant"
-            @dismissed="alertModal.showAlert = null"
-          >
-            {{ alert.message }}
-          </b-alert>
+    <b-alert
+      :show="alert.showAlert"
+      :variant="alert.variant"
+      @dismissed="alert.showAlert = null"
+    >
+      {{ alert.message }}
+    </b-alert>
+    <b-modal id="manageCarModal" hide-header hide-footer size="lg">
+      <b-form @submit="onSubmit" v-if="show" class="form-100">
+        <b-alert
+          :show="alertModal.showAlert"
+          :variant="alertModal.variant"
+          @dismissed="alertModal.showAlert = null"
+        >
+          {{ alert.message }}
+        </b-alert>
 
-          <h6>Car Details</h6>
-          <hr />
+        <h6>Car Details</h6>
+        <hr />
 
-          <!-- GRID -->
-          <div class="grid-container">
-            <!-- Grid1 -->
-            <div class="grid-item">
-              <b-form-group
-                id="serial_number"
-                label="Serial Number:"
-                label-for="input-serial_number"
-              >
-                <b-form-input
-                  type="text"
-                  id="input-serial_number"
-                  v-model="form.serial_number"
-                  placeholder="Enter serial #"
-                  required
-                  class="globalInputSize"
-                ></b-form-input>
-              </b-form-group>
+        <!-- GRID -->
+        <div class="grid-container">
+          <!-- Grid1 -->
+          <div class="grid-item">
+            <b-form-group
+              id="serial_number"
+              label="Serial Number:"
+              label-for="input-serial_number"
+            >
+              <b-form-input
+                type="text"
+                id="input-serial_number"
+                v-model="form.serial_number"
+                placeholder="Enter serial #"
+                required
+                class="globalInputSize"
+              ></b-form-input>
+            </b-form-group>
 
-              <b-form-group id="color" label="Color:" label-for="input-color">
-                <b-form-input
-                  type="text"
-                  id="input-color"
-                  v-model="form.color"
-                  placeholder="Enter color"
-                  required
-                  class="globalInputSize"
-                ></b-form-input>
-              </b-form-group>
+            <b-form-group id="color" label="Color:" label-for="input-color">
+              <b-form-input
+                type="text"
+                id="input-color"
+                v-model="form.color"
+                placeholder="Enter color"
+                required
+                class="globalInputSize"
+              ></b-form-input>
+            </b-form-group>
 
-              <b-form-group id="model" label="Model:" label-for="input-model">
-                <b-form-input
-                  type="text"
-                  id="input-model"
-                  v-model="form.model"
-                  placeholder="Enter model"
-                  required
-                  class="globalInputSize"
-                ></b-form-input>
-              </b-form-group>
-            </div>
-
-            <!-- Grrid2 -->
-            <div class="grid-item">
-              <b-form-group
-                id="brandname"
-                label="Brand Name:"
-                label-for="input-brandname"
-              >
-                <b-form-input
-                  type="text"
-                  id="input-brandname"
-                  v-model="form.brandname"
-                  placeholder="Enter brandname"
-                  required
-                  class="globalInputSize"
-                ></b-form-input>
-              </b-form-group>
-
-              <b-form-group id="unit" label="Unit:" label-for="input-unit">
-                <b-form-input
-                  type="text"
-                  id="input-unit"
-                  v-model="form.unit"
-                  placeholder="Enter unit"
-                  required
-                  class="globalInputSize"
-                ></b-form-input>
-              </b-form-group>
-
-              <b-form-group id="cost" label="Cost:" label-for="input-cost">
-                <b-form-input
-                  type="number"
-                  id="input-cost"
-                  v-model="form.cost"
-                  placeholder="Enter cost"
-                  required
-                  class="globalInputSize"
-                ></b-form-input>
-              </b-form-group>
-            </div>
+            <b-form-group id="model" label="Model:" label-for="input-model">
+              <b-form-input
+                type="text"
+                id="input-model"
+                v-model="form.model"
+                placeholder="Enter model"
+                required
+                class="globalInputSize"
+              ></b-form-input>
+            </b-form-group>
           </div>
-          <!-- END OF GRID -->
 
-          <b-button type="submit" variant="primary" class="font-12">
-            <font-awesome-icon
-              :icon="['fa-solid', isUpdate ? 'fa-user-pen' : 'fa-user-plus']"
-            />
-            {{ btnSubmitLabel }}
-          </b-button>
+          <!-- Grrid2 -->
+          <div class="grid-item">
+            <b-form-group id="brandname" label="Brand Name:" label-for="input-brandname">
+              <b-form-input
+                type="text"
+                id="input-brandname"
+                v-model="form.brandname"
+                placeholder="Enter brandname"
+                required
+                class="globalInputSize"
+              ></b-form-input>
+            </b-form-group>
 
-          <b-button type="reset" variant="danger" class="font-12" @click="onReset">
-            <font-awesome-icon icon="fa-solid fa-close" /> Cancel
-          </b-button>
-        </b-form>
-      </b-modal>
+            <b-form-group id="unit" label="Unit:" label-for="input-unit">
+              <b-form-input
+                type="text"
+                id="input-unit"
+                v-model="form.unit"
+                placeholder="Enter unit"
+                required
+                class="globalInputSize"
+              ></b-form-input>
+            </b-form-group>
 
-      <b-button variant="primary" class="font-12 mb-3" @click="onAdd">
-        <font-awesome-icon icon="fa-solid fa-plus" />
-        Add Car
-      </b-button>
+            <b-form-group id="cost" label="Cost:" label-for="input-cost">
+              <b-form-input
+                type="number"
+                id="input-cost"
+                v-model="form.cost"
+                placeholder="Enter cost"
+                required
+                class="globalInputSize"
+              ></b-form-input>
+            </b-form-group>
+          </div>
+        </div>
+        <!-- END OF GRID -->
 
-      <!-- search input -->
-      <b-form-group id="inputSearch" label="" label-for="input-search">
-        <b-form-input
-          id="input-search"
-          v-model="inputSearch"
-          placeholder="Search . . ."
-          class="globalInputSize"
-          @keyup.enter="onSearch"
-        ></b-form-input>
-      </b-form-group>
+        <b-button type="submit" variant="primary" class="font-12">
+          <font-awesome-icon
+            :icon="['fa-solid', isUpdate ? 'fa-user-pen' : 'fa-user-plus']"
+          />
+          {{ btnSubmitLabel }}
+        </b-button>
 
-      <!-- table -->
-      <b-table
-        class="customer_list-table"
-        hover
-        :items="tblItems"
-        :fields="partsTblFields"
-        :per-page="perPage"
-        :current-page="currentPage"
-      >
-        <template #cell(cost)="data">
-          {{ Number(data.value).toLocaleString("en-US") }}
-        </template>
+        <b-button type="reset" variant="danger" class="font-12" @click="onReset">
+          <font-awesome-icon icon="fa-solid fa-close" /> Cancel
+        </b-button>
+      </b-form>
+    </b-modal>
 
-        <template #cell(action)="data">
-          <b-button size="sm" class="font-10" variant="info" @click="onEdit(data)">
-            <font-awesome-icon icon="fa-solid fa-user-pen" /> Update</b-button
-          >
-        </template>
-      </b-table>
+    <b-button variant="primary" class="font-12 mb-3" @click="onAdd">
+      <font-awesome-icon icon="fa-solid fa-plus" />
+      Add Car
+    </b-button>
 
-      <b-pagination
-        v-model="currentPage"
-        :total-rows="rows"
-        :per-page="perPage"
-        aria-controls="my-table"
-        class="pagination"
-      ></b-pagination>
-    </div>
+    <!-- search input -->
+    <b-form-group id="inputSearch" label="" label-for="input-search">
+      <b-form-input
+        id="input-search"
+        v-model="inputSearch"
+        placeholder="Search . . ."
+        class="globalInputSize"
+        @keyup.enter="onSearch"
+      ></b-form-input>
+    </b-form-group>
+
+    <!-- table -->
+    <b-table
+      class="customer_list-table"
+      hover
+      :items="tblItems"
+      :fields="partsTblFields"
+      :per-page="perPage"
+      :current-page="currentPage"
+    >
+      <template #cell(cost)="data">
+        {{ Number(data.value).toLocaleString("en-US") }}
+      </template>
+
+      <template #cell(action)="data">
+        <b-button size="sm" class="font-10" variant="info" @click="onEdit(data)">
+          <font-awesome-icon icon="fa-solid fa-user-pen" /> Update</b-button
+        >
+      </template>
+    </b-table>
+
+    <b-pagination
+      v-model="currentPage"
+      :total-rows="rows"
+      :per-page="perPage"
+      aria-controls="my-table"
+      class="paginationSmall"
+    ></b-pagination>
   </div>
 </template>
 
@@ -371,10 +363,6 @@ export default {
 }
 
 .customer_list-table {
-  font-size: 12px;
-}
-
-.pagination {
   font-size: 12px;
 }
 </style>

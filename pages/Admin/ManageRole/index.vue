@@ -2,84 +2,88 @@
   <div class="mainContainer">
     <Navbar />
     <SideBar />
-    <div><h6>Manage Role</h6></div>
-    <hr />
-    <div>
-      <b-form @submit="onSubmit" v-if="show" class="form-manage_role">
+    <transition name="slide-fade">
+      <div v-show="showDelay">
+        <div><h6>Manage Role</h6></div>
+        <hr />
         <div>
-          <b-alert
-            :show="alert.showAlert"
-            :variant="alert.variant"
-            @dismissed="alert.showAlert = null"
+          <b-form @submit="onSubmit" v-if="show" class="form-manage_role">
+            <div>
+              <b-alert
+                :show="alert.showAlert"
+                :variant="alert.variant"
+                @dismissed="alert.showAlert = null"
+              >
+                {{ alert.message }} <br />
+                {{ alert.subMsg }}
+              </b-alert>
+            </div>
+            <b-form-group id="role" label="Role name:" label-for="input-role">
+              <b-form-input
+                id="input-role"
+                v-model="form.role"
+                placeholder="Enter role"
+                required
+                class="globalInputSize"
+              ></b-form-input>
+            </b-form-group>
+
+            <b-button type="submit" variant="primary" class="form-manage_role-btn">
+              <font-awesome-icon
+                :icon="['fa-solid', isUpdate ? 'fa-user-pen' : 'fa-user-plus']"
+              />
+              {{ btnSubmitLabel }}
+            </b-button>
+
+            <b-button
+              type="reset"
+              variant="danger"
+              class="form-manage_role-btn"
+              @click="onReset"
+            >
+              <font-awesome-icon icon="fa-solid fa-redo" /> Reset
+            </b-button>
+          </b-form>
+
+          <br />
+
+          <!-- search input -->
+          <b-form-group id="inputSearch" label="Search:" label-for="input-search">
+            <b-form-input
+              id="input-search"
+              v-model="inputSearch"
+              placeholder="Enter text . . ."
+              class="globalInputSize"
+              @keyup.enter="onSearch"
+            ></b-form-input>
+          </b-form-group>
+
+          <b-table
+            class="customer_list-table"
+            hover
+            :items="roleList"
+            :fields="roleTblFields"
+            :per-page="perPage"
+            :current-page="currentPage"
+            select-mode="single"
+            ref="selectableTable"
+            selectable
+            selected-variant="info"
+            @row-selected="onRowSelected"
+            :busy="isBusy"
           >
-            {{ alert.message }} <br />
-            {{ alert.subMsg }}
-          </b-alert>
+          </b-table>
+
+          <b-pagination
+            v-model="currentPage"
+            :total-rows="rows"
+            :per-page="perPage"
+            aria-controls="my-table"
+            class="paginationSmall"
+          ></b-pagination>
         </div>
-        <b-form-group id="role" label="Role name:" label-for="input-role">
-          <b-form-input
-            id="input-role"
-            v-model="form.role"
-            placeholder="Enter role"
-            required
-            class="globalInputSize"
-          ></b-form-input>
-        </b-form-group>
-
-        <b-button type="submit" variant="primary" class="form-manage_role-btn">
-          <font-awesome-icon
-            :icon="['fa-solid', isUpdate ? 'fa-user-pen' : 'fa-user-plus']"
-          />
-          {{ btnSubmitLabel }}
-        </b-button>
-
-        <b-button
-          type="reset"
-          variant="danger"
-          class="form-manage_role-btn"
-          @click="onReset"
-        >
-          <font-awesome-icon icon="fa-solid fa-redo" /> Reset
-        </b-button>
-      </b-form>
-
-      <br />
-
-      <!-- search input -->
-      <b-form-group id="inputSearch" label="Search:" label-for="input-search">
-        <b-form-input
-          id="input-search"
-          v-model="inputSearch"
-          placeholder="Enter text . . ."
-          class="globalInputSize"
-          @keyup.enter="onSearch"
-        ></b-form-input>
-      </b-form-group>
-
-      <b-table
-        class="customer_list-table"
-        hover
-        :items="roleList"
-        :fields="roleTblFields"
-        :per-page="perPage"
-        :current-page="currentPage"
-        select-mode="single"
-        ref="selectableTable"
-        selectable
-        selected-variant="info"
-        @row-selected="onRowSelected"
-        :busy="isBusy"
-      >
-      </b-table>
-
-      <b-pagination
-        v-model="currentPage"
-        :total-rows="rows"
-        :per-page="perPage"
-        aria-controls="my-table"
-        class="pagination"
-      ></b-pagination>
-    </div>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -88,6 +92,7 @@ let currentDate = new Date().toJSON().slice(0, 10);
 export default {
   data() {
     return {
+      showDelay: false,
       alert: {
         showAlert: 0,
         variant: "",
@@ -191,6 +196,9 @@ export default {
 
   mounted() {
     this.loadRoles();
+    setTimeout(() => {
+      this.showDelay = true;
+    }, 1);
   },
 
   computed: {
@@ -230,10 +238,6 @@ export default {
 
 .customer_list-table {
   width: 100%;
-  font-size: 12px;
-}
-
-.pagination {
   font-size: 12px;
 }
 </style>

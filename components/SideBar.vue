@@ -309,16 +309,4 @@ export default {
   transform: rotate(45deg);
   -webkit-transform: rotate(45deg);
 }
-
-.slide-fade-enter-active {
-  transition: all 0.1s ease;
-}
-
-.slide-fade-leave-active {
-  transition: all 0.1s cubic-bezier(1, 0.5, 0.8, 1);
-}
-.slide-fade-enter,
-.slide-fade-leave-to {
-  transform: translateX(50px);
-}
 </style>

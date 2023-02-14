@@ -2,174 +2,183 @@
   <div class="mainContainer">
     <Navbar />
     <SideBar />
-    <div><h6>Manage User</h6></div>
-    <hr />
-    <div class="font-13">
-      <b-alert
-        :show="alert.showAlert"
-        :variant="alert.variant"
-        @dismissed="alert.showAlert = null"
-      >
-        {{ alert.message }}
-      </b-alert>
+    <transition name="slide-fade">
+      <div v-show="showDelay">
+        <div><h6>Manage User</h6></div>
+        <hr />
 
-      <base-button @click="onAdd()" type="primary" class="font-12 mb-3">
-        <font-awesome-icon icon="fa-solid fa-user-plus" /> Add new User
-      </base-button>
-
-      <b-modal id="userModal" size="lg" hide-footer hide-header>
-        <b-form @submit="onSubmit" v-if="show" class="form-100">
+        <div class="font-13">
           <b-alert
-            :show="alertModal.showAlert"
-            :variant="alertModal.variant"
-            @dismissed="alertModal.showAlert = null"
+            :show="alert.showAlert"
+            :variant="alert.variant"
+            @dismissed="alert.showAlert = null"
           >
             {{ alert.message }}
           </b-alert>
-          <h6>User Details</h6>
-          <hr />
-          <div class="row">
-            <div class="col-6 col-sm-6">
-              <b-form-group id="name" label="Name:" label-for="input-name">
-                <b-form-input
-                  id="input-name"
-                  v-model="form.name"
-                  placeholder="Enter name"
-                  required
-                  class="globalInputSize"
-                ></b-form-input>
-              </b-form-group>
 
-              <b-form-group
-                id="contact"
-                label="Cotanct Number:"
-                label-for="input-contact"
+          <base-button @click="onAdd()" type="primary" class="font-12 mb-3">
+            <font-awesome-icon icon="fa-solid fa-user-plus" /> Add new User
+          </base-button>
+
+          <b-modal id="userModal" size="lg" hide-footer hide-header>
+            <b-form @submit="onSubmit" v-if="show" class="form-100">
+              <b-alert
+                :show="alertModal.showAlert"
+                :variant="alertModal.variant"
+                @dismissed="alertModal.showAlert = null"
               >
-                <b-form-input
-                  id="input-contact"
-                  v-model="form.contact"
-                  placeholder="Enter contact number"
-                  required
-                  class="globalInputSize"
-                ></b-form-input>
-              </b-form-group>
-
-              <b-form-group id="address" label="Address:" label-for="input-address">
-                <b-form-input
-                  id="input-address"
-                  v-model="form.address"
-                  placeholder="Enter address"
-                  required
-                  class="globalInputSize"
-                ></b-form-input>
-              </b-form-group>
-            </div>
-
-            <div class="col-6 col-sm-6">
-              <b-form-group id="username" label="Role:" label-for="input-username">
-                <b-dropdown
-                  id="dropdown-1"
-                  :text="dropDownText"
-                  class="dropdown--dropdown_custom-size"
-                  size="sm"
-                >
-                  <b-dropdown-item
-                    class="dropdown--dropdown-menu-size"
-                    v-for="role in roleList"
-                    :key="role.roleId"
-                    @click="onClickRoleDropdownMenu(role)"
-                    >{{ role.role }}
-                  </b-dropdown-item>
-                </b-dropdown>
-              </b-form-group>
-
-              <b-form-group id="username" label="Username:" label-for="input-username">
-                <b-form-input
-                  id="input-username"
-                  v-model="form.username"
-                  placeholder="Enter username"
-                  required
-                  class="globalInputSize"
-                ></b-form-input>
-              </b-form-group>
-
-              <b-form-group id="pw" label="Password:" label-for="input-pw">
-                <b-input-group>
-                  <b-form-input
-                    id="input-pw"
-                    v-model="form.pw"
-                    placeholder="Enter password"
-                    required
-                    class="globalInputSize"
-                    :type="isPwShow ? 'text' : 'password'"
-                  ></b-form-input>
-                  <b-input-group-append>
-                    <base-button
-                      type="info"
+                {{ alert.message }}
+              </b-alert>
+              <h6>User Details</h6>
+              <hr />
+              <div class="row">
+                <div class="col-6 col-sm-6">
+                  <b-form-group id="name" label="Name:" label-for="input-name">
+                    <b-form-input
+                      id="input-name"
+                      v-model="form.name"
+                      placeholder="Enter name"
+                      required
                       class="globalInputSize"
-                      @click="onlickShowPw"
+                    ></b-form-input>
+                  </b-form-group>
+
+                  <b-form-group
+                    id="contact"
+                    label="Cotanct Number:"
+                    label-for="input-contact"
+                  >
+                    <b-form-input
+                      id="input-contact"
+                      v-model="form.contact"
+                      placeholder="Enter contact number"
+                      required
+                      class="globalInputSize"
+                    ></b-form-input>
+                  </b-form-group>
+
+                  <b-form-group id="address" label="Address:" label-for="input-address">
+                    <b-form-input
+                      id="input-address"
+                      v-model="form.address"
+                      placeholder="Enter address"
+                      required
+                      class="globalInputSize"
+                    ></b-form-input>
+                  </b-form-group>
+                </div>
+
+                <div class="col-6 col-sm-6">
+                  <b-form-group id="username" label="Role:" label-for="input-username">
+                    <b-dropdown
+                      id="dropdown-1"
+                      :text="dropDownText"
+                      class="dropdown--dropdown_custom-size"
+                      size="sm"
                     >
-                      <font-awesome-icon
-                        :icon="['fa-solid', isPwShow ? 'fa-eye' : 'fa-eye-slash']"
-                      />
-                    </base-button>
-                  </b-input-group-append>
-                </b-input-group>
-              </b-form-group>
-            </div>
-          </div>
+                      <b-dropdown-item
+                        class="dropdown--dropdown-menu-size"
+                        v-for="role in roleList"
+                        :key="role.roleId"
+                        @click="onClickRoleDropdownMenu(role)"
+                        >{{ role.role }}
+                      </b-dropdown-item>
+                    </b-dropdown>
+                  </b-form-group>
 
-          <b-button type="submit" variant="primary" class="font-12">
-            <font-awesome-icon :icon="['fa-solid', icn]" />
-            {{ isUpdate ? "Update User" : "Add User" }}
-          </b-button>
+                  <b-form-group
+                    id="username"
+                    label="Username:"
+                    label-for="input-username"
+                  >
+                    <b-form-input
+                      id="input-username"
+                      v-model="form.username"
+                      placeholder="Enter username"
+                      required
+                      class="globalInputSize"
+                    ></b-form-input>
+                  </b-form-group>
 
-          <b-button type="reset" variant="danger" class="font-12" @click="onReset">
-            <font-awesome-icon icon="fa-solid fa-close" /> Cancel
-          </b-button>
-        </b-form>
-      </b-modal>
+                  <b-form-group id="pw" label="Password:" label-for="input-pw">
+                    <b-input-group>
+                      <b-form-input
+                        id="input-pw"
+                        v-model="form.pw"
+                        placeholder="Enter password"
+                        required
+                        class="globalInputSize"
+                        :type="isPwShow ? 'text' : 'password'"
+                      ></b-form-input>
+                      <b-input-group-append>
+                        <base-button
+                          type="info"
+                          class="globalInputSize"
+                          @click="onlickShowPw"
+                        >
+                          <font-awesome-icon
+                            :icon="['fa-solid', isPwShow ? 'fa-eye' : 'fa-eye-slash']"
+                          />
+                        </base-button>
+                      </b-input-group-append>
+                    </b-input-group>
+                  </b-form-group>
+                </div>
+              </div>
 
-      <br />
+              <b-button type="submit" variant="primary" class="font-12">
+                <font-awesome-icon :icon="['fa-solid', icn]" />
+                {{ isUpdate ? "Update User" : "Add User" }}
+              </b-button>
 
-      <!-- search input -->
-      <b-form-group id="inputSearch" label="" label-for="input-search">
-        <b-form-input
-          id="input-search "
-          v-model="inputSearch"
-          placeholder="Search . . ."
-          class="globalInputSize"
-          @keyup.enter="onSearch"
-        ></b-form-input>
-      </b-form-group>
+              <b-button type="reset" variant="danger" class="font-12" @click="onReset">
+                <font-awesome-icon icon="fa-solid fa-close" /> Cancel
+              </b-button>
+            </b-form>
+          </b-modal>
 
-      <b-table
-        class="standardTable"
-        hover
-        :items="userTblList"
-        :fields="userTblFields"
-        :per-page="perPage"
-        :current-page="currentPage"
-      >
-        <template #cell(date_created)="data">
-          {{ new Date(data.value).toJSON().slice(0, 10) }}
-        </template>
+          <br />
 
-        <template #cell(action)="data">
-          <base-button size="sm" class="font-10" type="info" @click="onEdit(data)">
-            <font-awesome-icon icon="fa-solid fa-user-pen" /> Update</base-button
+          <!-- search input -->
+          <b-form-group id="inputSearch" label="" label-for="input-search">
+            <b-form-input
+              id="input-search "
+              v-model="inputSearch"
+              placeholder="Search . . ."
+              class="globalInputSize"
+              @keyup.enter="onSearch"
+            ></b-form-input>
+          </b-form-group>
+
+          <b-table
+            class="standardTable"
+            hover
+            :items="userTblList"
+            :fields="userTblFields"
+            :per-page="perPage"
+            :current-page="currentPage"
           >
-        </template>
-      </b-table>
+            <template #cell(date_created)="data">
+              {{ new Date(data.value).toJSON().slice(0, 10) }}
+            </template>
 
-      <b-pagination
-        v-model="currentPage"
-        :total-rows="rows"
-        :per-page="perPage"
-        aria-controls="my-table"
-        class="pagination"
-      ></b-pagination>
-    </div>
+            <template #cell(action)="data">
+              <base-button size="sm" class="font-10" type="info" @click="onEdit(data)">
+                <font-awesome-icon icon="fa-solid fa-user-pen" /> Update</base-button
+              >
+            </template>
+          </b-table>
+
+          <b-pagination
+            v-model="currentPage"
+            :total-rows="rows"
+            :per-page="perPage"
+            aria-controls="my-table"
+            class="paginationSmall"
+          ></b-pagination>
+        </div>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -181,6 +190,7 @@ const currentDate = new Date().toJSON().slice(0, 10);
 export default {
   data() {
     return {
+      showDelay: false,
       isUpdate: false,
       isPwShow: false,
       icn: "fa-user-plus",
@@ -447,6 +457,9 @@ export default {
   mounted() {
     this.loadRoles();
     this.loadUser();
+    setTimeout(() => {
+      this.showDelay = true;
+    }, 1);
   },
 
   computed: {

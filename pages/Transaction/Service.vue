@@ -4,356 +4,361 @@
     <div class="dontPrint">
       <Navbar />
       <SideBar />
-      <div><h6>Service</h6></div>
-      <hr />
-      <b-form class="form-60">
-        <b-alert
-          :show="alert.showAlert"
-          :variant="alert.variant"
-          @dismissed="alert.showAlert = null"
-        >
-          {{ alert.message }}
-        </b-alert>
-        <b-button
-          v-if="isProcessed"
-          variant="primary"
-          class="font-12 ml-2"
-          @click="onNewTrans"
-        >
-          <font-awesome-icon icon="fa-solid fa-plus" />
-          New Trasaction
-        </b-button>
-
-        <div class="grid-container-3">
-          <div class="grid-item">
-            <!-- transaction number form group-->
-            <b-form-group
-              id="serviceNum"
-              label="Reference Number:"
-              label-for="serviceNum"
-            >
-              <b-form-input
-                id="serviceNum"
-                v-model="form.serviceNumber"
-                placeholder="None"
-                required
-                class="globalInputSize docnoInput"
-                disabled
-              ></b-form-input>
-            </b-form-group>
-          </div>
-
-          <div class="grid-item">
-            <!-- customer form grp-->
-            <b-form-group
-              id="customerName"
-              label="Select Customer:"
-              label-for="input-customerName"
-            >
-              <b-input-group id="b-input-group-customerName">
-                <b-form-input
-                  id="input-customerName"
-                  v-model="form.customer.customerName"
-                  required
-                  class="globalInputSize"
-                  placeholder="None"
-                  disabled
-                ></b-form-input>
-                <b-input-group-append>
-                  <b-button
-                    id="b-modal-customer"
-                    v-b-modal.modal-lg="'customerModal'"
-                    variant="secondary"
-                    class="font-12"
-                    @click="openCustomerModal"
-                    :disabled="isProcessed"
-                    >Select</b-button
-                  >
-                </b-input-group-append>
-              </b-input-group>
-            </b-form-group>
-          </div>
-
-          <div class="grid-item">
-            <!-- car serial number -->
-            <b-form-group id="serialNum" label="Serial Number:" label-for="serialNum">
-              <b-form-input
-                id="serialNum"
-                v-model="form.serialNum"
-                placeholder="Enter serial number"
-                required
-                class="globalInputSize"
-                :disabled="isProcessed"
-              ></b-form-input>
-            </b-form-group>
-          </div>
-
-          <div class="grid-item">
-            <!-- car serial number -->
-            <b-form-group id="textarea" label="Comment:" label-for="textarea">
-              <b-form-textarea
-                id="textarea"
-                v-model="form.comment"
-                placeholder="Enter something..."
-                rows="3"
-                max-rows="6"
-                class="standardFontSize"
-                :disabled="isProcessed"
-              ></b-form-textarea>
-            </b-form-group>
-          </div>
-        </div>
-
-        <!-- Customer Modals -->
-        <b-modal
-          id="customerModal"
-          size="lg"
-          hide-footer
-          hide-header
-          title="Select Customer"
-          centered
-        >
-          <div class="modal-container">
-            <h6>Select Customer</h6>
-            <hr />
-            <!-- search input -->
-            <b-form-group id="inputSearch" label="Search:" label-for="input-search">
-              <b-form-input
-                id="input-search"
-                v-model="customerModal.inputSearch"
-                placeholder="Search . . ."
-                class="font-12"
-                @keyup.enter="onSearchCustomer"
-              ></b-form-input>
-            </b-form-group>
-
-            <!-- customer modal table -->
-            <b-table
-              class="standardTable"
-              hover
-              :items="customerModal.customerTblList"
-              :fields="customerModal.customerTblFields"
-              :per-page="customerModal.perPage"
-              :current-page="customerModal.currentPage"
-              select-mode="single"
-              ref="selectableTable"
-              selectable
-              selected-variant="info"
-              @row-selected="setSelectedCustomer"
-            >
-              <template #cell(date_created)="data">
-                {{ new Date(data.value).toJSON().slice(0, 10) }}
-              </template>
-            </b-table>
-
-            <!-- tbl pages -->
-            <b-pagination
-              v-model="customerModal.currentPage"
-              :total-rows="totalRowsCustomerModal"
-              :per-page="customerModal.perPage"
-              aria-controls="my-table"
-              class="paginationSmall"
-            ></b-pagination>
-
-            <hr />
-
-            <!-- customer modal action btn -->
-            <div class="div-content-left">
-              <b-button
-                variant="success"
-                class="font-12 h-3 ml-2"
-                @click="selectCustomer"
-              >
-                <font-awesome-icon icon="fa-solid fa-check" /> Select
-              </b-button>
-
-              <b-button
-                variant="danger"
-                class="font-12 h-3 ml-2"
-                @click="$bvModal.hide('customerModal')"
-              >
-                <font-awesome-icon icon="fa-solid fa-xmark" /> Cancel
-              </b-button>
-            </div>
-          </div>
-        </b-modal>
-      </b-form>
-      <br />
-
-      <!-- Insert item button -->
-      <b-button
-        v-b-modal.modal-lg="'insertItemModal'"
-        variant="info"
-        class="font-12 t-btn-secondary-margin-bottom"
-        @click="onClickInsertItem"
-        :disabled="isProcessed"
-      >
-        <font-awesome-icon icon="fa-solid fa-arrow-down" />
-        Insert Item
-      </b-button>
-
-      <!-- Remove item button -->
-      <b-button
-        variant="danger"
-        class="font-12 t-btn-secondary-margin-bottom"
-        @click="removeItem"
-        :disabled="isProcessed"
-      >
-        <font-awesome-icon icon="fa-solid fa-close" />
-        Remove Item
-      </b-button>
-
-      <!--transaction table -->
-      <b-table
-        class="standardTable"
-        hover
-        :items="serviceLineList"
-        :fields="serviceLineTblField"
-        :per-page="perPage"
-        :current-page="currentPage"
-        select-mode="single"
-        ref="selectableTable"
-        selectable
-        selected-variant="info"
-        @row-selected="setSelectedLine"
-      >
-        <template #cell(qty)="data">
-          <b-form-input
-            class="font-9 w-1"
-            type="number"
-            v-model="serviceLineList[data.index].qty"
-            :value="data.value"
-            @keyup="onKeypressInputQty"
-            :disabled="isProcessed"
-          ></b-form-input>
-        </template>
-
-        <template #cell(amount)="data">
-          {{ serviceLineList[data.index].qty * serviceLineList[data.index].cost }}
-        </template>
-      </b-table>
-
-      <hr />
-
-      <!-- Total amount section -->
-
-      <div class="d-flex flex-row-reverse">
-        <div class="p-2">
-          <b-input-group class="font-13" size="sm" prepend="Total:">
-            <b-form-input disabled v-model="totalAmount" type="text"></b-form-input>
-          </b-input-group>
-        </div>
-
-        <div class="p-2">
-          <b-pagination
-            v-model="currentPage"
-            :total-rows="rows"
-            :per-page="perPage"
-            aria-controls="my-table"
-            v-if="rows > 0"
-            class="pagination"
-          ></b-pagination>
-        </div>
-      </div>
-
-      <hr />
-
-      <!-- Proecss and Print button -->
-      <div class="div-content-left">
-        <b-button
-          @click="onProcess"
-          variant="primary"
-          class="font-12 ml-2"
-          :disabled="isProcessed"
-        >
-          <font-awesome-icon icon="fa-solid fa-cogs" /> Process Transaction
-        </b-button>
-
-        <b-button
-          @click="onPrint"
-          variant="info"
-          class="font-12 ml-2"
-          :disabled="!isProcessed"
-        >
-          <font-awesome-icon icon="fa-solid fa-file" />
-          Print Receipt
-        </b-button>
-      </div>
-
-      <!-- Insert Item Modal -->
-      <b-modal
-        id="insertItemModal"
-        size="xl"
-        hide-footer
-        hide-header
-        title="Insert Customer"
-      >
-        <div class="modal-container">
-          <h6>Insert Item</h6>
+      <transition name="slide-fade">
+        <div v-show="showDelay">
+          <div><h6>Service</h6></div>
           <hr />
+          <b-form class="form-60">
+            <b-alert
+              :show="alert.showAlert"
+              :variant="alert.variant"
+              @dismissed="alert.showAlert = null"
+            >
+              {{ alert.message }}
+            </b-alert>
 
-          <!-- search input -->
-          <b-form-group
-            id="inputSearchInsertItemModal"
-            label="Search:"
-            label-for="input-search"
+            <b-button
+              v-if="isProcessed"
+              variant="primary"
+              class="font-12 mb-3"
+              @click="onNewTrans"
+            >
+              <font-awesome-icon icon="fa-solid fa-plus" />
+              New Trasaction
+            </b-button>
+
+            <div class="grid-container-3">
+              <div class="grid-item">
+                <!-- transaction number form group-->
+                <b-form-group
+                  id="serviceNum"
+                  label="Reference Number:"
+                  label-for="serviceNum"
+                >
+                  <b-form-input
+                    id="serviceNum"
+                    v-model="form.serviceNumber"
+                    placeholder="None"
+                    required
+                    class="globalInputSize docnoInput"
+                    disabled
+                  ></b-form-input>
+                </b-form-group>
+              </div>
+
+              <div class="grid-item">
+                <!-- customer form grp-->
+                <b-form-group
+                  id="customerName"
+                  label="Select Customer:"
+                  label-for="input-customerName"
+                >
+                  <b-input-group id="b-input-group-customerName">
+                    <b-form-input
+                      id="input-customerName"
+                      v-model="form.customer.customerName"
+                      required
+                      class="globalInputSize"
+                      placeholder="None"
+                      disabled
+                    ></b-form-input>
+                    <b-input-group-append>
+                      <b-button
+                        id="b-modal-customer"
+                        v-b-modal.modal-lg="'customerModal'"
+                        variant="secondary"
+                        class="font-12"
+                        @click="openCustomerModal"
+                        :disabled="isProcessed"
+                        >Select</b-button
+                      >
+                    </b-input-group-append>
+                  </b-input-group>
+                </b-form-group>
+              </div>
+
+              <div class="grid-item">
+                <!-- car serial number -->
+                <b-form-group id="serialNum" label="Serial Number:" label-for="serialNum">
+                  <b-form-input
+                    id="serialNum"
+                    v-model="form.serialNum"
+                    placeholder="Enter serial number"
+                    required
+                    class="globalInputSize"
+                    :disabled="isProcessed"
+                  ></b-form-input>
+                </b-form-group>
+              </div>
+
+              <div class="grid-item">
+                <!-- car serial number -->
+                <b-form-group id="textarea" label="Comment:" label-for="textarea">
+                  <b-form-textarea
+                    id="textarea"
+                    v-model="form.comment"
+                    placeholder="Enter something..."
+                    rows="3"
+                    max-rows="6"
+                    class="standardFontSize"
+                    :disabled="isProcessed"
+                  ></b-form-textarea>
+                </b-form-group>
+              </div>
+            </div>
+
+            <!-- Customer Modals -->
+            <b-modal
+              id="customerModal"
+              size="lg"
+              hide-footer
+              hide-header
+              title="Select Customer"
+              centered
+            >
+              <div class="modal-container">
+                <h6>Select Customer</h6>
+                <hr />
+                <!-- search input -->
+                <b-form-group id="inputSearch" label="Search:" label-for="input-search">
+                  <b-form-input
+                    id="input-search"
+                    v-model="customerModal.inputSearch"
+                    placeholder="Search . . ."
+                    class="font-12"
+                    @keyup.enter="onSearchCustomer"
+                  ></b-form-input>
+                </b-form-group>
+
+                <!-- customer modal table -->
+                <b-table
+                  class="standardTable"
+                  hover
+                  :items="customerModal.customerTblList"
+                  :fields="customerModal.customerTblFields"
+                  :per-page="customerModal.perPage"
+                  :current-page="customerModal.currentPage"
+                  select-mode="single"
+                  ref="selectableTable"
+                  selectable
+                  selected-variant="info"
+                  @row-selected="setSelectedCustomer"
+                >
+                  <template #cell(date_created)="data">
+                    {{ new Date(data.value).toJSON().slice(0, 10) }}
+                  </template>
+                </b-table>
+
+                <!-- tbl pages -->
+                <b-pagination
+                  v-model="customerModal.currentPage"
+                  :total-rows="totalRowsCustomerModal"
+                  :per-page="customerModal.perPage"
+                  aria-controls="my-table"
+                  class="paginationSmall"
+                ></b-pagination>
+
+                <hr />
+
+                <!-- customer modal action btn -->
+                <div class="div-content-left">
+                  <b-button
+                    variant="success"
+                    class="font-12 h-3 ml-2"
+                    @click="selectCustomer"
+                  >
+                    <font-awesome-icon icon="fa-solid fa-check" /> Select
+                  </b-button>
+
+                  <b-button
+                    variant="danger"
+                    class="font-12 h-3 ml-2"
+                    @click="$bvModal.hide('customerModal')"
+                  >
+                    <font-awesome-icon icon="fa-solid fa-xmark" /> Cancel
+                  </b-button>
+                </div>
+              </div>
+            </b-modal>
+          </b-form>
+          <br />
+
+          <!-- Insert item button -->
+          <b-button
+            v-b-modal.modal-lg="'insertItemModal'"
+            variant="info"
+            class="font-12 t-btn-secondary-margin-bottom"
+            @click="onClickInsertItem"
+            :disabled="isProcessed"
           >
-            <b-form-input
-              id="input-search"
-              v-model="insertItemModal.inputSearch"
-              placeholder="Search . . ."
-              class="font-12"
-              @keyup.enter="onSearchServiceItems"
-            ></b-form-input>
-          </b-form-group>
+            <font-awesome-icon icon="fa-solid fa-arrow-down" />
+            Insert Item
+          </b-button>
 
-          <!-- item modal table -->
+          <!-- Remove item button -->
+          <b-button
+            variant="danger"
+            class="font-12 t-btn-secondary-margin-bottom"
+            @click="removeItem"
+            :disabled="isProcessed"
+          >
+            <font-awesome-icon icon="fa-solid fa-close" />
+            Remove Item
+          </b-button>
+
+          <!--transaction table -->
           <b-table
             class="standardTable"
             hover
-            :items="insertItemModal.itemList"
-            :fields="insertItemModal.itemTblFields"
-            :per-page="insertItemModal.perPage"
-            :current-page="insertItemModal.currentPage"
+            :items="serviceLineList"
+            :fields="serviceLineTblField"
+            :per-page="perPage"
+            :current-page="currentPage"
             select-mode="single"
             ref="selectableTable"
             selectable
             selected-variant="info"
-            @row-selected="setSelectedItem"
+            @row-selected="setSelectedLine"
           >
-          </b-table>
+            <template #cell(qty)="data">
+              <b-form-input
+                class="font-9 w-1"
+                type="number"
+                v-model="serviceLineList[data.index].qty"
+                :value="data.value"
+                @keyup="onKeypressInputQty"
+                :disabled="isProcessed"
+              ></b-form-input>
+            </template>
 
-          <!-- tbl pages -->
-          <b-pagination
-            v-model="insertItemModal.currentPage"
-            :total-rows="totalItemRows"
-            :per-page="insertItemModal.perPage"
-            aria-controls="my-table"
-            class="paginationSmall"
-          ></b-pagination>
+            <template #cell(amount)="data">
+              {{ serviceLineList[data.index].qty * serviceLineList[data.index].cost }}
+            </template>
+          </b-table>
 
           <hr />
 
-          <!-- item modal action btn -->
+          <!-- Total amount section -->
+
+          <div class="d-flex flex-row-reverse">
+            <div class="p-2">
+              <b-input-group class="font-13" size="sm" prepend="Total:">
+                <b-form-input disabled v-model="totalAmount" type="text"></b-form-input>
+              </b-input-group>
+            </div>
+
+            <div class="p-2">
+              <b-pagination
+                v-model="currentPage"
+                :total-rows="rows"
+                :per-page="perPage"
+                aria-controls="my-table"
+                v-if="rows > 0"
+                class="pagination"
+              ></b-pagination>
+            </div>
+          </div>
+
+          <hr />
+
+          <!-- Proecss and Print button -->
           <div class="div-content-left">
             <b-button
-              variant="success"
-              class="font-12 h-3 ml-2"
-              @click="onClickInsertItemModal"
+              @click="onProcess"
+              variant="primary"
+              class="font-12 ml-2"
+              :disabled="isProcessed"
             >
-              <font-awesome-icon icon="fa-solid fa-check" /> Insert
+              <font-awesome-icon icon="fa-solid fa-cogs" /> Process Transaction
             </b-button>
 
             <b-button
-              variant="danger"
-              class="font-12 h-3 ml-2"
-              @click="$bvModal.hide('insertItemModal')"
+              @click="onPrint"
+              variant="info"
+              class="font-12 ml-2"
+              :disabled="!isProcessed"
             >
-              <font-awesome-icon icon="fa-solid fa-xmark" /> Cancel
+              <font-awesome-icon icon="fa-solid fa-file" />
+              Print Receipt
             </b-button>
           </div>
+
+          <!-- Insert Item Modal -->
+          <b-modal
+            id="insertItemModal"
+            size="xl"
+            hide-footer
+            hide-header
+            title="Insert Customer"
+          >
+            <div class="modal-container">
+              <h6>Insert Item</h6>
+              <hr />
+
+              <!-- search input -->
+              <b-form-group
+                id="inputSearchInsertItemModal"
+                label="Search:"
+                label-for="input-search"
+              >
+                <b-form-input
+                  id="input-search"
+                  v-model="insertItemModal.inputSearch"
+                  placeholder="Search . . ."
+                  class="font-12"
+                  @keyup.enter="onSearchServiceItems"
+                ></b-form-input>
+              </b-form-group>
+
+              <!-- item modal table -->
+              <b-table
+                class="standardTable"
+                hover
+                :items="insertItemModal.itemList"
+                :fields="insertItemModal.itemTblFields"
+                :per-page="insertItemModal.perPage"
+                :current-page="insertItemModal.currentPage"
+                select-mode="single"
+                ref="selectableTable"
+                selectable
+                selected-variant="info"
+                @row-selected="setSelectedItem"
+              >
+              </b-table>
+
+              <!-- tbl pages -->
+              <b-pagination
+                v-model="insertItemModal.currentPage"
+                :total-rows="totalItemRows"
+                :per-page="insertItemModal.perPage"
+                aria-controls="my-table"
+                class="paginationSmall"
+              ></b-pagination>
+
+              <hr />
+
+              <!-- item modal action btn -->
+              <div class="div-content-left">
+                <b-button
+                  variant="success"
+                  class="font-12 h-3 ml-2"
+                  @click="onClickInsertItemModal"
+                >
+                  <font-awesome-icon icon="fa-solid fa-check" /> Insert
+                </b-button>
+
+                <b-button
+                  variant="danger"
+                  class="font-12 h-3 ml-2"
+                  @click="$bvModal.hide('insertItemModal')"
+                >
+                  <font-awesome-icon icon="fa-solid fa-xmark" /> Cancel
+                </b-button>
+              </div>
+            </div>
+          </b-modal>
         </div>
-      </b-modal>
+      </transition>
     </div>
 
     <div class="print">
@@ -372,6 +377,7 @@ export default {
   },
   data() {
     return {
+      showDelay: false,
       isBusy: false,
       isProcessed: false,
       show: true,
@@ -678,6 +684,10 @@ export default {
     }
     this.loadServiceItems();
     this.loadCustomer();
+
+    setTimeout(() => {
+      this.showDelay = true;
+    }, 1);
   },
 
   computed: {
@@ -718,16 +728,6 @@ export default {
         services.push(tempObj);
       });
       return services;
-    },
-
-    serviecReqBody() {
-      return {
-        customer_id: this.form.customer.customerId,
-        user_id: localStorage.userId,
-        serial_number: this.form.serialNum,
-        comment: this.form.comment,
-        services: this.services,
-      };
     },
   },
 };

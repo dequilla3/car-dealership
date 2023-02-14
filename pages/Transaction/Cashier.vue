@@ -4,288 +4,346 @@
     <div class="dontPrint">
       <Navbar />
       <SideBar />
-      <div><h6>Cashier</h6></div>
-      <hr />
-      <b-form class="form-60">
-        <b-alert
-          :show="alert.showAlert"
-          :variant="alert.variant"
-          @dismissed="alert.showAlert = null"
-        >
-          {{ alert.message }}
-        </b-alert>
-        <b-button variant="primary" class="font-12 mb-3" v-if="isPr" @click="onReset">
-          <font-awesome-icon icon="fa-solid fa-plus" />
-          New Trasaction
-        </b-button>
-
-        <div class="grid-container-3">
-          <div class="grid-item">
-            <!-- transaction number form group-->
-            <b-form-group id="sI" label="Sales Invoice Number:" label-for="sI">
-              <b-form-input
-                id="sI"
-                v-model="form.salesInvoiceNumber"
-                placeholder="None"
-                required
-                class="globalInputSize docnoInput"
-                disabled
-              ></b-form-input>
-            </b-form-group>
-          </div>
-
-          <div class="grid-item">
-            <!-- quote -->
-            <b-form-group id="quote" label="Select Quotation:" label-for="input-quote">
-              <b-input-group id="b-input-group-quote">
-                <b-form-input
-                  id="input-quote"
-                  v-model="form.quote.quoteNum"
-                  required
-                  class="globalInputSize"
-                  placeholder="None"
-                  disabled
-                ></b-form-input>
-                <b-input-group-append>
-                  <b-button
-                    id="b-modal-quote"
-                    variant="secondary"
-                    class="font-12"
-                    v-b-modal.modal-lg="'quoteModal'"
-                    @click="openQuoteModal"
-                    :disabled="isDisableQuote || isPr"
-                    >Select</b-button
-                  >
-                </b-input-group-append>
-              </b-input-group>
-            </b-form-group>
-          </div>
-
-          <div class="grid-item">
-            <!-- service -->
-            <b-form-group id="service" label="Select Service:" label-for="input-service">
-              <b-input-group id="b-input-group-quote">
-                <b-form-input
-                  id="input-service"
-                  v-model="form.service.serviceNum"
-                  required
-                  class="globalInputSize"
-                  placeholder="None"
-                  disabled
-                ></b-form-input>
-                <b-input-group-append>
-                  <b-button
-                    id="b-modal-service"
-                    variant="secondary"
-                    class="font-12"
-                    v-b-modal.modal-lg="'serviceModal'"
-                    @click="openServiceModal"
-                    :disabled="isDisableService || isPr"
-                    >Select</b-button
-                  >
-                </b-input-group-append>
-              </b-input-group>
-            </b-form-group>
-          </div>
-        </div>
-      </b-form>
-
-      <!-- table service -->
-      <b-table
-        class="standardTable"
-        hover
-        :items="serviceProps.serviceLineList"
-        :fields="serviceProps.serviceLineTblField"
-        select-mode="single"
-        ref="selectableTable"
-        v-if="showServiceTable"
-      >
-      </b-table>
-
-      <!-- table goods -->
-      <b-table
-        class="standardTable"
-        hover
-        :items="quotationProps.quotationLineList"
-        :fields="quotationProps.quotationLineTblFields"
-        select-mode="single"
-        ref="selectableTable"
-        v-if="showGoodsTable"
-      >
-      </b-table>
-
-      <div v-if="showServiceTable || showGoodsTable">
-        <br />
-        <hr />
-
-        <!-- total section -->
-        <div class="d-flex flex-row-reverse">
-          <div class="p-2">
-            <b-input-group class="input--total-size" size="sm" prepend="Total:">
-              <b-form-input disabled v-model="totalAmount" type="text"></b-form-input>
-            </b-input-group>
-          </div>
-        </div>
-
-        <hr />
-      </div>
-
-      <!-- Proecss and Print button -->
-      <div class="div-content-left" v-if="showServiceTable || showGoodsTable">
-        <b-button
-          variant="primary"
-          class="font-12"
-          @click="onClickProcess"
-          :disabled="isPr"
-        >
-          <b-spinner v-if="false" small></b-spinner>
-          <font-awesome-icon v-if="true" icon="fa-solid fa-cogs" /> Process Transaction
-        </b-button>
-
-        <b-button variant="info" class="font-12 ml-2" @click="onPrint" :disabled="!isPr">
-          <font-awesome-icon icon="fa-solid fa-file" />
-          Print Receipt
-        </b-button>
-
-        <b-button variant="danger" class="font-12 ml-2" @click="onReset" v-if="!isPr">
-          <font-awesome-icon icon="fa-solid fa-redo" />
-          Reset
-        </b-button>
-      </div>
-
-      <!-- Service Modals -->
-      <b-modal id="serviceModal" size="lg" hide-footer hide-header title="Select Service">
-        <div class="font-13">
-          <h6>Select Service</h6>
+      <transition name="slide-fade">
+        <div v-show="showDelay">
+          <div><h6>Cashier</h6></div>
           <hr />
-          <!-- search input -->
-          <b-form-group id="inputSearch" label="Search:" label-for="input-search">
-            <b-form-input
-              id="input-search"
-              v-model="serviceModalProps.inputSearch"
-              placeholder="Search . . ."
-              class="standardFontSize"
-              @keyup.enter="loadServices"
-            ></b-form-input>
+
+          <!-- Radio Button Select Transaction Type -->
+          <b-form-group
+            label="Select Transaction to Bill"
+            class="font-12 mb-4 fw-bold"
+            v-slot="{ ariaDescribedby }"
+          >
+            <b-form-radio-group
+              id="radio-group-1"
+              v-model="selectedTransaction"
+              :options="options"
+              :aria-describedby="ariaDescribedby"
+              name="radio-options"
+              class="font-12 fw-normal"
+              @change="onReset"
+            ></b-form-radio-group>
           </b-form-group>
 
-          <!-- service modal table -->
-          <b-table
-            class="standardTable"
-            hover
-            :items="serviceModalProps.serviceTblList"
-            :fields="serviceModalProps.serviceTblFields"
-            :per-page="serviceModalProps.perPage"
-            :current-page="serviceModalProps.currentPage"
-            select-mode="single"
-            ref="selectableTable"
-            selectable
-            selected-variant="info"
-            @row-selected="setSelectedService"
-          >
-            <template #cell(dateTrans)="data">
-              {{ new Date(data.value).toJSON().slice(0, 10) }}
-            </template>
-          </b-table>
-
-          <!-- tbl pages -->
-          <b-pagination
-            v-model="serviceModalProps.currentPage"
-            :total-rows="totalRowsServiceModal"
-            :per-page="serviceModalProps.perPage"
-            aria-controls="my-table"
-            class="paginationSmall"
-          ></b-pagination>
-
-          <hr />
-
-          <!-- service modal action btn -->
-          <div class="div-content-left">
-            <b-button
-              variant="success"
-              class="form-btn modal-action-btn"
-              @click="selectService"
+          <b-form class="form-60">
+            <b-alert
+              :show="alert.showAlert"
+              :variant="alert.variant"
+              @dismissed="alert.showAlert = null"
             >
-              <font-awesome-icon icon="fa-solid fa-check" /> Select
+              {{ alert.message }}
+            </b-alert>
+            <b-button variant="primary" class="font-12 mb-3" v-if="isPr" @click="onReset">
+              <font-awesome-icon icon="fa-solid fa-plus" />
+              New Trasaction
+            </b-button>
+
+            <div class="grid-container-3">
+              <div class="grid-item">
+                <!-- transaction number form group-->
+                <b-form-group id="sI" label="Sales Invoice Number:" label-for="sI">
+                  <b-form-input
+                    id="sI"
+                    v-model="form.salesInvoiceNumber"
+                    placeholder="None"
+                    required
+                    class="globalInputSize docnoInput"
+                    disabled
+                  ></b-form-input>
+                </b-form-group>
+              </div>
+
+              <transition name="fade" mode="out-in">
+                <div class="grid-item" v-if="selectedTransaction === 'QTN'">
+                  <!-- quote -->
+                  <b-form-group
+                    id="quote"
+                    label="Select Quotation:"
+                    label-for="input-quote"
+                  >
+                    <b-input-group id="b-input-group-quote">
+                      <b-form-input
+                        id="input-quote"
+                        v-model="form.quote.quoteNum"
+                        required
+                        class="globalInputSize"
+                        placeholder="None"
+                        disabled
+                      ></b-form-input>
+                      <b-input-group-append>
+                        <b-button
+                          id="b-modal-quote"
+                          variant="secondary"
+                          class="font-12"
+                          v-b-modal.modal-lg="'quoteModal'"
+                          @click="openQuoteModal"
+                          :disabled="isDisableQuote || isPr"
+                          >Select</b-button
+                        >
+                      </b-input-group-append>
+                    </b-input-group>
+                  </b-form-group>
+                </div>
+              </transition>
+
+              <transition name="fade" mode="out-in">
+                <div
+                  class="grid-item"
+                  v-if="selectedTransaction === 'SVC' || showServiceTable"
+                >
+                  <!-- service -->
+                  <b-form-group
+                    id="service"
+                    label="Select Service:"
+                    label-for="input-service"
+                  >
+                    <b-input-group id="b-input-group-quote">
+                      <b-form-input
+                        id="input-service"
+                        v-model="form.service.serviceNum"
+                        required
+                        class="globalInputSize"
+                        placeholder="None"
+                        disabled
+                      ></b-form-input>
+                      <b-input-group-append>
+                        <b-button
+                          id="b-modal-service"
+                          variant="secondary"
+                          class="font-12"
+                          v-b-modal.modal-lg="'serviceModal'"
+                          @click="openServiceModal"
+                          :disabled="isDisableService || isPr"
+                          >Select</b-button
+                        >
+                      </b-input-group-append>
+                    </b-input-group>
+                  </b-form-group>
+                </div>
+              </transition>
+            </div>
+          </b-form>
+          <!-- table goods -->
+          <transition name="slide-fade">
+            <b-table
+              class="standardTable"
+              hover
+              :items="quotationProps.quotationLineList"
+              :fields="quotationProps.quotationLineTblFields"
+              select-mode="single"
+              ref="selectableTable"
+              v-if="showGoodsTable"
+            >
+            </b-table>
+          </transition>
+
+          <!-- table service -->
+          <transition name="slide-fade">
+            <b-table
+              class="standardTable"
+              hover
+              :items="serviceProps.serviceLineList"
+              :fields="serviceProps.serviceLineTblField"
+              select-mode="single"
+              ref="selectableTable"
+              v-if="showServiceTable"
+            >
+            </b-table>
+          </transition>
+
+          <div v-if="showServiceTable || showGoodsTable">
+            <br />
+            <hr />
+
+            <!-- total section -->
+            <div class="d-flex flex-row-reverse">
+              <div class="p-2">
+                <b-input-group class="input--total-size" size="sm" prepend="Total:">
+                  <b-form-input disabled v-model="totalAmount" type="text"></b-form-input>
+                </b-input-group>
+              </div>
+            </div>
+
+            <hr />
+          </div>
+
+          <!-- Proecss and Print button -->
+          <div class="div-content-left" v-if="showServiceTable || showGoodsTable">
+            <b-button
+              variant="primary"
+              class="font-12"
+              @click="onClickProcess"
+              :disabled="isPr"
+            >
+              <b-spinner v-if="false" small></b-spinner>
+              <font-awesome-icon v-if="true" icon="fa-solid fa-cogs" /> Process
+              Transaction
             </b-button>
 
             <b-button
-              variant="danger"
-              class="form-btn modal-action-btn"
-              @click="$bvModal.hide('serviceModal')"
+              variant="info"
+              class="font-12 ml-2"
+              @click="onPrint"
+              :disabled="!isPr"
             >
-              <font-awesome-icon icon="fa-solid fa-xmark" /> Cancel
+              <font-awesome-icon icon="fa-solid fa-file" />
+              Print Receipt
+            </b-button>
+
+            <b-button variant="danger" class="font-12 ml-2" @click="onReset" v-if="!isPr">
+              <font-awesome-icon icon="fa-solid fa-redo" />
+              Reset
             </b-button>
           </div>
-        </div>
-      </b-modal>
 
-      <!-- Quotation Modals -->
-      <b-modal id="quoteModal" size="lg" hide-footer hide-header title="Select Quotation">
-        <div class="font-13">
-          <h6>Select Service</h6>
-          <hr />
-          <!-- search input -->
-          <b-form-group id="inputSearch" label="Search:" label-for="input-search">
-            <b-form-input
-              id="input-search"
-              v-model="quotationModalProps.inputSearch"
-              placeholder="Search . . ."
-              class="standardFontSize"
-              @keyup.enter="loadQuotes()"
-            ></b-form-input>
-          </b-form-group>
-
-          <!-- quotation modal table -->
-          <b-table
-            class="standardTable"
-            hover
-            :items="quotationModalProps.quotationTblList"
-            :fields="quotationModalProps.quotationTblFields"
-            :per-page="quotationModalProps.perPage"
-            :current-page="quotationModalProps.currentPage"
-            select-mode="single"
-            ref="selectableTable"
-            selectable
-            selected-variant="info"
-            @row-selected="setSelectedQuote"
+          <!-- Service Modals -->
+          <b-modal
+            id="serviceModal"
+            size="lg"
+            hide-footer
+            hide-header
+            title="Select Service"
           >
-            <template #cell(dateTrans)="data">
-              {{ new Date(data.value).toJSON().slice(0, 10) }}
-            </template>
-          </b-table>
+            <div class="font-13">
+              <h6>Select Service</h6>
+              <hr />
+              <!-- search input -->
+              <b-form-group id="inputSearch" label="Search:" label-for="input-search">
+                <b-form-input
+                  id="input-search"
+                  v-model="serviceModalProps.inputSearch"
+                  placeholder="Search . . ."
+                  class="standardFontSize"
+                  @keyup.enter="loadServices"
+                ></b-form-input>
+              </b-form-group>
 
-          <!-- tbl pages -->
-          <b-pagination
-            v-model="quotationModalProps.currentPage"
-            :total-rows="totalRowsQuoteModal"
-            :per-page="quotationModalProps.perPage"
-            aria-controls="my-table"
-            class="paginationSmall"
-          ></b-pagination>
+              <!-- service modal table -->
+              <b-table
+                class="standardTable"
+                hover
+                :items="serviceModalProps.serviceTblList"
+                :fields="serviceModalProps.serviceTblFields"
+                :per-page="serviceModalProps.perPage"
+                :current-page="serviceModalProps.currentPage"
+                select-mode="single"
+                ref="selectableTable"
+                selectable
+                selected-variant="info"
+                @row-selected="setSelectedService"
+              >
+                <template #cell(dateTrans)="data">
+                  {{ new Date(data.value).toJSON().slice(0, 10) }}
+                </template>
+              </b-table>
 
-          <hr />
+              <!-- tbl pages -->
+              <b-pagination
+                v-model="serviceModalProps.currentPage"
+                :total-rows="totalRowsServiceModal"
+                :per-page="serviceModalProps.perPage"
+                aria-controls="my-table"
+                class="paginationSmall"
+              ></b-pagination>
 
-          <!-- quote modal action btn -->
-          <div class="div-content-left">
-            <b-button
-              variant="success"
-              class="form-btn modal-action-btn"
-              @click="selectQuote"
-            >
-              <font-awesome-icon icon="fa-solid fa-check" /> Select
-            </b-button>
+              <hr />
 
-            <b-button
-              variant="danger"
-              class="form-btn modal-action-btn"
-              @click="$bvModal.hide('quoteModal')"
-            >
-              <font-awesome-icon icon="fa-solid fa-xmark" /> Cancel
-            </b-button>
-          </div>
+              <!-- service modal action btn -->
+              <div class="div-content-left">
+                <b-button
+                  variant="success"
+                  class="form-btn modal-action-btn"
+                  @click="selectService"
+                >
+                  <font-awesome-icon icon="fa-solid fa-check" /> Select
+                </b-button>
+
+                <b-button
+                  variant="danger"
+                  class="form-btn modal-action-btn"
+                  @click="$bvModal.hide('serviceModal')"
+                >
+                  <font-awesome-icon icon="fa-solid fa-xmark" /> Cancel
+                </b-button>
+              </div>
+            </div>
+          </b-modal>
+
+          <!-- Quotation Modals -->
+          <b-modal
+            id="quoteModal"
+            size="lg"
+            hide-footer
+            hide-header
+            title="Select Quotation"
+          >
+            <div class="font-13">
+              <h6>Select Service</h6>
+              <hr />
+              <!-- search input -->
+              <b-form-group id="inputSearch" label="Search:" label-for="input-search">
+                <b-form-input
+                  id="input-search"
+                  v-model="quotationModalProps.inputSearch"
+                  placeholder="Search . . ."
+                  class="standardFontSize"
+                  @keyup.enter="loadQuotes()"
+                ></b-form-input>
+              </b-form-group>
+
+              <!-- quotation modal table -->
+              <b-table
+                class="standardTable"
+                hover
+                :items="quotationModalProps.quotationTblList"
+                :fields="quotationModalProps.quotationTblFields"
+                :per-page="quotationModalProps.perPage"
+                :current-page="quotationModalProps.currentPage"
+                select-mode="single"
+                ref="selectableTable"
+                selectable
+                selected-variant="info"
+                @row-selected="setSelectedQuote"
+              >
+                <template #cell(dateTrans)="data">
+                  {{ new Date(data.value).toJSON().slice(0, 10) }}
+                </template>
+              </b-table>
+
+              <!-- tbl pages -->
+              <b-pagination
+                v-model="quotationModalProps.currentPage"
+                :total-rows="totalRowsQuoteModal"
+                :per-page="quotationModalProps.perPage"
+                aria-controls="my-table"
+                class="paginationSmall"
+              ></b-pagination>
+
+              <hr />
+
+              <!-- quote modal action btn -->
+              <div class="div-content-left">
+                <b-button
+                  variant="success"
+                  class="form-btn modal-action-btn"
+                  @click="selectQuote"
+                >
+                  <font-awesome-icon icon="fa-solid fa-check" /> Select
+                </b-button>
+
+                <b-button
+                  variant="danger"
+                  class="form-btn modal-action-btn"
+                  @click="$bvModal.hide('quoteModal')"
+                >
+                  <font-awesome-icon icon="fa-solid fa-xmark" /> Cancel
+                </b-button>
+              </div>
+            </div>
+          </b-modal>
         </div>
-      </b-modal>
+      </transition>
     </div>
 
     <div class="print">
@@ -306,11 +364,18 @@ export default {
 
   data() {
     return {
+      showDelay: false,
+      selectedTransaction: "QTN",
       totalAmount: 0,
       isBusy: false,
       isPr: false,
       isDisableService: false,
       isDisableQuote: false,
+
+      options: [
+        { text: "Quotation", value: "QTN" },
+        { text: "Service", value: "SVC" },
+      ],
 
       form: {
         customderId: "",
@@ -385,6 +450,12 @@ export default {
         message: "",
       },
     };
+  },
+
+  mounted() {
+    setTimeout(() => {
+      this.showDelay = true;
+    }, 1);
   },
 
   methods: {

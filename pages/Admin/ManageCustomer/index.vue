@@ -2,112 +2,120 @@
   <div class="mainContainer">
     <Navbar />
     <SideBar />
-    <div><h6>Manage Customer</h6></div>
-    <hr />
-    <div>
-      <b-alert
-        :show="alert.showAlert"
-        :variant="alert.variant"
-        @dismissed="alert.showAlert = null"
-        class="font-12"
-      >
-        {{ alert.message }}
-      </b-alert>
-
-      <b-modal id="customerFormModal" hide-footer hide-header size="lg">
-        <b-form @submit="onSubmit" v-if="show" class="form-100">
+    <transition name="slide-fade">
+      <div v-show="showDelay">
+        <div><h6>Manage Customer</h6></div>
+        <hr />
+        <div>
           <b-alert
-            :show="alertModal.showAlert"
-            :variant="alertModal.variant"
-            @dismissed="alertModal.showAlert = null"
+            :show="alert.showAlert"
+            :variant="alert.variant"
+            @dismissed="alert.showAlert = null"
+            class="font-12"
           >
             {{ alert.message }}
           </b-alert>
-          <h6>Customer Details</h6>
-          <hr />
-          <b-form-group id="name" label="Name:" label-for="input-name">
-            <b-form-input
-              id="input-name"
-              v-model="form.name"
-              placeholder="Enter name"
-              required
-              class="globalInputSize"
-            ></b-form-input>
-          </b-form-group>
-          <b-form-group id="contact" label="Cotanct Number:" label-for="input-contact">
-            <b-form-input
-              id="input-contact"
-              v-model="form.contact"
-              placeholder="Enter contact number"
-              required
-              class="globalInputSize"
-            ></b-form-input>
-          </b-form-group>
-          <b-form-group id="address" label="Address:" label-for="input-address">
-            <b-form-input
-              id="input-address"
-              v-model="form.address"
-              placeholder="Enter address"
-              required
-              class="globalInputSize"
-            ></b-form-input>
-          </b-form-group>
 
-          <b-button type="submit" variant="primary" class="font-12">
-            <font-awesome-icon :icon="['fa-solid', icn]" /> {{ btnSubmitLabel }}
+          <b-modal id="customerFormModal" hide-footer hide-header size="lg">
+            <b-form @submit="onSubmit" v-if="show" class="form-100">
+              <b-alert
+                :show="alertModal.showAlert"
+                :variant="alertModal.variant"
+                @dismissed="alertModal.showAlert = null"
+              >
+                {{ alert.message }}
+              </b-alert>
+              <h6>Customer Details</h6>
+              <hr />
+              <b-form-group id="name" label="Name:" label-for="input-name">
+                <b-form-input
+                  id="input-name"
+                  v-model="form.name"
+                  placeholder="Enter name"
+                  required
+                  class="globalInputSize"
+                ></b-form-input>
+              </b-form-group>
+              <b-form-group
+                id="contact"
+                label="Cotanct Number:"
+                label-for="input-contact"
+              >
+                <b-form-input
+                  id="input-contact"
+                  v-model="form.contact"
+                  placeholder="Enter contact number"
+                  required
+                  class="globalInputSize"
+                ></b-form-input>
+              </b-form-group>
+              <b-form-group id="address" label="Address:" label-for="input-address">
+                <b-form-input
+                  id="input-address"
+                  v-model="form.address"
+                  placeholder="Enter address"
+                  required
+                  class="globalInputSize"
+                ></b-form-input>
+              </b-form-group>
+
+              <b-button type="submit" variant="primary" class="font-12">
+                <font-awesome-icon :icon="['fa-solid', icn]" /> {{ btnSubmitLabel }}
+              </b-button>
+
+              <b-button type="reset" variant="danger" class="font-12" @click="onReset">
+                <font-awesome-icon icon="fa-solid fa-close" /> Cancel
+              </b-button>
+            </b-form>
+          </b-modal>
+          <!-- end of modal -->
+
+          <b-button variant="primary" class="font-12 mb-3" @click="onAdd">
+            <font-awesome-icon icon="fa-solid fa-user-plus" /> Add Customer
           </b-button>
 
-          <b-button type="reset" variant="danger" class="font-12" @click="onReset">
-            <font-awesome-icon icon="fa-solid fa-close" /> Cancel
-          </b-button>
-        </b-form>
-      </b-modal>
-      <!-- end of modal -->
+          <!-- search input -->
+          <b-form-group id="inputSearch" label="" label-for="input-search">
+            <b-form-input
+              id="input-search"
+              v-model="inputSearch"
+              placeholder="Search . . ."
+              class="globalInputSize"
+              @keyup.enter="onSearch"
+            ></b-form-input>
+          </b-form-group>
 
-      <b-button variant="primary" class="font-12 mb-3" @click="onAdd">
-        <font-awesome-icon icon="fa-solid fa-user-plus" /> Add Customer
-      </b-button>
-
-      <!-- search input -->
-      <b-form-group id="inputSearch" label="" label-for="input-search">
-        <b-form-input
-          id="input-search"
-          v-model="inputSearch"
-          placeholder="Search . . ."
-          class="globalInputSize"
-          @keyup.enter="onSearch"
-        ></b-form-input>
-      </b-form-group>
-
-      <b-table
-        class="customer_list-table"
-        hover
-        :items="customerTblList"
-        :fields="customerTblFields"
-        :per-page="perPage"
-        :current-page="currentPage"
-        select-mode="single"
-        ref="selectableTable"
-      >
-        <template #cell(date_created)="data">
-          {{ new Date(data.value).toJSON().slice(0, 10) }}
-        </template>
-
-        <template #cell(action)="data">
-          <b-button size="sm" class="font-10" variant="info" @click="onEdit(data)">
-            <font-awesome-icon icon="fa-solid fa-user-pen" /> Update</b-button
+          <b-table
+            class="customer_list-table"
+            hover
+            :items="customerTblList"
+            :fields="customerTblFields"
+            :per-page="perPage"
+            :current-page="currentPage"
+            select-mode="single"
+            ref="selectableTable"
           >
-        </template>
-      </b-table>
+            <template #cell(date_created)="data">
+              {{ new Date(data.value).toJSON().slice(0, 10) }}
+            </template>
 
-      <b-pagination
-        v-model="currentPage"
-        :total-rows="rows"
-        :per-page="perPage"
-        aria-controls="my-table"
-        class="pagination"
-      ></b-pagination>
-    </div>
+            <template #cell(action)="data">
+              <b-button size="sm" class="font-10" variant="info" @click="onEdit(data)">
+                <font-awesome-icon icon="fa-solid fa-user-pen" /> Update</b-button
+              >
+            </template>
+          </b-table>
+
+          <b-pagination
+            v-model="currentPage"
+            :total-rows="rows"
+            :per-page="perPage"
+            aria-controls="my-table"
+            class="paginationSmall"
+          ></b-pagination>
+        </div>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -116,6 +124,7 @@ let currentDate = new Date().toJSON().slice(0, 10);
 export default {
   data() {
     return {
+      showDelay: false,
       alert: {
         showAlert: 0,
         variant: "",
@@ -268,6 +277,9 @@ export default {
 
   mounted() {
     this.loadCustomer();
+    setTimeout(() => {
+      this.showDelay = true;
+    }, 1);
   },
 
   computed: {
@@ -308,10 +320,6 @@ export default {
 
 .customer_list-table {
   width: 100%;
-  font-size: 12px;
-}
-
-.pagination {
   font-size: 12px;
 }
 </style>

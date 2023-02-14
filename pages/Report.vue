@@ -3,38 +3,42 @@
     <div class="dontPrint">
       <Navbar />
       <SideBar />
-      <div><h6>Reports</h6></div>
-      <hr />
+      <transition name="slide-fade">
+        <div v-show="showDelay">
+          <div><h6>Reports</h6></div>
+          <hr />
 
-      <b-card no-body class="print-parent">
-        <b-tabs
-          class="standardFontSize"
-          card
-          active-nav-item-class="font-weight-bold text-uppercase text-default"
-        >
-          <b-tab @click="setReportName('customer')" title="Customers" active>
-            <CustomerReportTab />
-          </b-tab>
-          <b-tab @click="setReportName('car')" title="Cars">
-            <CarReportTab />
-          </b-tab>
-          <b-tab @click="setReportName('parts')" title="Spare Parts">
-            <SparePartsReportTab />
-          </b-tab>
-          <b-tab @click="setReportName('roles')" title="Roles">
-            <RoleReportTab />
-          </b-tab>
-          <b-tab @click="setReportName('serviceItem')" title="Service Items">
-            <ServiceItemReportTab />
-          </b-tab>
-          <b-tab @click="setReportName('services')" title="Services">
-            <ServiceReportTab />
-          </b-tab>
-          <b-tab @click="setReportName('quotes')" title="Quotations">
-            <QuotationReportTab />
-          </b-tab>
-        </b-tabs>
-      </b-card>
+          <b-card no-body class="print-parent">
+            <b-tabs
+              class="standardFontSize"
+              card
+              active-nav-item-class="font-weight-bold text-uppercase text-default"
+            >
+              <b-tab @click="setReportName('customer')" title="Customers" active>
+                <CustomerReportTab />
+              </b-tab>
+              <b-tab @click="setReportName('car')" title="Cars">
+                <CarReportTab />
+              </b-tab>
+              <b-tab @click="setReportName('parts')" title="Spare Parts">
+                <SparePartsReportTab />
+              </b-tab>
+              <b-tab @click="setReportName('roles')" title="Roles">
+                <RoleReportTab />
+              </b-tab>
+              <b-tab @click="setReportName('serviceItem')" title="Service Items">
+                <ServiceItemReportTab />
+              </b-tab>
+              <b-tab @click="setReportName('services')" title="Services">
+                <ServiceReportTab />
+              </b-tab>
+              <b-tab @click="setReportName('quotes')" title="Quotations">
+                <QuotationReportTab />
+              </b-tab>
+            </b-tabs>
+          </b-card>
+        </div>
+      </transition>
     </div>
     <div class="print">
       <div v-if="reportName === 'customer'">
@@ -114,6 +118,7 @@ export default {
   data() {
     return {
       reportName: "customer",
+      showDelay: false,
     };
   },
 
@@ -169,6 +174,10 @@ export default {
       this.loadServiceItems();
       this.loadServices();
       this.loadQuotes();
+
+      setTimeout(() => {
+        this.showDelay = true;
+      }, 1);
     } catch (err) {
       console.log(err);
     }

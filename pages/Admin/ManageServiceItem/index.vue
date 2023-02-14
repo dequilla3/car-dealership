@@ -2,126 +2,130 @@
   <div class="mainContainer">
     <Navbar />
     <SideBar />
-    <div><h6>Manage Service Items</h6></div>
-    <hr />
-    <b-alert
-      :show="alert.showAlert"
-      :variant="alert.variant"
-      @dismissed="alert.showAlert = null"
-      class="font-12"
-    >
-      {{ alert.message }} <br />
-      {{ alert.subMsg }}
-    </b-alert>
-    <div>
-      <b-button variant="primary" class="font-12 mb-3" @click="onAdd">
-        <font-awesome-icon icon="fa-solid fa-user-plus" />
-        Add Service Item
-      </b-button>
-
-      <b-modal id="manageServiceItemModal" hide-footer hide-header size="lg">
-        <b-form @submit="onSubmit" v-if="show" class="form-100">
-          <b-alert
-            :show="alertModal.showAlert"
-            :variant="alertModal.variant"
-            @dismissed="alertModal.showAlert = null"
-          >
-            {{ alert.message }} <br />
-            {{ alert.subMsg }}
-          </b-alert>
-
-          <h6>Service Items Details</h6>
-          <hr />
-
-          <b-form-group
-            id="service_name"
-            label="Service Item:"
-            label-for="input-service_name"
-          >
-            <b-form-input
-              id="input-service_name"
-              v-model="form.service_name"
-              placeholder="Enter service item name"
-              required
-              class="globalInputSize"
-            ></b-form-input>
-          </b-form-group>
-
-          <b-form-group id="unit" label="Unit:" label-for="input-unit">
-            <b-form-input
-              id="input-unit"
-              v-model="form.unit"
-              placeholder="Enter unit"
-              required
-              class="globalInputSize"
-            ></b-form-input>
-          </b-form-group>
-
-          <b-form-group id="cost" label="Cost:" label-for="input-cost">
-            <b-form-input
-              id="input-cost"
-              type="number"
-              v-model="form.cost"
-              placeholder="Enter cost"
-              required
-              class="globalInputSize"
-            ></b-form-input>
-          </b-form-group>
-
-          <b-button type="submit" variant="primary" class="font-12">
-            <font-awesome-icon
-              :icon="['fa-solid', isUpdate ? 'fa-user-pen' : 'fa-user-plus']"
-            />
-            {{ btnSubmitLabel }}
+    <transition name="slide-fade">
+      <div v-show="showDelay">
+        <div><h6>Manage Service Items</h6></div>
+        <hr />
+        <b-alert
+          :show="alert.showAlert"
+          :variant="alert.variant"
+          @dismissed="alert.showAlert = null"
+          class="font-12"
+        >
+          {{ alert.message }} <br />
+          {{ alert.subMsg }}
+        </b-alert>
+        <div>
+          <b-button variant="primary" class="font-12 mb-3" @click="onAdd">
+            <font-awesome-icon icon="fa-solid fa-user-plus" />
+            Add Service Item
           </b-button>
 
-          <b-button type="reset" variant="danger" class="font-12" @click="onReset">
-            <font-awesome-icon icon="fa-solid fa-close" /> Cancel
-          </b-button>
-        </b-form></b-modal
-      >
+          <b-modal id="manageServiceItemModal" hide-footer hide-header size="lg">
+            <b-form @submit="onSubmit" v-if="show" class="form-100">
+              <b-alert
+                :show="alertModal.showAlert"
+                :variant="alertModal.variant"
+                @dismissed="alertModal.showAlert = null"
+              >
+                {{ alert.message }} <br />
+                {{ alert.subMsg }}
+              </b-alert>
 
-      <br />
+              <h6>Service Items Details</h6>
+              <hr />
 
-      <!-- search input -->
-      <b-form-group id="inputSearch" label="" label-for="input-search">
-        <b-form-input
-          id="input-search"
-          v-model="inputSearch"
-          placeholder="Search . . ."
-          class="globalInputSize"
-          @keyup.enter="onSearch"
-        ></b-form-input>
-      </b-form-group>
+              <b-form-group
+                id="service_name"
+                label="Service Item:"
+                label-for="input-service_name"
+              >
+                <b-form-input
+                  id="input-service_name"
+                  v-model="form.service_name"
+                  placeholder="Enter service item name"
+                  required
+                  class="globalInputSize"
+                ></b-form-input>
+              </b-form-group>
 
-      <b-table
-        class="standardTable"
-        hover
-        :items="serviceTblList"
-        :fields="serviceTblFields"
-        :per-page="perPage"
-        :current-page="currentPage"
-        select-mode="single"
-      >
-        <template #cell(date_created)="data">
-          {{ new Date(data.value).toJSON().slice(0, 10) }}
-        </template>
+              <b-form-group id="unit" label="Unit:" label-for="input-unit">
+                <b-form-input
+                  id="input-unit"
+                  v-model="form.unit"
+                  placeholder="Enter unit"
+                  required
+                  class="globalInputSize"
+                ></b-form-input>
+              </b-form-group>
 
-        <template #cell(action)="data">
-          <base-button size="sm" class="font-10" type="info" @click="onEdit(data)">
-            <font-awesome-icon icon="fa-solid fa-user-pen" /> Update</base-button
+              <b-form-group id="cost" label="Cost:" label-for="input-cost">
+                <b-form-input
+                  id="input-cost"
+                  type="number"
+                  v-model="form.cost"
+                  placeholder="Enter cost"
+                  required
+                  class="globalInputSize"
+                ></b-form-input>
+              </b-form-group>
+
+              <b-button type="submit" variant="primary" class="font-12">
+                <font-awesome-icon
+                  :icon="['fa-solid', isUpdate ? 'fa-user-pen' : 'fa-user-plus']"
+                />
+                {{ btnSubmitLabel }}
+              </b-button>
+
+              <b-button type="reset" variant="danger" class="font-12" @click="onReset">
+                <font-awesome-icon icon="fa-solid fa-close" /> Cancel
+              </b-button>
+            </b-form></b-modal
           >
-        </template>
-      </b-table>
 
-      <b-pagination
-        v-model="currentPage"
-        :total-rows="rows"
-        :per-page="perPage"
-        aria-controls="my-table"
-        class="pagination"
-      ></b-pagination>
-    </div>
+          <br />
+
+          <!-- search input -->
+          <b-form-group id="inputSearch" label="" label-for="input-search">
+            <b-form-input
+              id="input-search"
+              v-model="inputSearch"
+              placeholder="Search . . ."
+              class="globalInputSize"
+              @keyup.enter="onSearch"
+            ></b-form-input>
+          </b-form-group>
+
+          <b-table
+            class="standardTable"
+            hover
+            :items="serviceTblList"
+            :fields="serviceTblFields"
+            :per-page="perPage"
+            :current-page="currentPage"
+            select-mode="single"
+          >
+            <template #cell(date_created)="data">
+              {{ new Date(data.value).toJSON().slice(0, 10) }}
+            </template>
+
+            <template #cell(action)="data">
+              <base-button size="sm" class="font-10" type="info" @click="onEdit(data)">
+                <font-awesome-icon icon="fa-solid fa-user-pen" /> Update</base-button
+              >
+            </template>
+          </b-table>
+
+          <b-pagination
+            v-model="currentPage"
+            :total-rows="rows"
+            :per-page="perPage"
+            aria-controls="my-table"
+            class="paginationSmall"
+          ></b-pagination>
+        </div>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -130,6 +134,7 @@ let currentDate = new Date().toJSON().slice(0, 10);
 export default {
   data() {
     return {
+      showDelay: false,
       alert: {
         showAlert: 0,
         variant: "",
@@ -269,6 +274,9 @@ export default {
   },
   mounted() {
     this.loadServiceItems();
+    setTimeout(() => {
+      this.showDelay = true;
+    }, 1);
   },
   computed: {
     rows() {
