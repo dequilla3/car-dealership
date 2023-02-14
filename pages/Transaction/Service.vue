@@ -17,7 +17,7 @@
         <b-button
           v-if="isProcessed"
           variant="primary"
-          class="form-t_service-btn t-btn-primary-margin-bottom"
+          class="font-12 ml-2"
           @click="onNewTrans"
         >
           <font-awesome-icon icon="fa-solid fa-plus" />
@@ -64,7 +64,7 @@
                     id="b-modal-customer"
                     v-b-modal.modal-lg="'customerModal'"
                     variant="secondary"
-                    class="form-t_service-btn"
+                    class="font-12"
                     @click="openCustomerModal"
                     :disabled="isProcessed"
                     >Select</b-button
@@ -122,14 +122,14 @@
                 id="input-search"
                 v-model="customerModal.inputSearch"
                 placeholder="Search . . ."
-                class="modal-input"
+                class="font-12"
                 @keyup.enter="onSearchCustomer"
               ></b-form-input>
             </b-form-group>
 
             <!-- customer modal table -->
             <b-table
-              class="t_service-table"
+              class="standardTable"
               hover
               :items="customerModal.customerTblList"
               :fields="customerModal.customerTblFields"
@@ -152,7 +152,7 @@
               :total-rows="totalRowsCustomerModal"
               :per-page="customerModal.perPage"
               aria-controls="my-table"
-              class="pagination"
+              class="paginationSmall"
             ></b-pagination>
 
             <hr />
@@ -161,7 +161,7 @@
             <div class="div-content-left">
               <b-button
                 variant="success"
-                class="form-t_service-btn modal-action-btn"
+                class="font-12 h-3 ml-2"
                 @click="selectCustomer"
               >
                 <font-awesome-icon icon="fa-solid fa-check" /> Select
@@ -169,7 +169,7 @@
 
               <b-button
                 variant="danger"
-                class="form-t_service-btn modal-action-btn"
+                class="font-12 h-3 ml-2"
                 @click="$bvModal.hide('customerModal')"
               >
                 <font-awesome-icon icon="fa-solid fa-xmark" /> Cancel
@@ -184,7 +184,7 @@
       <b-button
         v-b-modal.modal-lg="'insertItemModal'"
         variant="info"
-        class="form-t_service-btn t-btn-secondary-margin-bottom"
+        class="font-12 t-btn-secondary-margin-bottom"
         @click="onClickInsertItem"
         :disabled="isProcessed"
       >
@@ -195,7 +195,7 @@
       <!-- Remove item button -->
       <b-button
         variant="danger"
-        class="form-t_service-btn t-btn-secondary-margin-bottom"
+        class="font-12 t-btn-secondary-margin-bottom"
         @click="removeItem"
         :disabled="isProcessed"
       >
@@ -205,7 +205,7 @@
 
       <!--transaction table -->
       <b-table
-        class="t_service-table"
+        class="standardTable"
         hover
         :items="serviceLineList"
         :fields="serviceLineTblField"
@@ -219,7 +219,7 @@
       >
         <template #cell(qty)="data">
           <b-form-input
-            class="b-table-input"
+            class="font-9 w-1"
             type="number"
             v-model="serviceLineList[data.index].qty"
             :value="data.value"
@@ -239,7 +239,7 @@
 
       <div class="d-flex flex-row-reverse">
         <div class="p-2">
-          <b-input-group class="input--total-size" size="sm" prepend="Total:">
+          <b-input-group class="font-13" size="sm" prepend="Total:">
             <b-form-input disabled v-model="totalAmount" type="text"></b-form-input>
           </b-input-group>
         </div>
@@ -263,7 +263,7 @@
         <b-button
           @click="onProcess"
           variant="primary"
-          class="form-t_service-btn btn-transaction"
+          class="font-12 ml-2"
           :disabled="isProcessed"
         >
           <font-awesome-icon icon="fa-solid fa-cogs" /> Process Transaction
@@ -272,7 +272,7 @@
         <b-button
           @click="onPrint"
           variant="info"
-          class="form-t_service-btn btn-transaction"
+          class="font-12 ml-2"
           :disabled="!isProcessed"
         >
           <font-awesome-icon icon="fa-solid fa-file" />
@@ -302,14 +302,14 @@
               id="input-search"
               v-model="insertItemModal.inputSearch"
               placeholder="Search . . ."
-              class="modal-input"
+              class="font-12"
               @keyup.enter="onSearchServiceItems"
             ></b-form-input>
           </b-form-group>
 
           <!-- item modal table -->
           <b-table
-            class="t_service-table"
+            class="standardTable"
             hover
             :items="insertItemModal.itemList"
             :fields="insertItemModal.itemTblFields"
@@ -329,7 +329,7 @@
             :total-rows="totalItemRows"
             :per-page="insertItemModal.perPage"
             aria-controls="my-table"
-            class="pagination"
+            class="paginationSmall"
           ></b-pagination>
 
           <hr />
@@ -338,7 +338,7 @@
           <div class="div-content-left">
             <b-button
               variant="success"
-              class="form-t_service-btn modal-action-btn"
+              class="font-12 h-3 ml-2"
               @click="onClickInsertItemModal"
             >
               <font-awesome-icon icon="fa-solid fa-check" /> Insert
@@ -346,7 +346,7 @@
 
             <b-button
               variant="danger"
-              class="form-t_service-btn modal-action-btn"
+              class="font-12 h-3 ml-2"
               @click="$bvModal.hide('insertItemModal')"
             >
               <font-awesome-icon icon="fa-solid fa-xmark" /> Cancel
@@ -733,61 +733,4 @@ export default {
 };
 </script>
 
-<style scoped>
-.form-t_service {
-  width: 25%;
-  font-size: 12px;
-}
-
-.form-t_service-btn {
-  height: 35px;
-  font-size: 12px;
-}
-.pagination {
-  font-size: 12px;
-}
-
-.form-t_service-btn {
-  height: 35px;
-  font-size: 12px;
-}
-.modal-action-btn {
-  width: 130px;
-  margin-top: 20px;
-  margin-left: 5px;
-}
-.t_service-table {
-  width: 100%;
-  font-size: 12px;
-}
-.form-t_service-btn {
-  height: 35px;
-  font-size: 12px;
-}
-.t-btn-secondary-margin-bottom {
-  width: 150;
-  margin-bottom: 10px;
-}
-.t_service-table {
-  width: 100%;
-  font-size: 12px;
-}
-.modal-input {
-  font-size: 13px;
-}
-.b-table-input {
-  font-size: 12px;
-  width: 100px;
-}
-.btn-transaction {
-  width: 170px;
-  margin: 20px 0px 20px 5px;
-}
-.input--total-size {
-  width: 200px;
-}
-.t-btn-primary-margin-bottom {
-  width: 150px;
-  margin-bottom: 20px;
-}
-</style>
+<style scoped></style>

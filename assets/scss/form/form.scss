@@ -1,0 +1,45 @@
+@import "../size/size.scss";
+
+.m-bttm-10 {
+  margin-bottom: 10px;
+}
+
+.form-60 {
+  width: 60%;
+  font-size: $smFSize;
+}
+.form-80 {
+  width: 80%;
+  font-size: $smFSize;
+}
+.form-100 {
+  width: 100%;
+  font-size: $smFSize;
+  padding: 20px;
+}
+
+.form-btn {
+  height: 35px;
+  font-size: 12px;
+}
+
+.modal-action-btn {
+  width: 130px;
+  margin-top: 20px;
+  margin-left: 5px;
+}
+
+@media (max-width: 780px) {
+  .form-60 {
+    width: 100%;
+    font-size: $smFSize;
+  }
+  .form-80 {
+    width: 100%;
+    font-size: $smFSize;
+  }
+  .form-100 {
+    width: 100%;
+    font-size: $smFSize;
+  }
+}

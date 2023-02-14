@@ -208,20 +208,6 @@ export default {
   padding: 60px 10px 0 10px;
 }
 
-@media (max-width: 780px) {
-  .sidenav {
-    height: 100%;
-    width: 200px;
-    position: fixed;
-    z-index: 1;
-    top: 0;
-    left: 0;
-    background-color: lightgray;
-    overflow-x: hidden;
-    padding-top: 60px;
-  }
-}
-
 /* Style the sidenav links and the dropdown button */
 .sidenav a,
 .dropdown-btn {

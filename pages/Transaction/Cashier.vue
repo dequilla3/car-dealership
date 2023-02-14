@@ -14,12 +14,7 @@
         >
           {{ alert.message }}
         </b-alert>
-        <b-button
-          variant="primary"
-          class="form-t_cashier-btn t-btn-primary-margin-bottom"
-          v-if="isPr"
-          @click="onReset"
-        >
+        <b-button variant="primary" class="font-12 mb-3" v-if="isPr" @click="onReset">
           <font-awesome-icon icon="fa-solid fa-plus" />
           New Trasaction
         </b-button>
@@ -55,7 +50,7 @@
                   <b-button
                     id="b-modal-quote"
                     variant="secondary"
-                    class="form-t_cashier-btn"
+                    class="font-12"
                     v-b-modal.modal-lg="'quoteModal'"
                     @click="openQuoteModal"
                     :disabled="isDisableQuote || isPr"
@@ -82,7 +77,7 @@
                   <b-button
                     id="b-modal-service"
                     variant="secondary"
-                    class="form-t_cashier-btn"
+                    class="font-12"
                     v-b-modal.modal-lg="'serviceModal'"
                     @click="openServiceModal"
                     :disabled="isDisableService || isPr"
@@ -97,30 +92,24 @@
 
       <!-- table service -->
       <b-table
-        class="t_cashier-table"
+        class="standardTable"
         hover
         :items="serviceProps.serviceLineList"
         :fields="serviceProps.serviceLineTblField"
         select-mode="single"
         ref="selectableTable"
-        selectable
-        selected-variant="info"
-        @row-selected="setSelectedServiceLine"
         v-if="showServiceTable"
       >
       </b-table>
 
       <!-- table goods -->
       <b-table
-        class="t_cashier-table"
+        class="standardTable"
         hover
         :items="quotationProps.quotationLineList"
         :fields="quotationProps.quotationLineTblFields"
         select-mode="single"
         ref="selectableTable"
-        selectable
-        selected-variant="info"
-        @row-selected="setSelectedQuoteLine"
         v-if="showGoodsTable"
       >
       </b-table>
@@ -145,7 +134,7 @@
       <div class="div-content-left" v-if="showServiceTable || showGoodsTable">
         <b-button
           variant="primary"
-          class="form-t_cashier-btn btn-transaction"
+          class="font-12"
           @click="onClickProcess"
           :disabled="isPr"
         >
@@ -153,22 +142,12 @@
           <font-awesome-icon v-if="true" icon="fa-solid fa-cogs" /> Process Transaction
         </b-button>
 
-        <b-button
-          variant="info"
-          class="form-t_cashier-btn btn-transaction"
-          @click="onPrint"
-          :disabled="!isPr"
-        >
+        <b-button variant="info" class="font-12 ml-2" @click="onPrint" :disabled="!isPr">
           <font-awesome-icon icon="fa-solid fa-file" />
           Print Receipt
         </b-button>
 
-        <b-button
-          variant="danger"
-          class="form-t_cashier-btn btn-transaction"
-          @click="onReset"
-          v-if="!isPr"
-        >
+        <b-button variant="danger" class="font-12 ml-2" @click="onReset" v-if="!isPr">
           <font-awesome-icon icon="fa-solid fa-redo" />
           Reset
         </b-button>
@@ -215,7 +194,7 @@
             :total-rows="totalRowsServiceModal"
             :per-page="serviceModalProps.perPage"
             aria-controls="my-table"
-            class="pagination"
+            class="paginationSmall"
           ></b-pagination>
 
           <hr />
@@ -282,7 +261,7 @@
             :total-rows="totalRowsQuoteModal"
             :per-page="quotationModalProps.perPage"
             aria-controls="my-table"
-            class="pagination"
+            class="paginationSmall"
           ></b-pagination>
 
           <hr />
@@ -322,7 +301,9 @@ export default {
   components: {
     SalesInvoice,
   },
+
   name: "Cashier",
+
   data() {
     return {
       totalAmount: 0,
@@ -408,6 +389,23 @@ export default {
 
   methods: {
     //EVENTS
+
+    async openServiceModal() {
+      try {
+        await this.loadBillings().then((res) => {
+          this.loadQuotes();
+        });
+      } catch (err) {
+        console.log(err);
+      }
+    },
+
+    async openQuoteModal() {
+      await this.loadBillings().then((res) => {
+        this.loadQuotes();
+      });
+    },
+
     onPrint() {
       window.print();
     },
@@ -428,15 +426,6 @@ export default {
             this.isBusy = false;
           }
         );
-    },
-
-    async getUserById() {
-      await this.$store
-        .dispatch("user/getUserById", { id: Number(localStorage.userId) })
-        .then((res) => {
-          localStorage.userName = res.data[0].name;
-          return res;
-        });
     },
 
     async postBilling() {
@@ -469,11 +458,13 @@ export default {
             cashierName: localStorage.userName,
           });
 
+          // SET STATE QUOTELINE
           this.$store.commit(
             "quotation/SET_QUOTE_LINE",
             this.quotationProps.quotationLineList
           );
 
+          //SET STATE SERVICELINE
           this.$store.commit(
             "service/SET_SERVICE_LINE",
             this.serviceProps.serviceLineList
@@ -589,6 +580,7 @@ export default {
       this.quotationProps.quotationLineList = tempDetailList;
     },
 
+    //total service + total quote
     computeTotalAmount() {
       let totalAmount = 0;
       this.quotationProps.quotationLineList.forEach(function (val) {
@@ -599,21 +591,6 @@ export default {
         totalAmount = totalAmount + Number(val.amount);
       });
       this.totalAmount = totalAmount;
-    },
-
-    async openServiceModal() {
-      try {
-        await this.loadBillings().then((res) => {
-          this.loadQuotes();
-        });
-      } catch (err) {
-        console.log(err);
-      }
-    },
-    async openQuoteModal() {
-      await this.loadBillings().then((res) => {
-        this.loadQuotes();
-      });
     },
 
     //SET METHODS
@@ -639,6 +616,7 @@ export default {
       return doc[0].code;
     },
 
+    //LOAD
     async loadServices() {
       return await this.$store.dispatch("service/loadServices").then((res) => {
         this.serviceModalProps.serviceTblList = this.getServicedList.filter(
@@ -684,8 +662,6 @@ export default {
     },
   },
 
-  mounted() {},
-
   computed: {
     getBillings() {
       return this.$store.state.cashier.billings;
@@ -710,8 +686,6 @@ export default {
     },
 
     getServicedList() {
-      //TODO: SELECT SERVICES WHERE NOT IN QUOTATIONS
-
       let doc = this.getDoc("SERVICE");
       let servicesList = this.$store.state.service.serviceList;
       let tempList = [];
@@ -743,7 +717,7 @@ export default {
         return !serviceIdFromBilling.includes(val.service_id);
       });
 
-      //interate filteredServiceListand do set new columns
+      //iterate filteredServiceListand do set new columns
       servicedNotBilled.forEach(function (val) {
         tempList = []; // set temp list to empty
         tempList.service_id = val.service_id;
@@ -808,31 +782,4 @@ export default {
 };
 </script>
 
-<style scoped>
-.form-t_cashier {
-  width: 25%;
-  font-size: 12px;
-}
-.form-t_cashier-btn {
-  height: 35px;
-  font-size: 12px;
-}
-
-.t-btn-primary-margin-bottom {
-  width: 150px;
-  margin-bottom: 20px;
-}
-.t_cashier-table {
-  width: 100%;
-  font-size: 12px;
-}
-
-.div-content-left {
-  display: flex;
-  justify-content: flex-end;
-}
-.btn-transaction {
-  width: 170px;
-  margin: 20px 0px 20px 5px;
-}
-</style>
+<style scoped></style>

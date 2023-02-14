@@ -5,73 +5,75 @@
     <div><h6>Manage Customer</h6></div>
     <hr />
     <div>
-      <b-form @submit="onSubmit" v-if="show" class="form-60">
-        <b-alert
-          :show="alert.showAlert"
-          :variant="alert.variant"
-          @dismissed="alert.showAlert = null"
-        >
-          {{ alert.message }}
-        </b-alert>
-        <div class="grid-container-3">
-          <div class="grid-item">
-            <b-form-group id="name" label="Name:" label-for="input-name">
-              <b-form-input
-                id="input-name"
-                v-model="form.name"
-                placeholder="Enter name"
-                required
-                class="globalInputSize"
-              ></b-form-input>
-            </b-form-group>
-          </div>
-          <div class="grid-item">
-            <b-form-group id="contact" label="Cotanct Number:" label-for="input-contact">
-              <b-form-input
-                id="input-contact"
-                v-model="form.contact"
-                placeholder="Enter contact number"
-                required
-                class="globalInputSize"
-              ></b-form-input>
-            </b-form-group>
-          </div>
+      <b-alert
+        :show="alert.showAlert"
+        :variant="alert.variant"
+        @dismissed="alert.showAlert = null"
+        class="font-12"
+      >
+        {{ alert.message }}
+      </b-alert>
 
-          <div class="grid-item">
-            <b-form-group id="address" label="Address:" label-for="input-address">
-              <b-form-input
-                id="input-address"
-                v-model="form.address"
-                placeholder="Enter address"
-                required
-                class="globalInputSize"
-              ></b-form-input>
-            </b-form-group>
-          </div>
-        </div>
+      <b-modal id="customerFormModal" hide-footer hide-header size="lg">
+        <b-form @submit="onSubmit" v-if="show" class="form-100">
+          <b-alert
+            :show="alertModal.showAlert"
+            :variant="alertModal.variant"
+            @dismissed="alertModal.showAlert = null"
+          >
+            {{ alert.message }}
+          </b-alert>
+          <h6>Customer Details</h6>
+          <hr />
+          <b-form-group id="name" label="Name:" label-for="input-name">
+            <b-form-input
+              id="input-name"
+              v-model="form.name"
+              placeholder="Enter name"
+              required
+              class="globalInputSize"
+            ></b-form-input>
+          </b-form-group>
+          <b-form-group id="contact" label="Cotanct Number:" label-for="input-contact">
+            <b-form-input
+              id="input-contact"
+              v-model="form.contact"
+              placeholder="Enter contact number"
+              required
+              class="globalInputSize"
+            ></b-form-input>
+          </b-form-group>
+          <b-form-group id="address" label="Address:" label-for="input-address">
+            <b-form-input
+              id="input-address"
+              v-model="form.address"
+              placeholder="Enter address"
+              required
+              class="globalInputSize"
+            ></b-form-input>
+          </b-form-group>
 
-        <b-button type="submit" variant="primary" class="form-manage_customer-btn">
-          <font-awesome-icon :icon="['fa-solid', icn]" /> {{ btnSubmitLabel }}
-        </b-button>
+          <b-button type="submit" variant="primary" class="font-12">
+            <font-awesome-icon :icon="['fa-solid', icn]" /> {{ btnSubmitLabel }}
+          </b-button>
 
-        <b-button
-          type="reset"
-          variant="danger"
-          class="form-manage_customer-btn"
-          @click="onReset"
-        >
-          <font-awesome-icon icon="fa-solid fa-redo" /> Reset
-        </b-button>
-      </b-form>
+          <b-button type="reset" variant="danger" class="font-12" @click="onReset">
+            <font-awesome-icon icon="fa-solid fa-close" /> Cancel
+          </b-button>
+        </b-form>
+      </b-modal>
+      <!-- end of modal -->
 
-      <br />
+      <b-button variant="primary" class="font-12 mb-3" @click="onAdd">
+        <font-awesome-icon icon="fa-solid fa-user-plus" /> Add Customer
+      </b-button>
 
       <!-- search input -->
-      <b-form-group id="inputSearch" label="Search:" label-for="input-search">
+      <b-form-group id="inputSearch" label="" label-for="input-search">
         <b-form-input
           id="input-search"
           v-model="inputSearch"
-          placeholder="Enter text . . ."
+          placeholder="Search . . ."
           class="globalInputSize"
           @keyup.enter="onSearch"
         ></b-form-input>
@@ -86,12 +88,15 @@
         :current-page="currentPage"
         select-mode="single"
         ref="selectableTable"
-        selectable
-        selected-variant="info"
-        @row-selected="onRowSelected"
       >
         <template #cell(date_created)="data">
           {{ new Date(data.value).toJSON().slice(0, 10) }}
+        </template>
+
+        <template #cell(action)="data">
+          <b-button size="sm" class="font-10" variant="info" @click="onEdit(data)">
+            <font-awesome-icon icon="fa-solid fa-user-pen" /> Update</b-button
+          >
         </template>
       </b-table>
 
@@ -116,12 +121,17 @@ export default {
         variant: "",
         message: "",
       },
+      alertModal: {
+        showAlert: 0,
+        variant: "",
+        message: "",
+      },
       icn: "fa-user-plus",
       inputSearch: "",
       perPage: 5,
       currentPage: 1,
       selected: [],
-      customerTblFields: ["name", "contact_number", "address", "date_created"],
+      customerTblFields: ["name", "contact_number", "address", "date_created", "action"],
       btnSubmitLabel: "Add new Customer",
       customerTblList: [],
 
@@ -137,6 +147,32 @@ export default {
   },
 
   methods: {
+    showAlertModal(dissmiss, warning, msg) {
+      this.alert.showAlert = dissmiss;
+      this.alert.variant = warning;
+      this.alert.message = msg;
+    },
+    onAdd() {
+      this.$bvModal.show("customerFormModal");
+      this.form.name = "";
+      this.form.contact = "";
+      this.form.address = "";
+      this.btnSubmitLabel = "Add new Customer";
+      this.icn = "fa-user-plus";
+      this.isUpdate = false;
+    },
+
+    onEdit(data) {
+      this.selected = data.item;
+      this.$bvModal.show("customerFormModal");
+      this.form.name = this.selected.name;
+      this.form.contact = this.selected.contact_number;
+      this.form.address = this.selected.address;
+      this.btnSubmitLabel = "Update Customer";
+      this.icn = "fa-user-pen";
+      this.isUpdate = true;
+    },
+
     showAlert(dissmiss, warning, msg) {
       this.alert.showAlert = dissmiss;
       this.alert.variant = warning;
@@ -157,30 +193,14 @@ export default {
       });
     },
 
-    onRowSelected(items) {
-      this.selected = items;
-      if (this.selected.length > 0) {
-        this.form.name = this.selected[0].name;
-        this.form.contact = this.selected[0].contact_number;
-        this.form.address = this.selected[0].address;
-        this.btnSubmitLabel = "Update Customer";
-        this.icn = "fa-user-pen";
-        this.isUpdate = true;
-      } else {
-        this.form.name = "";
-        this.form.contact = "";
-        this.form.address = "";
-        this.btnSubmitLabel = "Add new Customer";
-        this.icn = "fa-user-plus";
-        this.isUpdate = false;
-      }
-    },
     onReset() {
       this.form.name = "";
       this.form.contact = "";
       this.form.address = "";
       this.btnSubmitLabel = "Add new Customer";
+      this.$bvModal.hide("customerFormModal");
     },
+
     onSubmit(event) {
       event.preventDefault();
       if (this.isUpdate) {
@@ -214,12 +234,12 @@ export default {
         })
         .then(
           (res) => {
-            this.showAlert(3, "success", "Successfully added new customer!");
+            this.showAlertModal(3, "success", "Successfully added new customer!");
             this.loadCustomer();
             this.onReset();
           },
           (err) => {
-            this.showAlert(3, "warning", `${err.response.data.error}`);
+            this.showAlertModal(3, "warning", `${err.response.data.error}`);
           }
         );
     },
@@ -228,19 +248,19 @@ export default {
       await this.$store
         .dispatch("customer/editCustomer", {
           token: localStorage.token,
-          customer_id: this.selected[0].customer_id,
+          customer_id: this.selected.customer_id,
           name: this.form.name,
           contact_number: this.form.contact,
           address: this.form.address,
         })
         .then(
           (res) => {
-            this.showAlert(3, "info", "Successfully updated customer!");
+            this.showAlertModal(3, "info", "Successfully updated customer!");
             this.loadCustomer();
             this.onReset();
           },
           (err) => {
-            this.showAlert(3, "warning", `${err.response.data.error}`);
+            this.showAlertModal(3, "warning", `${err.response.data.error}`);
           }
         );
     },

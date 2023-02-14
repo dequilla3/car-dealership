@@ -4,140 +4,161 @@
     <SideBar />
     <div><h6>Manage User</h6></div>
     <hr />
-    <div>
-      <b-form @submit="onSubmit" v-if="show" class="form-app_user">
-        <b-alert
-          :show="alert.showAlert"
-          :variant="alert.variant"
-          @dismissed="alert.showAlert = null"
-        >
-          {{ alert.message }}
-        </b-alert>
-        <div class="row">
-          <div class="col-6 col-sm-4">
-            <b-form-group id="name" label="Name:" label-for="input-name">
-              <b-form-input
-                id="input-name"
-                v-model="form.name"
-                placeholder="Enter name"
-                required
-                class="globalInputSize"
-              ></b-form-input>
-            </b-form-group>
+    <div class="font-13">
+      <b-alert
+        :show="alert.showAlert"
+        :variant="alert.variant"
+        @dismissed="alert.showAlert = null"
+      >
+        {{ alert.message }}
+      </b-alert>
 
-            <b-form-group id="contact" label="Cotanct Number:" label-for="input-contact">
-              <b-form-input
-                id="input-contact"
-                v-model="form.contact"
-                placeholder="Enter contact number"
-                required
-                class="globalInputSize"
-              ></b-form-input>
-            </b-form-group>
+      <base-button @click="onAdd()" type="primary" class="font-12 mb-3">
+        <font-awesome-icon icon="fa-solid fa-user-plus" /> Add new User
+      </base-button>
 
-            <b-form-group id="address" label="Address:" label-for="input-address">
-              <b-form-input
-                id="input-address"
-                v-model="form.address"
-                placeholder="Enter address"
-                required
-                class="globalInputSize"
-              ></b-form-input>
-            </b-form-group>
-          </div>
-
-          <div class="col-6 col-sm-4">
-            <b-form-group id="username" label="Role:" label-for="input-username">
-              <b-dropdown
-                id="dropdown-1"
-                :text="dropDownText"
-                class="dropdown--dropdown_custom-size"
-                size="sm"
-              >
-                <b-dropdown-item
-                  class="dropdown--dropdown-menu-size"
-                  v-for="role in roleList"
-                  :key="role.roleId"
-                  @click="onClickRoleDropdownMenu(role)"
-                  >{{ role.role }}
-                </b-dropdown-item>
-              </b-dropdown>
-            </b-form-group>
-
-            <b-form-group id="username" label="Username:" label-for="input-username">
-              <b-form-input
-                id="input-username"
-                v-model="form.username"
-                placeholder="Enter username"
-                required
-                class="globalInputSize"
-              ></b-form-input>
-            </b-form-group>
-
-            <b-form-group id="pw" label="Password:" label-for="input-pw">
-              <b-input-group>
+      <b-modal id="userModal" size="lg" hide-footer hide-header>
+        <b-form @submit="onSubmit" v-if="show" class="form-100">
+          <b-alert
+            :show="alertModal.showAlert"
+            :variant="alertModal.variant"
+            @dismissed="alertModal.showAlert = null"
+          >
+            {{ alert.message }}
+          </b-alert>
+          <h6>User Details</h6>
+          <hr />
+          <div class="row">
+            <div class="col-6 col-sm-6">
+              <b-form-group id="name" label="Name:" label-for="input-name">
                 <b-form-input
-                  id="input-pw"
-                  v-model="form.pw"
-                  placeholder="Enter password"
+                  id="input-name"
+                  v-model="form.name"
+                  placeholder="Enter name"
                   required
                   class="globalInputSize"
-                  :type="isPwShow ? 'text' : 'password'"
                 ></b-form-input>
-                <b-input-group-append>
-                  <b-button variant="info" class="globalInputSize" @click="onlickShowPw">
-                    <font-awesome-icon
-                      :icon="['fa-solid', isPwShow ? 'fa-eye' : 'fa-eye-slash']"
-                    />
-                  </b-button>
-                </b-input-group-append>
-              </b-input-group>
-            </b-form-group>
+              </b-form-group>
+
+              <b-form-group
+                id="contact"
+                label="Cotanct Number:"
+                label-for="input-contact"
+              >
+                <b-form-input
+                  id="input-contact"
+                  v-model="form.contact"
+                  placeholder="Enter contact number"
+                  required
+                  class="globalInputSize"
+                ></b-form-input>
+              </b-form-group>
+
+              <b-form-group id="address" label="Address:" label-for="input-address">
+                <b-form-input
+                  id="input-address"
+                  v-model="form.address"
+                  placeholder="Enter address"
+                  required
+                  class="globalInputSize"
+                ></b-form-input>
+              </b-form-group>
+            </div>
+
+            <div class="col-6 col-sm-6">
+              <b-form-group id="username" label="Role:" label-for="input-username">
+                <b-dropdown
+                  id="dropdown-1"
+                  :text="dropDownText"
+                  class="dropdown--dropdown_custom-size"
+                  size="sm"
+                >
+                  <b-dropdown-item
+                    class="dropdown--dropdown-menu-size"
+                    v-for="role in roleList"
+                    :key="role.roleId"
+                    @click="onClickRoleDropdownMenu(role)"
+                    >{{ role.role }}
+                  </b-dropdown-item>
+                </b-dropdown>
+              </b-form-group>
+
+              <b-form-group id="username" label="Username:" label-for="input-username">
+                <b-form-input
+                  id="input-username"
+                  v-model="form.username"
+                  placeholder="Enter username"
+                  required
+                  class="globalInputSize"
+                ></b-form-input>
+              </b-form-group>
+
+              <b-form-group id="pw" label="Password:" label-for="input-pw">
+                <b-input-group>
+                  <b-form-input
+                    id="input-pw"
+                    v-model="form.pw"
+                    placeholder="Enter password"
+                    required
+                    class="globalInputSize"
+                    :type="isPwShow ? 'text' : 'password'"
+                  ></b-form-input>
+                  <b-input-group-append>
+                    <base-button
+                      type="info"
+                      class="globalInputSize"
+                      @click="onlickShowPw"
+                    >
+                      <font-awesome-icon
+                        :icon="['fa-solid', isPwShow ? 'fa-eye' : 'fa-eye-slash']"
+                      />
+                    </base-button>
+                  </b-input-group-append>
+                </b-input-group>
+              </b-form-group>
+            </div>
           </div>
-        </div>
 
-        <b-button type="submit" variant="primary" class="form-app_user-btn">
-          <font-awesome-icon :icon="['fa-solid', icn]" /> {{ btnSubmitLabel }}
-        </b-button>
+          <b-button type="submit" variant="primary" class="font-12">
+            <font-awesome-icon :icon="['fa-solid', icn]" />
+            {{ isUpdate ? "Update User" : "Add User" }}
+          </b-button>
 
-        <b-button
-          type="reset"
-          variant="danger"
-          class="form-app_user-btn"
-          @click="onReset"
-        >
-          <font-awesome-icon icon="fa-solid fa-redo" /> Reset
-        </b-button>
-      </b-form>
+          <b-button type="reset" variant="danger" class="font-12" @click="onReset">
+            <font-awesome-icon icon="fa-solid fa-close" /> Cancel
+          </b-button>
+        </b-form>
+      </b-modal>
 
       <br />
 
       <!-- search input -->
-      <b-form-group id="inputSearch" label="Search:" label-for="input-search">
+      <b-form-group id="inputSearch" label="" label-for="input-search">
         <b-form-input
-          id="input-search"
+          id="input-search "
           v-model="inputSearch"
-          placeholder="Enter text . . ."
+          placeholder="Search . . ."
           class="globalInputSize"
           @keyup.enter="onSearch"
         ></b-form-input>
       </b-form-group>
 
       <b-table
-        class="user-table"
+        class="standardTable"
         hover
         :items="userTblList"
         :fields="userTblFields"
         :per-page="perPage"
         :current-page="currentPage"
-        select-mode="single"
-        ref="selectableTable"
-        selectable
-        selected-variant="info"
-        @row-selected="onRowSelected"
       >
         <template #cell(date_created)="data">
           {{ new Date(data.value).toJSON().slice(0, 10) }}
+        </template>
+
+        <template #cell(action)="data">
+          <base-button size="sm" class="font-10" type="info" @click="onEdit(data)">
+            <font-awesome-icon icon="fa-solid fa-user-pen" /> Update</base-button
+          >
         </template>
       </b-table>
 
@@ -165,12 +186,18 @@ export default {
       icn: "fa-user-plus",
       dropDownText: "-- Select Role -- ",
       inputSearch: "",
-      perPage: 3,
+      perPage: 5,
       currentPage: 1,
       selected: [],
       userTblList: [],
-      userTblFields: ["name", "contact_number", "address", "date_created"],
-      btnSubmitLabel: "Add new User",
+      userTblFields: [
+        { key: "name", label: "Name", thStyle: { width: "20%" } },
+        { key: "contact_number", label: "Contact Number", thStyle: { width: "10%" } },
+        { key: "address", label: "Address", thStyle: { width: "15%" } },
+        { key: "date_created", label: "Date Created", thStyle: { width: "10%" } },
+        { key: "action", label: "Update", thStyle: { width: "10%" } },
+      ],
+
       roleList: [],
 
       form: {
@@ -195,63 +222,92 @@ export default {
         variant: "",
         message: "",
       },
+
+      alertModal: {
+        showAlert: 0,
+        variant: "",
+        message: "",
+      },
     };
   },
 
   methods: {
+    showConfirmationDialog() {
+      this.$bvModal
+        .msgBoxConfirm(
+          `Are you sure you want to ${this.isUpdate ? "UPDATE" : "ADD"} User?`
+        )
+        .then((value) => {
+          return value === null ? false : value;
+        })
+        .catch((err) => {
+          // An error occurred
+          return false;
+        });
+    },
+
+    onAdd() {
+      this.onReset();
+      this.$bvModal.show("userModal");
+      this.isUpdate = false;
+    },
     showAlert(dissmiss, warning, msg) {
       this.alert.showAlert = dissmiss;
       this.alert.variant = warning;
       this.alert.message = msg;
     },
-    onRowSelected(items) {
-      this.selected = items;
-      if (this.selected.length > 0) {
-        this.form.name = this.selected[0].name;
-        this.form.contact = this.selected[0].contact_number;
-        this.form.address = this.selected[0].address;
-        this.form.username = this.selected[0].username;
+
+    showAlertModal(dissmiss, warning, msg) {
+      this.alertModal.showAlert = dissmiss;
+      this.alertModal.variant = warning;
+      this.alertModal.message = msg;
+    },
+    onEdit(data) {
+      this.$bvModal.show("userModal");
+      this.selected = data.item;
+
+      if (this.selected !== undefined) {
+        this.form.name = this.selected.name;
+        this.form.contact = this.selected.contact_number;
+        this.form.address = this.selected.address;
+        this.form.username = this.selected.username;
         this.form.pw = "";
-        this.btnSubmitLabel = "Update User";
         this.icn = "fa-user-pen";
 
         this.isDisabled = true;
         this.isUpdate = true;
 
         this.roleList.forEach((val) => {
-          if (val.user_role_id === this.selected[0].user_role_id) {
+          if (val.user_role_id === this.selected.user_role_id) {
             this.form.userRole.roleId = val.user_role_id;
             this.form.userRole.role = val.role;
             this.dropDownText = val.role;
           }
         });
-      } else {
-        this.form.name = "";
-        this.form.contact = "";
-        this.form.address = "";
-        this.form.username = "";
-        this.form.pw = "";
-        this.btnSubmitLabel = "Add new User";
-        this.icn = "fa-user-plus";
 
-        this.isDisabled = false;
-        this.isPwShow = false;
-        this.isUpdate = false;
-
-        this.form.userRole.roleId = "";
-        this.form.userRole.role = "";
-        this.dropDownText = "-- Select Role -- ";
+        return;
       }
+
+      this.onReset();
     },
 
     onReset() {
-      this.$refs.selectableTable.clearSelected();
+      this.$bvModal.hide("userModal");
+
       this.form.name = "";
       this.form.contact = "";
       this.form.address = "";
       this.form.username = "";
       this.form.pw = "";
-      this.btnSubmitLabel = "Add new User";
+      this.icn = "fa-user-plus";
+
+      this.isDisabled = false;
+      this.isPwShow = false;
+      this.isUpdate = false;
+
+      this.form.userRole.roleId = "";
+      this.form.userRole.role = "";
+      this.dropDownText = "-- Select Role -- ";
     },
 
     async onSearch() {
@@ -271,16 +327,29 @@ export default {
     async onSubmit(event) {
       event.preventDefault();
 
-      if (this.form.userRole.roleId === "") {
-        this.showAlert(3, "warning", "Please select role");
-        return;
-      }
+      this.$bvModal
+        .msgBoxConfirm(
+          `Are you sure you want to ${this.isUpdate ? "UPDATE" : "ADD"} User?`
+        )
+        .then((value) => {
+          let proceed = value === null ? false : value;
+          if (proceed) {
+            if (this.form.userRole.roleId === "") {
+              this.showAlertModal(3, "warning", "Please select role");
+              return;
+            }
 
-      if (this.isUpdate) {
-        this.editUser();
-      } else {
-        this.addUser();
-      }
+            if (this.isUpdate) {
+              this.editUser();
+            } else {
+              this.addUser();
+            }
+          }
+        })
+        .catch((err) => {
+          // An error occurred
+          return false;
+        });
     },
 
     async addUser() {
@@ -314,7 +383,7 @@ export default {
     async editUser() {
       await axios({
         method: "PATCH",
-        url: `${this.$axios.defaults.baseURL}/user/edit/${this.selected[0].user_id}`,
+        url: `${this.$axios.defaults.baseURL}/user/edit/${this.selected.user_id}`,
         headers: {
           Authorization: `Bearer ${localStorage.token}`,
         },
@@ -401,34 +470,6 @@ export default {
 </script>
 
 <style scoped>
-.form-app_user {
-  width: 75%;
-  font-size: 12px;
-}
-
-.form-app_user-btn {
-  font-size: 12px;
-  width: 180px;
-  margin-bottom: 10px;
-}
-
-@media (max-width: 800px) {
-  .form-app_user-btn {
-    width: 100%;
-  }
-}
-
-@media (max-width: 800px) {
-  .form-app_user {
-    width: 100%;
-  }
-}
-
-.user-table {
-  width: 100%;
-  font-size: 12px;
-}
-
 .dropdown--dropdown_custom-size {
   width: 100%;
   font-size: 12px !important;

@@ -1,0 +1,66 @@
+@import "../size/size.scss";
+
+.div-content-left {
+  display: flex;
+  justify-content: flex-end;
+}
+.grid-container-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  width: 100%;
+}
+
+.grid-container-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  width: 100%;
+}
+
+.grid-container-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  width: 100%;
+}
+
+.grid-item {
+  text-align: left;
+  padding-right: 10px;
+  width: 100%;
+}
+
+.mainContainer {
+  margin: $mainContainerSize;
+}
+
+.modal-container {
+  font-size: $smFSize;
+  padding: 20px;
+}
+
+.print {
+  display: none;
+}
+
+.print-body {
+  padding: 50px 20px 20px 20px;
+}
+
+@media print {
+  .dontPrint {
+    display: none;
+  }
+  .print {
+    display: block;
+    margin: 0;
+    padding: 0;
+  }
+
+  .mainContainer {
+    margin: 0;
+    padding: 0;
+  }
+  @page {
+    size: auto;
+    margin: 0mm;
+  }
+}

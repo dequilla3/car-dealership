@@ -4,7 +4,7 @@
       <b-navbar-brand href="/dashboard"
         ><font-awesome-icon icon="fa-solid fa-car" /> DMS</b-navbar-brand
       >
-      <div class="d-flex flex-row-reverse w-100">
+      <div class="d-flex flex-row-reverse w">
         <b-dropdown id="dropdown-right" right variant="info" size="sm">
           <template #button-content>
             <font-awesome-icon icon="fa-solid fa-user" />
@@ -117,4 +117,14 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style>
+.w {
+  width: 100%;
+}
+
+@media (max-width: 780px) {
+  .w {
+    width: 80%;
+  }
+}
+</style>

@@ -3,120 +3,134 @@
     <Navbar />
     <SideBar />
     <div>
-      <b-form @submit="onSubmit" v-if="show" class="form-manage_car">
-        <b-alert
-          :show="alert.showAlert"
-          :variant="alert.variant"
-          @dismissed="alert.showAlert = null"
-        >
-          {{ alert.message }}
-        </b-alert>
-        <!-- GRID -->
-        <div class="grid-container">
-          <!-- Grid1 -->
-          <div class="grid-item">
-            <b-form-group
-              id="serial_number"
-              label="Serial Number:"
-              label-for="input-serial_number"
-            >
-              <b-form-input
-                type="text"
-                id="input-serial_number"
-                v-model="form.serial_number"
-                placeholder="Enter serial #"
-                required
-                class="globalInputSize"
-              ></b-form-input>
-            </b-form-group>
+      <b-alert
+        :show="alert.showAlert"
+        :variant="alert.variant"
+        @dismissed="alert.showAlert = null"
+      >
+        {{ alert.message }}
+      </b-alert>
+      <b-modal id="manageCarModal" hide-header hide-footer size="lg">
+        <b-form @submit="onSubmit" v-if="show" class="form-100">
+          <b-alert
+            :show="alertModal.showAlert"
+            :variant="alertModal.variant"
+            @dismissed="alertModal.showAlert = null"
+          >
+            {{ alert.message }}
+          </b-alert>
 
-            <b-form-group id="color" label="Color:" label-for="input-color">
-              <b-form-input
-                type="text"
-                id="input-color"
-                v-model="form.color"
-                placeholder="Enter color"
-                required
-                class="globalInputSize"
-              ></b-form-input>
-            </b-form-group>
+          <h6>Car Details</h6>
+          <hr />
 
-            <b-form-group id="model" label="Model:" label-for="input-model">
-              <b-form-input
-                type="text"
-                id="input-model"
-                v-model="form.model"
-                placeholder="Enter model"
-                required
-                class="globalInputSize"
-              ></b-form-input>
-            </b-form-group>
+          <!-- GRID -->
+          <div class="grid-container">
+            <!-- Grid1 -->
+            <div class="grid-item">
+              <b-form-group
+                id="serial_number"
+                label="Serial Number:"
+                label-for="input-serial_number"
+              >
+                <b-form-input
+                  type="text"
+                  id="input-serial_number"
+                  v-model="form.serial_number"
+                  placeholder="Enter serial #"
+                  required
+                  class="globalInputSize"
+                ></b-form-input>
+              </b-form-group>
+
+              <b-form-group id="color" label="Color:" label-for="input-color">
+                <b-form-input
+                  type="text"
+                  id="input-color"
+                  v-model="form.color"
+                  placeholder="Enter color"
+                  required
+                  class="globalInputSize"
+                ></b-form-input>
+              </b-form-group>
+
+              <b-form-group id="model" label="Model:" label-for="input-model">
+                <b-form-input
+                  type="text"
+                  id="input-model"
+                  v-model="form.model"
+                  placeholder="Enter model"
+                  required
+                  class="globalInputSize"
+                ></b-form-input>
+              </b-form-group>
+            </div>
+
+            <!-- Grrid2 -->
+            <div class="grid-item">
+              <b-form-group
+                id="brandname"
+                label="Brand Name:"
+                label-for="input-brandname"
+              >
+                <b-form-input
+                  type="text"
+                  id="input-brandname"
+                  v-model="form.brandname"
+                  placeholder="Enter brandname"
+                  required
+                  class="globalInputSize"
+                ></b-form-input>
+              </b-form-group>
+
+              <b-form-group id="unit" label="Unit:" label-for="input-unit">
+                <b-form-input
+                  type="text"
+                  id="input-unit"
+                  v-model="form.unit"
+                  placeholder="Enter unit"
+                  required
+                  class="globalInputSize"
+                ></b-form-input>
+              </b-form-group>
+
+              <b-form-group id="cost" label="Cost:" label-for="input-cost">
+                <b-form-input
+                  type="number"
+                  id="input-cost"
+                  v-model="form.cost"
+                  placeholder="Enter cost"
+                  required
+                  class="globalInputSize"
+                ></b-form-input>
+              </b-form-group>
+            </div>
           </div>
+          <!-- END OF GRID -->
 
-          <!-- Grrid2 -->
-          <div class="grid-item">
-            <b-form-group id="brandname" label="Brand Name:" label-for="input-brandname">
-              <b-form-input
-                type="text"
-                id="input-brandname"
-                v-model="form.brandname"
-                placeholder="Enter brandname"
-                required
-                class="globalInputSize"
-              ></b-form-input>
-            </b-form-group>
+          <b-button type="submit" variant="primary" class="font-12">
+            <font-awesome-icon
+              :icon="['fa-solid', isUpdate ? 'fa-user-pen' : 'fa-user-plus']"
+            />
+            {{ btnSubmitLabel }}
+          </b-button>
 
-            <b-form-group id="unit" label="Unit:" label-for="input-unit">
-              <b-form-input
-                type="text"
-                id="input-unit"
-                v-model="form.unit"
-                placeholder="Enter unit"
-                required
-                class="globalInputSize"
-              ></b-form-input>
-            </b-form-group>
+          <b-button type="reset" variant="danger" class="font-12" @click="onReset">
+            <font-awesome-icon icon="fa-solid fa-close" /> Cancel
+          </b-button>
+        </b-form>
+      </b-modal>
 
-            <b-form-group id="cost" label="Cost:" label-for="input-cost">
-              <b-form-input
-                type="number"
-                id="input-cost"
-                v-model="form.cost"
-                placeholder="Enter cost"
-                required
-                class="globalInputSize"
-              ></b-form-input>
-            </b-form-group>
-          </div>
-          <!-- Grid3 -->
-          <div class="grid-item">
-            <div class="form-manage_car-after-grid"></div>
-            <b-button type="submit" variant="primary" class="form-manage_car-btn">
-              <font-awesome-icon
-                :icon="['fa-solid', isUpdate ? 'fa-user-pen' : 'fa-user-plus']"
-              />
-              {{ btnSubmitLabel }}
-            </b-button>
+      <b-button variant="primary" class="font-12 mb-3" @click="onAdd">
+        <font-awesome-icon icon="fa-solid fa-plus" />
+        Add Car
+      </b-button>
 
-            <b-button
-              type="reset"
-              variant="danger"
-              class="form-manage_car-btn"
-              @click="onReset"
-            >
-              <font-awesome-icon icon="fa-solid fa-redo" /> Reset
-            </b-button>
-          </div>
-        </div>
-        <!-- END OF GRID -->
-      </b-form>
-      <br />
       <!-- search input -->
-      <b-form-group id="inputSearch" label="Search:" label-for="input-search">
+      <b-form-group id="inputSearch" label="" label-for="input-search">
         <b-form-input
           id="input-search"
           v-model="inputSearch"
-          placeholder="Enter text . . ."
+          placeholder="Search . . ."
           class="globalInputSize"
           @keyup.enter="onSearch"
         ></b-form-input>
@@ -130,14 +144,15 @@
         :fields="partsTblFields"
         :per-page="perPage"
         :current-page="currentPage"
-        select-mode="single"
-        ref="selectableTable"
-        selectable
-        selected-variant="info"
-        @row-selected="onRowSelected"
       >
         <template #cell(cost)="data">
           {{ Number(data.value).toLocaleString("en-US") }}
+        </template>
+
+        <template #cell(action)="data">
+          <b-button size="sm" class="font-10" variant="info" @click="onEdit(data)">
+            <font-awesome-icon icon="fa-solid fa-user-pen" /> Update</b-button
+          >
         </template>
       </b-table>
 
@@ -162,19 +177,26 @@ export default {
         variant: "",
         message: "",
       },
+
+      alertModal: {
+        showAlert: 0,
+        variant: "",
+        message: "",
+      },
       inputSearch: "",
       isUpdate: false,
-      perPage: 3,
+      perPage: 8,
       currentPage: 1,
       selected: [],
       tblItems: [],
       partsTblFields: [
-        { key: "serial_number", label: "Serial Number", thStyle: { width: "10%" } },
+        { key: "serial_number", label: "Serial Number", thStyle: { width: "20%" } },
         { key: "color", label: "Color", thStyle: { width: "10%" } },
-        { key: "model", label: "Model", thStyle: { width: "30%" } },
-        { key: "brand_name", label: "Brand", thStyle: { width: "30%" } },
+        { key: "model", label: "Model", thStyle: { width: "15%" } },
+        { key: "brand_name", label: "Brand", thStyle: { width: "25%" } },
         { key: "unit", label: "Unit", thStyle: { width: "10%" } },
         { key: "cost", label: "Cost", thStyle: { width: "10%" } },
+        { key: "action", label: "", thStyle: { width: "10%" } },
       ],
       btnSubmitLabel: "Add New Car Details",
 
@@ -191,11 +213,36 @@ export default {
       show: true,
     };
   },
+
   methods: {
+    onAdd() {
+      this.$bvModal.show("manageCarModal");
+      this.onReset();
+    },
+
+    onEdit(data) {
+      this.$bvModal.show("manageCarModal");
+      this.selected = data.item;
+      this.form.serial_number = this.selected.serial_number;
+      this.form.color = this.selected.color;
+      this.form.model = this.selected.model;
+      this.form.brandname = this.selected.brand_name;
+      this.form.unit = this.selected.unit;
+      this.form.cost = this.selected.cost;
+      this.form.qty = this.selected.qty;
+      this.btnSubmitLabel = "Update Car Details";
+      this.isUpdate = true;
+    },
     showAlert(dissmiss, warning, msg) {
       this.alert.showAlert = dissmiss;
       this.alert.variant = warning;
       this.alert.message = msg;
+    },
+
+    showAlertModal(dissmiss, warning, msg) {
+      this.alertModal.showAlert = dissmiss;
+      this.alertModal.variant = warning;
+      this.alertModal.message = msg;
     },
 
     async onSearch() {
@@ -213,38 +260,15 @@ export default {
         this.tblItems = filteredList;
       });
     },
-    onRowSelected(items) {
-      this.selected = items;
-      if (this.selected.length > 0) {
-        this.form.serial_number = this.selected[0].serial_number;
-        this.form.color = this.selected[0].color;
-        this.form.model = this.selected[0].model;
-        this.form.brandname = this.selected[0].brand_name;
-        this.form.unit = this.selected[0].unit;
-        this.form.cost = this.selected[0].cost;
-        this.form.qty = this.selected[0].qty;
-        this.btnSubmitLabel = "Update Car Details";
-        this.isUpdate = true;
-      } else {
-        this.form.serial_number = "";
-        this.form.color = "";
-        this.form.model = "";
-        this.form.brandname = "";
-        this.form.unit = "";
-        this.form.cost = "";
-        this.form.qty = "";
-        this.btnSubmitLabel = "Add New Car Details";
-        this.isUpdate = false;
-      }
-    },
+
     onReset() {
-      this.$refs.selectableTable.clearSelected();
       this.form.barcode = "";
       this.form.printname = "";
       this.form.unit = "";
       this.form.cost = "";
       this.btnSubmitLabel = "Add New Car Details";
       this.isUpdate = false;
+      this.$bvModal.hide("manageCarModal");
     },
     onSubmit(event) {
       event.preventDefault();
@@ -288,7 +312,7 @@ export default {
       await this.$store
         .dispatch("goods/editCars", {
           token: localStorage.token,
-          product_car_id: this.selected[0].product_car_id,
+          product_car_id: this.selected.product_car_id,
           unit: this.form.unit,
           cost: this.form.cost,
           serial_number: this.form.serial_number,
@@ -329,12 +353,6 @@ export default {
   font-size: 12px;
 }
 
-.form-manage_car-btn {
-  font-size: 12px;
-  width: 170px;
-  margin-bottom: 10px;
-}
-
 .grid-container {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -344,12 +362,6 @@ export default {
   text-align: left;
   padding-right: 10px;
   width: 100%;
-}
-
-@media (max-width: 800px) {
-  .form-manage_car-btn {
-    width: 100%;
-  }
 }
 
 @media (max-width: 800px) {
