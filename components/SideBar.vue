@@ -1,5 +1,11 @@
 <template>
   <div class="sidenav dontPrint">
+    <b-navbar-brand @click="this.$router.push('./dashboard')" class="mybrand text-space"
+      ><font-awesome-icon icon="fa-solid fa-car" class="mr-2" /> LOU GEH DMS
+    </b-navbar-brand>
+
+    <hr />
+
     <div
       class="sidebar-menus-parent"
       id="dashboard"
@@ -11,65 +17,32 @@
       >
     </div>
 
-    <!-- Admin menu parent-->
-    <div class="sidebar-menus-parent" v-if="role.toLowerCase() === 'admin'">
-      <button @click="dropDownTriggerAdmin()" class="dropdown-btn">
-        <font-awesome-icon icon="fa-solid fa-user-tie" /> Admin
-        <i :class="dropDownAdminArrowIcon()" />
+    <div class="sidebar-menus-parent font-13" v-for="menu in menus" :key="menu.id">
+      <button @click="dropDownTrigger(menu)" class="dropdown-btn">
+        <font-awesome-icon :icon="['fa-solid', menu.icn]" /> {{ menu.parentTitle }}
+        <i :class="dropDownArrow(menu)" />
       </button>
 
-      <!-- Admin dropdown menus -->
-      <div class="sidebar-menus">
-        <transition name="slide-fade">
-          <div v-show="isActiveAdmin">
-            <div
-              v-for="adminMenu in adminMenus"
-              :key="adminMenu.key"
-              class="sidebar-menus-list mt-1"
-              :class="{ active: adminMenu.active }"
-              @click="setMenuActive(adminMenu.key)"
-              v-show="showMenu(adminMenu)"
-            >
-              <font-awesome-icon :icon="['fa-solid', adminMenu.icon]" />
-              {{ adminMenu.title }}
-            </div>
-          </div></transition
-        >
-      </div>
-    </div>
-
-    <!-- Transaction menu parent-->
-    <div class="sidebar-menus-parent">
-      <button @click="dropDownTriggerTransaction()" class="dropdown-btn">
-        <font-awesome-icon icon="fa-solid fa-exchange" /> Transaction
-        <i :class="dropDownTransactionArrowIcon()" />
-      </button>
-      <!-- Transaction dropdown menus -->
-      <div class="sidebar-menus">
-        <transition name="slide-fade">
-          <div v-show="isActiveTransaction">
-            <div
-              v-for="transactionMenu in transactionMenus"
-              :key="transactionMenu.id"
-              class="sidebar-menus-list mt-1"
-              :class="{ active: transactionMenu.active }"
-              @click="setMenuActive(transactionMenu.key)"
-              v-show="showMenu(transactionMenu)"
-            >
-              <font-awesome-icon :icon="['fa-solid', transactionMenu.icon]" />
-              {{ transactionMenu.title }}
+      <transition name="slide-fade">
+        <div v-show="menu.isActive">
+          <div
+            v-for="childMenu in menu.childMenus"
+            :key="childMenu.key"
+            :class="{ baseMenuActive: childMenu.active }"
+            @click="setMenuActive(childMenu.key)"
+            v-show="showMenu(childMenu)"
+          >
+            <div class="baseChildMenu font-12" :class="{ activeMenu: childMenu.active }">
+              <font-awesome-icon :icon="['fa-solid', childMenu.icon]" />
+              {{ childMenu.title }}
             </div>
           </div>
-        </transition>
-      </div>
+        </div>
+      </transition>
     </div>
 
     <!-- Report menu -->
-    <div
-      v-show="isAdmin"
-      class="sidebar-menus-parent"
-      @click="setMenuActive('report', '/report')"
-    >
+    <div class="sidebar-menus-parent" @click="setMenuActive('report', '/report')">
       <a> <font-awesome-icon icon="fa-solid fa-file" /> Reports</a>
     </div>
   </div>
@@ -79,234 +52,132 @@
 export default {
   data() {
     return {
-      isAdmin: false,
-      role: "",
       isActiveTransaction: true,
       isActiveAdmin: true,
       isDashboardActive: false,
       dashboardKey: "dashboard",
-      transactionMenus: [],
-      adminMenus: [],
+      menus: [],
     };
   },
 
   methods: {
-    dropDownTriggerAdmin() {
-      this.isActiveAdmin = !this.isActiveAdmin;
-    },
-
-    dropDownTriggerTransaction() {
-      this.isActiveTransaction = !this.isActiveTransaction;
-    },
-
-    dropDownTransactionArrowIcon() {
-      return this.isActiveTransaction ? "arrow down" : "arrow right";
-    },
-
-    dropDownAdminArrowIcon() {
-      return this.isActiveAdmin ? "arrow down" : "arrow right";
-    },
-
-    setActiveMenus() {},
-
     setMenuActive(menuKey, route) {
       localStorage.activeMenuId = menuKey;
       var path = "";
 
-      //update selected menu status to true
-      this.adminMenus.forEach(function (menu) {
-        if (menu.key == menuKey) {
-          menu.active = true;
-          path = menu.href;
-        } else {
-          menu.active = false;
-        }
-      });
-
-      this.transactionMenus.forEach(function (menu) {
-        if (menu.key == menuKey) {
-          menu.active = true;
-          path = menu.href;
-        } else {
-          menu.active = false;
-        }
+      this.menus.forEach(function (menu) {
+        menu.childMenus.forEach(function (chimdMenu) {
+          if (chimdMenu.key == menuKey) {
+            chimdMenu.active = true;
+            path = chimdMenu.href;
+          } else {
+            chimdMenu.active = false;
+          }
+        });
       });
 
       // if #path is empty then use #route
       this.$router.push({ path: path === "" ? route : path });
     },
 
-    showMenu(menu) {
+    showMenu(childMenu) {
       try {
-        let useRole = localStorage.userRole;
-        let access = menu.access.filter(function (val) {
-          return val.toLowerCase() === useRole.toLowerCase();
+        let userRole =
+          localStorage.userRole === undefined
+            ? ""
+            : localStorage.userRole.toUpperCase().replace(/ +/g, "");
+
+        let hasAccess = childMenu.access.filter(function (val) {
+          return userRole === val;
         });
-        return access.length > 0;
+
+        return hasAccess.length > 0;
       } catch (err) {
+        console.log(err);
         return false;
       }
+    },
+
+    dropDownTrigger(menu) {
+      menu.isActive = !menu.isActive;
+    },
+
+    dropDownArrow(menu) {
+      return menu.isActive ? "arrow down" : "arrow right";
+    },
+
+    setSidebarState() {
+      this.menus = this.getMenus;
+      this.setMenuActive(localStorage.activeMenuId);
+    },
+
+    async initCreds() {
+      await this.loadRoles().then((res) => {
+        this.loadUser();
+      });
+    },
+
+    async loadUser() {
+      await await this.$store.dispatch("login/getUserById").then((res) => {
+        setTimeout(() => {
+          localStorage.userRole = this.getUserRole;
+          this.setSidebarState();
+        }, 1000);
+      });
+    },
+
+    async loadRoles() {
+      return await this.$store
+        .dispatch("role/loadRoles", { token: localStorage.token })
+        .then((res) => {});
     },
   },
 
   mounted() {
-    var menuKey = localStorage.activeMenuId;
-    //init menus
-    if (localStorage.userRole !== undefined) {
-      this.transactionMenus = this.getTransactionMenus;
-      this.adminMenus = this.getAdminMenus;
-      this.role = localStorage.userRole;
-      this.isAdmin = this.role.toLowerCase() === "admin";
-    } else {
-      //reload menus every 1
-      setInterval(() => {
-        this.transactionMenus = this.getTransactionMenus;
-        this.adminMenus = this.getAdminMenus;
-        this.role = localStorage.userRole;
-        this.isAdmin = this.role.toLowerCase() === "admin";
-      }, 1000);
+    try {
+      if (!this.validateLogin) {
+        if (localStorage.userRole === undefined) {
+          this.initCreds();
+          return;
+        }
+        this.setSidebarState();
+      }
+    } catch (err) {
+      console.log(err);
     }
-
-    //for admin menus
-    this.adminMenus.forEach(function (menu) {
-      menu.active = menu.key == menuKey;
-    });
-
-    //for transaction menus
-    this.transactionMenus.forEach(function (menu) {
-      menu.active = menu.key == menuKey;
-    });
-
-    this.setMenuActive(menuKey);
   },
 
   computed: {
-    getTransactionMenus() {
-      return this.$store.state.menus.transactionMenus;
+    validateLogin() {
+      return (
+        localStorage.userId === undefined ||
+        localStorage.userName === undefined ||
+        localStorage.token === undefined
+      );
+    },
+    getMenus() {
+      return this.$store.state.menus.menus;
+    },
+    getUser() {
+      return this.$store.state.login.user;
     },
 
-    getAdminMenus() {
-      return this.$store.state.menus.adminMenus;
+    getRoles() {
+      return this.$store.state.role.roles;
+    },
+    getUserRole() {
+      let users = this.getUser;
+      let roles = this.getRoles;
+      let role = "";
+      users.forEach(function (valUser) {
+        roles.forEach(function (valRole) {
+          if (valUser.user_role_id === valRole.user_role_id) {
+            role = valRole.role;
+          }
+        });
+      });
+      return role;
     },
   },
 };
 </script>
-
-<style scoped>
-/* Fixed sidenav, full height */
-
-.sidenav {
-  height: 100%;
-  width: 280px;
-  position: fixed;
-  z-index: 2;
-  top: 0;
-  left: 0;
-  background-color: rgb(231, 231, 231);
-  overflow-x: hidden;
-  padding-top: 60px;
-  padding: 60px 10px 0 10px;
-}
-
-/* Style the sidenav links and the dropdown button */
-.sidenav a,
-.dropdown-btn {
-  padding: 6px 8px 6px 16px;
-  text-decoration: none;
-  color: black;
-  display: block;
-  border: none;
-  background: none;
-  width: 100%;
-  text-align: left;
-  cursor: pointer;
-  outline: none;
-}
-
-/* Parent menus */
-.sidebar-menus-parent {
-  margin-top: 15px;
-  font-size: 14px;
-}
-
-/* Dropdown menus */
-.sidebar-menus {
-  font-size: 12.5px;
-  padding-left: 30px;
-}
-.sidebar-menus-list {
-  padding: 6px 8px 6px 40px;
-  color: black;
-  display: block;
-  background: none;
-  width: 100%;
-  text-align: left;
-  cursor: pointer;
-  outline: none;
-}
-
-.sidebar-menus-list:hover {
-  background: gray;
-  color: white;
-}
-
-/* On mouse-over */
-.sidenav a:hover {
-  background: gray;
-  color: white;
-}
-
-/* Main content */
-.main {
-  margin-left: 200px; /* Same as the width of the sidenav */
-  font-size: 20px; /* Increased text to enable scrolling */
-  padding: 0px 10px;
-}
-
-/* Add an active class to the active dropdown button */
-.active {
-  background: gray;
-  color: white;
-}
-
-/* Dropdown container (hidden by default). Optional: add a lighter background color and some left padding to change the design of the dropdown content */
-.dropdown-container-none {
-  display: none;
-  transition-timing-function: ease-out;
-}
-
-.dropdown-container-block {
-  height: 100%;
-  display: block;
-  transition-timing-function: ease-out;
-}
-
-.btn-icon {
-  width: 18px;
-  margin-right: 10px;
-}
-
-.menus-icon {
-  height: 15px;
-  width: 15;
-}
-
-.arrow {
-  border: solid rgb(16, 15, 15);
-  border-width: 0 2px 2px 0;
-  display: inline-block;
-  padding: 1px;
-  margin-left: 5px;
-  margin-bottom: 3px;
-}
-
-.right {
-  transform: rotate(-42deg);
-  -webkit-transform: rotate(-42deg);
-}
-
-.down {
-  transform: rotate(45deg);
-  -webkit-transform: rotate(45deg);
-}
-</style>

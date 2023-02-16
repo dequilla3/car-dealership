@@ -272,9 +272,12 @@ export default {
   },
 
   mounted() {
-    setInterval(() => {
+    this.interval = setInterval(() => {
       this.loadServices();
     }, 3000);
+  },
+  beforeDestroy() {
+    clearInterval(this.interval);
   },
 
   computed: {

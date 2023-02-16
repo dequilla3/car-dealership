@@ -59,9 +59,12 @@ export default {
   },
 
   mounted() {
-    setInterval(() => {
+    this.interval = setInterval(() => {
       this.partsList = this.getPartList;
     }, 3000);
+  },
+  beforeDestroy() {
+    clearInterval(this.interval);
   },
 
   computed: {

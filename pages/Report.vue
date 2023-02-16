@@ -13,6 +13,7 @@
               class="standardFontSize"
               card
               active-nav-item-class="font-weight-bold text-uppercase text-default"
+              fill
             >
               <b-tab @click="setReportName('customer')" title="Customers" active>
                 <CustomerReportTab />
@@ -181,10 +182,6 @@ export default {
     } catch (err) {
       console.log(err);
     }
-  },
-
-  beforeDestroy() {
-    clearInterval(this.interval);
   },
 };
 </script>

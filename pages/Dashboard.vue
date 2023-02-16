@@ -1,21 +1,26 @@
 <template>
-  <div>
+  <div class="mainContainer">
     <Navbar />
     <SideBar />
-    <div class="mainContainer">
-      <div><h6>Analytical view</h6></div>
-      <hr />
-      <div class="dashboard-content-container">
-        <div class="db-content" v-for="dbContent in dbContents" :key="dbContent.id">
-          <p>{{ dbContent.title }}</p>
-          <h1>
-            <small class="text-muted">
-              <font-awesome-icon icon="fa-solid fa-peso-sign" /></small
-            >{{ dbContent.value.toLocaleString("en-US"), }}
-          </h1>
+    <transition name="slide-fade">
+      <div v-show="showDelay">
+        <div><h6>Analytical view</h6></div>
+        <hr />
+        <div class="dashboard-content-container">
+          <div class="db-content" v-for="dbContent in dbContents" :key="dbContent.id">
+            <div class="mt-2 mb-2 ml-4">
+              {{ dbContent.title }}
+            </div>
+
+            <h2 class="ml-5">
+              <small class="text-muted">
+                <font-awesome-icon icon="fa-solid fa-peso-sign" /></small
+              >{{ dbContent.value.toLocaleString("en-US"), }}
+            </h2>
+          </div>
         </div>
       </div>
-    </div>
+    </transition>
   </div>
 </template>
 
@@ -26,6 +31,7 @@ export default {
   name: "Dashboard",
   data() {
     return {
+      showDelay: false,
       isLoggedIn: false,
       dbContents: [
         { title: "Daily Sales", value: "" },
@@ -79,16 +85,32 @@ export default {
     },
   },
 
-  mounted() {
-    this.loadDailySales();
-    this.loadMonthlySales();
-    this.loadWeeklySales();
+  computed: {
+    validateLogin() {
+      return (
+        localStorage.userId === undefined ||
+        localStorage.userName === undefined ||
+        localStorage.token === undefined
+      );
+    },
+  },
 
-    this.interval = setInterval(() => {
+  mounted() {
+    setTimeout(() => {
+      this.showDelay = true;
+    }, 1);
+
+    if (!this.validateLogin) {
       this.loadDailySales();
       this.loadMonthlySales();
       this.loadWeeklySales();
-    }, 1500);
+
+      this.interval = setInterval(() => {
+        this.loadDailySales();
+        this.loadMonthlySales();
+        this.loadWeeklySales();
+      }, 1500);
+    }
   },
 
   beforeDestroy() {
@@ -108,21 +130,22 @@ export default {
 .db-content {
   height: 120px;
   width: 280px;
-  background-color: whitesmoke;
+  color: black;
+  background-color: hsl(0, 0%, 96%);
   padding: 10px;
+  background-image: linear-gradient(to top, #f5f5f5, #e8e8e8, #dbdbdb, #cfcfcf, #c2c2c2);
+  clip-path: polygon(0 0, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 0 100%, 0% 80%, 0% 20%);
+  transition: 0.5s;
 }
 
 .db-content,
 p {
   font-size: 13px;
   cursor: pointer;
-  transition: 0.5s;
 }
 
 .db-content:hover {
-  height: 130px;
-  width: 290px;
-  transition-timing-function: ease-out;
+  padding: 20px;
 }
 
 @media (max-width: 1800px) {

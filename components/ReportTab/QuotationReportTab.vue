@@ -299,9 +299,13 @@ export default {
   },
 
   mounted() {
-    setInterval(() => {
+    this.interval = setInterval(() => {
       this.loadQuotes();
     }, 3000);
+  },
+
+  beforeDestroy() {
+    clearInterval(this.interval);
   },
 
   computed: {

@@ -1,12 +1,12 @@
 .slide-fade-enter-active {
-  transition: all 0.3s ease;
+  transition: all 0.4s ease;
 }
 
 .slide-fade-leave-active {
   transition: all 0.3s cubic-bezier(1, 0.5, 0.8, 1);
 }
 .slide-fade-enter {
-  transform: translateX(200px);
+  transform: translateX(500px);
 }
 
 .slide-fade-leave-to {
@@ -36,4 +36,35 @@
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+button:hover {
+  box-shadow: 3px 3px 7px rgba(59, 168, 107, 0.4);
+}
+
+// ------------------
+
+.loginHeader {
+  animation: moveLogin 1s ease-in-out infinite alternate;
+  margin-right: 10px;
+  font-size: 60px;
+}
+
+@keyframes move {
+  from {
+    transform: translateX(-5px);
+  }
+
+  to {
+    transform: rotate(-20deg);
+  }
+}
+
+@keyframes moveLogin {
+  from {
+    transform: rotate(-20deg);
+  }
+  to {
+    transform: rotate(20deg);
+  }
 }

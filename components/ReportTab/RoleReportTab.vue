@@ -54,8 +54,12 @@ export default {
     },
   },
 
+  beforeDestroy() {
+    clearInterval(this.interval);
+  },
+
   mounted() {
-    setInterval(() => {
+    this.interval = setInterval(() => {
       this.list = this.getList;
     }, 3000);
   },

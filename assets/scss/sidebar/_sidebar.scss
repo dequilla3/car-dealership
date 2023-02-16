@@ -1,0 +1,142 @@
+$sidebarBgColor: rgb(7, 80, 79);
+$menuHoverColor: rgb(57, 128, 111);
+$menuFontColor: rgb(225, 222, 222);
+
+.sidenav {
+  height: 100%;
+  width: 280px;
+  position: fixed;
+  z-index: 1000;
+  top: 0;
+  left: 0;
+  background-color: $sidebarBgColor;
+  overflow-x: hidden;
+  padding-top: 60px;
+  padding: 10px 0px 0px 10px;
+  color: $menuFontColor;
+  background-image: linear-gradient(
+    to top,
+    #2e6f2e,
+    #166638,
+    #005b3e,
+    #005141,
+    #024640
+  );
+}
+
+.bringToBack {
+  z-index: 0;
+}
+
+.sidenav a,
+.dropdown-btn {
+  padding: 6px 0px 6px 16px;
+  text-decoration: none;
+  color: $menuFontColor;
+  display: block;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  outline: none;
+}
+
+.dropdown-btn:hover {
+  box-shadow: 0px 0px 0px;
+}
+
+.sidenav a:hover {
+  background: $menuHoverColor;
+}
+
+.sidebar-menus-parent {
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+.baseChildMenu:hover {
+  background: $menuHoverColor;
+}
+
+.baseMenuActive {
+  background: white;
+}
+
+.baseChildMenu {
+  padding: 8px 0px 8px 50px;
+  color: $menuFontColor;
+  display: block;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  outline: none;
+}
+
+.text-space {
+  display: flex;
+  align-items: center;
+  letter-spacing: 0.2em;
+}
+
+.activeMenu {
+  background-color: $sidebarBgColor;
+  clip-path: polygon(
+    100% 0,
+    100% 22%,
+    88% 48%,
+    100% 76%,
+    100% 100%,
+    0 100%,
+    0% 43%,
+    0 0
+  );
+}
+.dropdown-container-none {
+  display: none;
+  transition-timing-function: ease-out;
+}
+
+.dropdown-container-block {
+  height: 100%;
+  display: block;
+  transition-timing-function: ease-out;
+}
+
+.btn-icon {
+  width: 18px;
+  margin-right: 10px;
+}
+
+.menus-icon {
+  height: 15px;
+  width: 15;
+}
+
+.arrow {
+  border: solid $menuFontColor;
+  border-width: 0 2px 2px 0;
+  display: inline-block;
+  padding: 1px;
+  margin-left: 5px;
+  margin-bottom: 3px;
+}
+
+.right {
+  transform: rotate(-42deg);
+  -webkit-transform: rotate(-42deg);
+}
+
+.down {
+  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+}
+.mybrand {
+  text-shadow: 4px 4px 5px rgba(67, 154, 135, 0.25);
+  padding-left: 15px;
+}
+
+.mybrand:hover {
+  cursor: pointer;
+  animation: move 0.7s ease-in-out infinite alternate;
+}

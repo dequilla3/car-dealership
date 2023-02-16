@@ -8,20 +8,18 @@
         <hr />
         <!-- TABS -->
         <div>
-          <b-card no-body class="manage_goods-card">
-            <b-tabs
-              card
-              class="manage_goods-card-tabs"
-              active-nav-item-class="font-weight-bold text-uppercase text-default"
-            >
-              <b-tab title="Spare Parts" active>
-                <ManageGoodsTabParts />
-              </b-tab>
-              <b-tab title="Cars">
-                <ManageGoodsTabCar />
-              </b-tab>
-            </b-tabs>
-          </b-card>
+          <b-tabs
+            card
+            active-nav-item-class="font-weight-bold text-uppercase text-default"
+            class="font-12"
+          >
+            <b-tab title="Spare Parts" active>
+              <ManageGoodsTabParts />
+            </b-tab>
+            <b-tab title="Cars">
+              <ManageGoodsTabCar />
+            </b-tab>
+          </b-tabs>
         </div>
       </div>
     </transition>
@@ -44,12 +42,4 @@ export default {
 };
 </script>
 
-<style scoped>
-.manage_goods-card {
-  padding-bottom: 100px;
-}
-
-.manage_goods-card-tabs {
-  font-size: 13px;
-}
-</style>
+<style scoped></style>

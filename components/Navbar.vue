@@ -1,17 +1,25 @@
 <template>
   <div class="dontPrint">
-    <b-navbar class="navbar" fixed="top" toggleable="lg" type="dark" variant="dark">
-      <b-navbar-brand href="/dashboard"
-        ><font-awesome-icon icon="fa-solid fa-car" /> DMS</b-navbar-brand
-      >
+    <b-overlay
+      no-wrap
+      :show="showOverlay"
+      :opacity="1"
+      spinner-variant="primary"
+      spinner-type="grow"
+    ></b-overlay>
+    <b-navbar class="navbar bringToBack" fixed="top" toggleable="lg">
       <div class="d-flex flex-row-reverse w">
-        <b-dropdown id="dropdown-right" right variant="info" size="sm">
+        <b-dropdown id="dropdown-right" right variant="light" size="sm">
           <template #button-content>
-            <font-awesome-icon icon="fa-solid fa-user" />
+            <b-avatar
+              variant="primary"
+              :text="userName.charAt(0).toUpperCase()"
+              size="1.5rem"
+            ></b-avatar>
             <span class="font-12"> {{ userName }}</span>
           </template>
           <hr />
-          <b-dropdown-item class="standardFontSize" @click="onLogout">
+          <b-dropdown-item class="standardFontSize" @click="doLogout()">
             <font-awesome-icon icon="fa-solid fa-arrow-right-from-bracket" />
             Logout
           </b-dropdown-item>
@@ -22,11 +30,11 @@
 </template>
 
 <script>
-import axios from "axios";
 export default {
   name: "Navbar",
   data() {
     return {
+      showOverlay: false,
       token: "",
       isLoggedIn: false,
       userName: "",
@@ -35,16 +43,20 @@ export default {
   },
 
   methods: {
-    onLogout() {
+    doLogout() {
+      this.showOverlay = true;
       localStorage.clear();
-      this.$router.push({ path: "/" });
+
+      setTimeout(() => {
+        this.$router.push({ path: "/login" });
+      }, 3000);
     },
 
     async validateUser() {
       try {
         return await this.$store.dispatch("login/getUserById").then((res) => {
           if (res === undefined) {
-            this.onLogout();
+            this.doLogout();
             return;
           }
 
@@ -53,59 +65,35 @@ export default {
             localStorage.isLoggedIn = true;
             this.isLoggedIn = true;
           } else {
-            localStorage.clear();
-            this.$router.push({ path: "/" });
+            this.doLogout();
           }
-
-          this.loadRoles();
         });
       } catch (err) {
         console.log(err);
       }
     },
-
-    async loadRoles() {
-      await this.$store
-        .dispatch("role/loadRoles", { token: localStorage.token })
-        .then((res) => {
-          localStorage.userRole = this.getUserRole;
-        });
-    },
   },
-  mounted() {
-    if (this.validateLogin) {
-      this.onLogout();
-    }
 
-    this.userName = localStorage.userName;
-    this.token = localStorage.token;
-    this.validateUser();
+  mounted() {
+    try {
+      if (this.validateLogin) {
+        this.showOverlay = true;
+        this.doLogout();
+      } else {
+        this.userName = localStorage.userName;
+        this.token = localStorage.token;
+        this.validateUser();
+      }
+    } catch (err) {
+      console.log(err);
+    }
   },
 
   computed: {
     getToken() {
       return localStorage.token;
     },
-    getUser() {
-      return this.$store.state.login.user;
-    },
 
-    getRoles() {
-      return this.$store.state.role.roles;
-    },
-    getUserRole() {
-      let users = this.getUser;
-      let roles = this.getRoles;
-      let role = "";
-      users.forEach(function (valUser) {
-        roles.forEach(function (valRole) {
-          if (valUser.user_role_id === valRole.user_role_id) {
-            role = valRole.role;
-          }
-        });
-      });
-      return role;
-    },
     validateLogin() {
       return (
         localStorage.userId === undefined ||
